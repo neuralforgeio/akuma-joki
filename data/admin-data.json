@@ -229,8 +229,15 @@
       "label": "Chat Admin",
       "emoji": "👤",
       "kind": "redirect"
+    },
+    {
+      "label": "Apakah Ada Bonus?",
+      "emoji": "👀",
+      "kind": "auto",
+      "autoKey": "custom",
+      "reply": "Pertanyaan bagus, User! Untuk mengetahui apakah ada bonus yang tersedia saat ini, silahkan hubungi admin langsung dengan cara / lalu pilih 👤Chat Admin, semua pertanyaan anda akan dijawab oleh Admin🙏. Terimakasih"
     }
   ],
   "version": 1,
-  "updatedAt": "2026-07-10T22:05:16.763Z"
+  "updatedAt": "2026-07-10T22:11:36.568Z"
 }
