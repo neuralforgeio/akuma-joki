@@ -151,6 +151,51 @@ export const GAMES: Game[] = [
 
 export const WHATSAPP_NUMBER = "6282131561301";
 
+/* ============================ SYNCED DATA ============================ */
+// Saat admin update via dashboard, data di-push ke GitHub sebagai
+// data/admin-data.json. Vercel redeploys → file ini terbaca saat build.
+// Jika file ada & valid, override DEFAULT_GAMES. Jika tidak, fallback default.
+
+import adminData from "../../data/admin-data.json";
+
+type AdminDataFile = {
+  games?: Game[];
+  announcement?: {
+    id: string;
+    title: string;
+    body: string;
+    type: "warning" | "info" | "success";
+    active: boolean;
+    createdAt: number;
+  } | null;
+  takedown?: boolean;
+  takedownReason?: string;
+  settings?: { whatsappNumber: string; csName: string };
+  faq?: { id: string; question: string; answer: string }[];
+  waReplies?: unknown[];
+  version?: number;
+  updatedAt?: string;
+};
+
+const parsed = adminData as AdminDataFile;
+
+// Override games jika admin sudah sync (data lebih baru dari default)
+export const SYNCED_GAMES: Game[] =
+  parsed.games && parsed.games.length > 0 ? parsed.games : GAMES;
+
+// Override announcement & takedown dari synced data
+export const SYNCED_ANNOUNCEMENT = parsed.announcement ?? null;
+export const SYNCED_TAKEDOWN = parsed.takedown ?? false;
+export const SYNCED_TAKEDOWN_REASON =
+  parsed.takedownReason ??
+  "Website sedang dalam perbaikan sistem (Maintenance). Kami akan kembali secepatnya! - AKUMA JOKI";
+export const SYNCED_SETTINGS = parsed.settings ?? {
+  whatsappNumber: WHATSAPP_NUMBER,
+  csName: "Akuma Joki",
+};
+export const SYNCED_FAQ = parsed.faq ?? [];
+export const SYNCED_UPDATED_AT = parsed.updatedAt ?? null;
+
 export function getGameBySlug(slug: string | null): Game | undefined {
   if (!slug) return undefined;
   return GAMES.find((g) => g.slug === slug);

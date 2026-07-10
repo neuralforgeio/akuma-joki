@@ -17,8 +17,18 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { GAMES as DEFAULT_GAMES, WHATSAPP_NUMBER as DEFAULT_WA } from "./games-data";
+import {
+  GAMES as DEFAULT_GAMES,
+  WHATSAPP_NUMBER as DEFAULT_WA,
+  SYNCED_GAMES,
+  SYNCED_ANNOUNCEMENT,
+  SYNCED_TAKEDOWN,
+  SYNCED_TAKEDOWN_REASON,
+  SYNCED_SETTINGS,
+  SYNCED_FAQ,
+} from "./games-data";
 import type { Game } from "./games-data";
+import { scheduleGitHubSync } from "./github-sync";
 
 /* ============================ Types ============================ */
 export type Announcement = {
@@ -143,6 +153,9 @@ type AdminState = {
   /* activity log */
   logActivity: (action: string, detail: string) => void;
 
+  /* sync ke GitHub */
+  triggerSync: (commitMessage?: string) => void;
+
   /* visitors */
   trackVisitor: () => void;
 
@@ -176,19 +189,18 @@ function todayStr(): string {
 export const useAdminStore = create<AdminState>()(
   persist(
     (set, get) => ({
-      games: DEFAULT_GAMES,
-      announcement: null,
-      takedown: false,
-      takedownReason:
-        "Website sedang dalam perbaikan sistem (Maintenance). Kami akan kembali secepatnya! - AKUMA JOKI",
+      games: SYNCED_GAMES,
+      announcement: SYNCED_ANNOUNCEMENT,
+      takedown: SYNCED_TAKEDOWN,
+      takedownReason: SYNCED_TAKEDOWN_REASON,
       orders: [],
       commits: [],
       activityLog: [],
       visitors: [],
       artifacts: [],
       waReplies: [],
-      faq: [],
-      settings: { whatsappNumber: DEFAULT_WA, csName: "Akuma Joki" },
+      faq: SYNCED_FAQ,
+      settings: SYNCED_SETTINGS,
       _hasHydrated: false,
 
       setHasHydrated: (v) => set({ _hasHydrated: v }),
@@ -197,16 +209,19 @@ export const useAdminStore = create<AdminState>()(
       addGame: (game) => {
         set((s) => ({ games: [...s.games, game] }));
         get().logActivity("ADD_GAME", `Tambah game: ${game.name}`);
+        get().triggerSync(`Add game: ${game.name}`);
       },
       updateGame: (slug, game) => {
         set((s) => ({
           games: s.games.map((g) => (g.slug === slug ? { ...g, ...game } : g)),
         }));
         get().logActivity("UPDATE_GAME", `Edit game: ${slug}`);
+        get().triggerSync(`Update game: ${slug}`);
       },
       deleteGame: (slug) => {
         set((s) => ({ games: s.games.filter((g) => g.slug !== slug) }));
         get().logActivity("DELETE_GAME", `Hapus game: ${slug}`);
+        get().triggerSync(`Delete game: ${slug}`);
       },
       addCategory: (slug, cat) => {
         set((s) => ({
@@ -217,6 +232,7 @@ export const useAdminStore = create<AdminState>()(
           ),
         }));
         get().logActivity("ADD_CATEGORY", `Tambah kategori ${cat.name} di ${slug}`);
+        get().triggerSync(`Add category ${cat.name} to ${slug}`);
       },
       deleteCategory: (slug, catId) => {
         set((s) => ({
@@ -227,6 +243,7 @@ export const useAdminStore = create<AdminState>()(
           ),
         }));
         get().logActivity("DELETE_CATEGORY", `Hapus kategori ${catId} di ${slug}`);
+        get().triggerSync(`Delete category ${catId} from ${slug}`);
       },
       addItem: (slug, catId, item) => {
         set((s) => ({
@@ -242,6 +259,7 @@ export const useAdminStore = create<AdminState>()(
           ),
         }));
         get().logActivity("ADD_ITEM", `Tambah item ${item.name} di ${slug}`);
+        get().triggerSync(`Add item ${item.name} to ${slug}`);
       },
       updateItem: (slug, catId, itemId, item) => {
         set((s) => ({
@@ -281,6 +299,7 @@ export const useAdminStore = create<AdminState>()(
           ),
         }));
         get().logActivity("DELETE_ITEM", `Hapus item ${itemId} di ${slug}`);
+        get().triggerSync(`Delete item ${itemId} from ${slug}`);
       },
 
       /* ===== announcement ===== */
@@ -288,6 +307,7 @@ export const useAdminStore = create<AdminState>()(
         set({ announcement: a });
         if (a) get().logActivity("SET_ANNOUNCEMENT", `Set: ${a.title}`);
         else get().logActivity("CLEAR_ANNOUNCEMENT", "Hapus announcement");
+        get().triggerSync(a ? `Set announcement: ${a.title}` : "Clear announcement");
       },
 
       /* ===== takedown ===== */
@@ -305,6 +325,7 @@ export const useAdminStore = create<AdminState>()(
           /* ignore */
         }
         get().logActivity("TAKEDOWN", `Takedown ${on ? "ON" : "OFF"}`);
+        get().triggerSync(`Takedown ${on ? "ON" : "OFF"}`);
       },
 
       /* ===== orders ===== */
@@ -370,6 +391,25 @@ export const useAdminStore = create<AdminState>()(
         set((s) => ({ activityLog: [entry, ...s.activityLog].slice(0, 200) }));
       },
 
+      /* ===== trigger sync ke GitHub ===== */
+      // Helper internal: kirim data terbaru ke GitHub (debounced).
+      // Dipanggil setelah setiap mutation (addGame, updateGame, dll).
+      triggerSync: (commitMessage?: string) => {
+        const s = get();
+        const payload = {
+          games: s.games,
+          announcement: s.announcement,
+          takedown: s.takedown,
+          takedownReason: s.takedownReason,
+          settings: s.settings,
+          faq: s.faq,
+          waReplies: s.waReplies,
+          version: 1,
+          updatedAt: new Date().toISOString(),
+        };
+        scheduleGitHubSync(payload, commitMessage);
+      },
+
       /* ===== visitors ===== */
       trackVisitor: () => {
         const today = todayStr();
@@ -400,6 +440,7 @@ export const useAdminStore = create<AdminState>()(
       setWAReplies: (r) => {
         set({ waReplies: r });
         get().logActivity("UPDATE_TEMPLATES", "Update WA templates");
+        get().triggerSync("Update WA templates");
       },
 
       /* ===== FAQ ===== */
@@ -407,6 +448,7 @@ export const useAdminStore = create<AdminState>()(
         const item: FAQItem = { id: uid(), question: q, answer: a };
         set((s) => ({ faq: [...s.faq, item] }));
         get().logActivity("ADD_FAQ", q);
+        get().triggerSync(`Add FAQ: ${q}`);
       },
       updateFAQ: (id, q, a) => {
         set((s) => ({
@@ -421,22 +463,24 @@ export const useAdminStore = create<AdminState>()(
       updateSettings: (s) => {
         set((st) => ({ settings: { ...st.settings, ...s } }));
         get().logActivity("UPDATE_SETTINGS", JSON.stringify(s));
+        get().triggerSync("Update settings");
       },
 
       /* ===== reset ===== */
       resetAll: () => {
         set({
-          games: DEFAULT_GAMES,
-          announcement: null,
-          takedown: false,
+          games: SYNCED_GAMES,
+          announcement: SYNCED_ANNOUNCEMENT,
+          takedown: SYNCED_TAKEDOWN,
+          takedownReason: SYNCED_TAKEDOWN_REASON,
           orders: [],
           commits: [],
           activityLog: [],
           visitors: [],
           artifacts: [],
           waReplies: [],
-          faq: [],
-          settings: { whatsappNumber: DEFAULT_WA, csName: "Akuma Joki" },
+          faq: SYNCED_FAQ,
+          settings: SYNCED_SETTINGS,
         });
         try {
           document.cookie = "akuma-takedown=0; path=/; max-age=0";
