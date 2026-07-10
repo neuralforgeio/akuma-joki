@@ -8,6 +8,7 @@ import { GAMES } from "@/lib/games-data";
 import { useAkumaStore } from "@/lib/store";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
+import { SkeletonGrid } from "./skeleton";
 
 export function StoreView({ game }: { game: Game }) {
   const router = useRouter();

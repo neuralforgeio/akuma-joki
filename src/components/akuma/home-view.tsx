@@ -23,6 +23,7 @@ import { useAdminStore } from "@/lib/admin-store";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { Starfield, MovingGrid } from "./backgrounds";
+import { SkeletonGameCard } from "./skeleton";
 
 /**
  * AnimatedHeading — heading "AKUMA JOKI" dengan animasi timbul-timbul looping
@@ -241,13 +242,18 @@ export function HomeView() {
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {games.map((g, idx) => (
-            <Reveal key={g.slug} delay={idx * 90}>
-              <Link href={`/store/${g.slug}`} className="group block h-full text-left">
-                <GameCard game={g} />
-              </Link>
-            </Reveal>
-          ))}
+          {!hydrated ? (
+            // Loading skeleton saat admin store belum hydrate
+            Array.from({ length: 3 }).map((_, i) => <SkeletonGameCard key={i} />)
+          ) : (
+            games.map((g, idx) => (
+              <Reveal key={g.slug} delay={idx * 90}>
+                <Link href={`/store/${g.slug}`} className="group block h-full text-left">
+                  <GameCard game={g} />
+                </Link>
+              </Reveal>
+            ))
+          )}
         </div>
       </section>
 
