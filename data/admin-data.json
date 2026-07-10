@@ -179,32 +179,6 @@
           ]
         }
       ]
-    },
-    {
-      "slug": "test-new-game",
-      "name": "Test New Game",
-      "tagline": "gontol",
-      "description": "hai",
-      "emoji": "🔥",
-      "accent": "#ffd166",
-      "categories": [
-        {
-          "id": "juancoks",
-          "name": "JUANCOKS",
-          "icon": "📈",
-          "items": [
-            {
-              "id": "montol",
-              "name": "MONTOL",
-              "price": 20000,
-              "priceLabel": "20K",
-              "tag": "kons",
-              "description": "kont",
-              "requirement": "kwont"
-            }
-          ]
-        }
-      ]
     }
   ],
   "announcement": null,
@@ -217,5 +191,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T19:29:59.761Z"
+  "updatedAt": "2026-07-10T19:32:29.128Z"
 }
