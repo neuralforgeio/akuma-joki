@@ -35,3 +35,4 @@ dev.log
 server.log
 worklog.md
 /upload/
+bun.lock

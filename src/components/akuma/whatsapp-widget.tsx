@@ -76,11 +76,11 @@ const REDIRECT_MSG = "Pesan dikirim! Mengarahkan ke WhatsApp admin...";
 const AUTO_REPLY_HINT =
   "👆 Pilih menu di bawah untuk jawaban otomatis. Ketik pesan sendiri akan langsung diteruskan ke admin.";
 const HOURS_REPLY =
-  "🕐 Kami online setiap hari 09.00–23.00 WIB. Di luar jam itu, pesan akan dibalas saat kami kembali online!";
+  "🕐 Kami online setiap hari 09.00-23.00 WIB. Di luar jam itu, pesan akan dibalas saat kami kembali online!";
 const OFFLINE_WELCOME =
   "Halo! 👋 Saat ini kami sedang OFFLINE. Tinggalkan pesan, akan kami balas saat kembali online (09.00 WIB).";
 const SUBSTATUS_ONLINE = "Biasanya balas dalam beberapa menit";
-const SUBSTATUS_OFFLINE = "Online 09.00–23.00 WIB";
+const SUBSTATUS_OFFLINE = "Online 09.00-23.00 WIB";
 
 /** Pesan auto-reply untuk "Status Pesanan" (tidak ada sistem order tracking backend). */
 const STATUS_REPLY =
@@ -92,7 +92,7 @@ const CHAT_ADMIN_REPLY =
 
 /** Pesan auto-reply untuk "Cara Order" — panduan step-by-step. */
 const CARA_ORDER_REPLY =
-  "🚀 CARA ORDER JOKI AKUMA:\n\n1️⃣ Pilih game di menu atau halaman store\n2️⃣ Klik joki yang kamu mau (mis. '200 Level')\n3️⃣ Lanjut ke Checkout & isi data (username Roblox + kontak WA)\n4️⃣ Klik 'Pesan via WhatsApp' — pesananmu langsung ke admin\n5️⃣ Transfer DP/lunas sesuai instruksi admin\n6️⃣ Joki dikerjakan! Cek progres via 'Status Pesanan'\n\nButuh bantuan? Klik 'Chat Admin' ya! 🤝";
+  "🚀 CARA ORDER JOKI AKUMA:\n\n1. Pilih game di menu atau halaman store\n2. Klik joki yang kamu mau (mis. '200 Level')\n3. Lanjut ke Checkout & isi data (username Roblox + kontak WA)\n4. Klik 'Pesan via WhatsApp' - pesananmu langsung ke admin\n5. Transfer DP/lunas sesuai instruksi admin\n6. Joki dikerjakan! Cek progres via 'Status Pesanan'\n\nButuh bantuan? Klik 'Chat Admin' ya! 🤝";
 
 /** Jam operasional (WIB). Di luar ini = offline. */
 const OPEN_HOUR = 9;
@@ -297,7 +297,7 @@ function buildPriceListMsg(gameSlug?: string): Msg {
       for (const item of cat.items) {
         const tagStr = item.tag ? ` [${item.tag}]` : "";
         const reqStr = item.requirement ? ` ⚠️${item.requirement}` : "";
-        lines.push(`    • ${item.name} — ${item.priceLabel}${tagStr}${reqStr}`);
+        lines.push(`    - ${item.name} - ${item.priceLabel}${tagStr}${reqStr}`);
       }
     }
   }
