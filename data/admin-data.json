@@ -179,32 +179,6 @@
           ]
         }
       ]
-    },
-    {
-      "slug": "test-game",
-      "name": "Test Game",
-      "tagline": "test",
-      "description": "test",
-      "emoji": "⚔️",
-      "accent": "#a020f0",
-      "categories": [
-        {
-          "id": "hai",
-          "name": "HAI",
-          "icon": "🐄",
-          "items": [
-            {
-              "id": "y",
-              "name": "Y",
-              "price": null,
-              "priceLabel": "9K",
-              "tag": "JS",
-              "description": "jekd",
-              "requirement": "poe"
-            }
-          ]
-        }
-      ]
     }
   ],
   "announcement": null,
@@ -217,5 +191,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T19:42:51.424Z"
+  "updatedAt": "2026-07-10T19:46:21.953Z"
 }
