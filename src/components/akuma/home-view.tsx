@@ -104,6 +104,36 @@ function AnimatedHeading() {
   );
 }
 
+const TESTIMONIALS = [
+  {
+    name: "RizkyGaming",
+    initials: "RG",
+    game: "Blox Fruits",
+    item: "200 Level",
+    accent: "#a020f0",
+    review:
+      "Pelayanan cepat banget! 200 level selesai dalam 1 hari. Adminnya ramah dan selalu update progres. Recommended!",
+  },
+  {
+    name: "FrozenMaster",
+    initials: "FM",
+    game: "Expedition Antarctica",
+    item: "Muncak 1-25",
+    accent: "#7fd4ff",
+    review:
+      "Muncak 1-25 kelar cepat, harga bersahabat. Akun aman, nggak ada masalah sama sekali. Bakal langganan!",
+  },
+  {
+    name: "TycoonKing",
+    initials: "TK",
+    game: "Retail Tycoon 2",
+    item: "Main Sampai Pro",
+    accent: "#ffd166",
+    review:
+      "Toko saya jadi profit maksimal! Joki profesional, sabar, dan ngerti banget strategi retail. Top!",
+  },
+];
+
 export function HomeView() {
   const gamesRef = useRef<HTMLDivElement>(null);
   // Baca games dari admin store (ter-sync dari GitHub). Fallback ke DEFAULT_GAMES.
@@ -264,6 +294,56 @@ export function HomeView() {
             <MiniFeature icon={<Star className="size-4" />} text="Review Positif dari Player" />
             <MiniFeature icon={<Flame className="size-4" />} text="Joki Pro Berpengalaman" />
           </div>
+        </div>
+      </section>
+
+      {/* ============ TESTIMONIALS ============ */}
+      <section className="relative mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24 border-t-2 border-[#a020f0]/30">
+        <div className="text-center mb-10">
+          <p className="font-pixel text-[9px] uppercase tracking-[0.3em] text-[#a020f0]">
+            TESTIMONI
+          </p>
+          <h2 className="mt-3 font-pixel text-base sm:text-xl text-[#e5e5e5] text-glow-neon">
+            KATA MEREKA YANG SUDAH JOKI
+          </h2>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {TESTIMONIALS.map((t, i) => (
+            <Reveal key={t.name} delay={i * 80}>
+              <div className="group relative h-full border-2 border-[#2a2436] bg-[#121017] pixel-corner p-5 akuma-card-hover">
+                {/* stars */}
+                <div className="flex gap-0.5 mb-3">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star
+                      key={s}
+                      className="size-3.5 fill-[#ffd166] text-[#ffd166]"
+                    />
+                  ))}
+                </div>
+                {/* review text */}
+                <p className="text-sm text-[#bcb4c9] leading-relaxed mb-4">
+                  &ldquo;{t.review}&rdquo;
+                </p>
+                {/* customer info */}
+                <div className="flex items-center gap-3 border-t-2 border-[#2a2436] pt-3">
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-pixel text-[8px] text-[#0a0a0a]"
+                    style={{ background: t.accent }}
+                  >
+                    {t.initials}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-pixel text-[8px] uppercase text-[#e5e5e5] truncate">
+                      {t.name}
+                    </p>
+                    <p className="text-[10px] text-[#9a93a8] mt-0.5">
+                      {t.game} · {t.item}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 
