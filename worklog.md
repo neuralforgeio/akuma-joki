@@ -378,3 +378,154 @@ QUICK_REPLIES = [
 ]
 // Free-text input → sendMessage() → wa.me/6282131561301?text=<user text encoded>
 ```
+
+---
+
+## Task ID: 4
+Agent: webDevReview (scheduled, job_id 263411)
+Task: Scheduled QA + enhancement round — assess status, fix bugs, add features & styling details.
+
+Work Log:
+- Membaca worklog.md fase 3: widget v3 stabil (auto-reply engine, nomor admin benar 6282131561301, lint clean, QA passed). Push GitHub masih gagal (token invalid).
+- **Baseline QA**: semua route 200 (/, /store/*, /checkout), lint 0 error, zero console errors. Widget berfungsi normal.
+- Memilih work focus: **enhancement** (project stabil) — implementasi 5 rekomendasi next-phase dari worklog sebelumnya.
+- **Refactor `src/components/akuma/whatsapp-widget.tsx`** (+355/-65 baris):
+
+  **Fitur 1 — Context-aware quick replies** (via `usePathname()`):
+  - Di `/store/[slug]`: menu adaptif → "Cek Harga Game Ini" (bukan "Cek Harga Joki"), 4 items (tanpa "Status Pesanan" karena context store).
+  - Di halaman lain: menu default 5 items (termasuk "Cara Order" baru & "Status Pesanan").
+  - Header badge: tampilkan emoji + nama game dengan accent color game saat di store page.
+
+  **Fitur 2 — Structured price-list bubble** (variant="price-list"):
+  - Render sebagai **cards per game** (bukan plain text): setiap card punya header (emoji + nama game accent color + deep-link "STORE →"), kategori dengan icon, list item (name + tag badge + price).
+  - Deep-link clickable → navigasi ke `/store/[slug]`.
+  - Untuk "Cek Harga Game Ini" (context store): hanya 1 card game terkait.
+  - Untuk "Cek Harga Joki" (homepage): semua 3 game.
+  - Helper `buildPriceListMsg(gameSlug?)` return Msg object dengan variant & priceGameSlug.
+
+  **Fitur 3 — Quick reply "Cara Order"** baru (auto-reply):
+  - Panduan step-by-step 6 langkah (1️⃣-6️⃣ dengan emoji): pilih game → klik joki → checkout → isi data → WA admin → transfer → joki dikerjakan.
+  - Badge AUTO, yellow accent border (`#ffd166`), `whitespace-pre-line` untuk formatting.
+
+  **Fitur 4 — Personalized welcome** (returning user detection):
+  - Persist flag `akuma-wa-seen-v3` di localStorage (set saat toggle open).
+  - Saat mount: jika seen=1 & chat masih welcome-default (length=1, text=WELCOME_MESSAGE) → replace ke "Halo lagi! 👋 Senang melihatmu kembali di Akuma Joki...".
+  - Tidak ganggu history user (hanya replace jika chat masih welcome pure).
+
+  **Fitur 5 — Badge system** di bubble CS:
+  - `⚡ Auto` (green) untuk auto-replies (Cek Harga, Cara Order, Status, Jam).
+  - `📱 Admin` (purple) untuk redirect-related messages (Chat Admin instruksi + konfirmasi).
+  - Field `badge: "AUTO" | "ADMIN"` di Msg type.
+
+  **Styling details:**
+  - Count indicator "{N} joki tersedia" di quick replies header (total items untuk context: 11 untuk all-games, 9 untuk Blox Fruits, dll).
+  - Card border `pixel-corner`, bg `#0a0a0a/60`, accent color per game.
+  - Tag badge kecil (5px pixel font) dengan accent color game.
+  - Price `#c44bff` (neon purple) di kanan setiap item.
+  - Deep-link "STORE" dengan ArrowRight icon, hover color transition.
+  - max-w bubble dinaikkan 80%→88% untuk price-list content.
+  - Cara Order bubble: yellow border `#ffd166/50` + `whitespace-pre-line`.
+
+- **Refactor types & helpers:**
+  - `Msg` type: tambah `variant?: "text" | "price-list"`, `priceGameSlug?: string`, `badge?: "AUTO" | "ADMIN"`.
+  - `QuickReply` type: tambah `kind: "auto" | "redirect"` + `autoKey` dispatcher.
+  - `QUICK_REPLIES_DEFAULT` (5 items) & `QUICK_REPLIES_STORE` (4 items) terpisah.
+  - `buildPriceListMsg(gameSlug?)` ganti `buildPriceListReply()`.
+  - `pushUserAndAutoReply(userText, csMsg: Msg)` — sekarang accept Msg object (bukan string), assign id/ts/badge di dalamnya.
+  - `handleQuickReply` rewrite dengan `autoKey` switch dispatcher: price-all, price-game, status, hours, cara-order.
+  - `sendMessage` & Chat Admin: bubble CS dapat `badge: "ADMIN"`.
+  - Helper `isReturningUser()`, `markSeen()`, `setMessagesWelcomeToReturning()`.
+  - localStorage keys bump v2→v3 (chat/mute/auto/seen) untuk avoid stale data dari versi sebelumnya.
+  - Import: `useMemo`, `Link` (next/link), `usePathname`, `ArrowRight` (lucide), `getGameBySlug`, `type Game`.
+
+- **Verifikasi end-to-end via agent-browser** (semua passed):
+  - Homepage: 5 quick replies (CEK HARGA JOKI, CARA ORDER, STATUS PESANAN, JAM OPERASIONAL, CHAT ADMIN), count "11 joki tersedia", welcome first-visit "Selamat datang".
+  - **Cek Harga Joki** → structured cards: "💰 SEMUA GAME" + 3 cards (Blox Fruits/Expedition/Retail) dengan deep-link "STORE", kategori (LEVELING/RAID/SENJATA/EKSPEDISI/MANAJEMEN TOKO), items dengan tag+price. **Tidak buka wa.me**.
+  - **Deep-link click** → navigasi ke `/store/blox-fruits`.
+  - Store page: header badge "⚔️ BLOX FRUITS", context-aware menu 4 items ("CEK HARGA GAME INI", CARA ORDER, JAM, CHAT ADMIN), count "9 joki tersedia".
+  - **Cek Harga Game Ini** → "💰 HARGA GAME INI" + hanya 1 card Blox Fruits. **Tidak ada Expedition/Retail** (filter context bekerja). **Tidak buka wa.me**.
+  - **Cara Order** → step-by-step 1️⃣-6️⃣, badge "⚡ AUTO", yellow border.
+  - **Chat Admin** → redirect `wa.me/6282131561301?text=Halo+Admin+Akuma+Joki%2C+saya+mau+bertanya%2FChat+Admin`. Nomor BENAR. Badge "📱 ADMIN" di 2 bubble CS.
+  - **Personalized welcome**: clear chat → reload (seen=1) → welcome "Halo lagi! 👋 Senang melihatmu kembali...".
+  - **Free-text** (tidak di-test ulang, behavior unchanged dari v3 — redirect wa.me/6282131561301 dengan teks user).
+  - Zero console errors, zero runtime errors.
+- `bun run lint` → 0 error, 0 warning.
+- Commit `f4f3604` (lokal).
+
+Stage Summary:
+- Widget v4 dengan 5 fitur baru + styling enhancements. Context-aware, structured cards, deep-links, personalized welcome, badge system.
+- Lint clean, QA end-to-end passed (8 skenario), zero errors.
+- Commit `f4f3604` siap di lokal (gabungan: 99402a0 v1 + d0a06d2 v2 + 0a82d36 v3 + f4f3604 v4 + 2 cron intermediate).
+
+---
+
+## Status Project Saat Ini (Assessment — Fase 4)
+
+**Stabil & feature-rich (v4).** Widget WhatsApp dengan auto-reply engine penuh, context-aware menu, structured price cards, personalized welcome, badge system. Semua route 200. Lint 0 error. QA end-to-end passed 8 skenario. Nomor admin benar (+62 821-3156-1301).
+
+**Perubahan fase ini (commit `f4f3604`, +355/-65 baris):**
+- `src/components/akuma/whatsapp-widget.tsx` — context-aware + structured cards + Cara Order + personalized welcome + badges
+
+**Commits lokal (belum ter-push — token GitHub invalid):**
+1. `99402a0` — v1 (widget dasar)
+2. `d0a06d2` — v2 (persistence, operating hours, sound, a11y, lazy-load)
+3. `0a82d36` — v3 (auto-reply templates + correct admin number)
+4. `f4f3604` — v4 (context-aware, structured cards, Cara Order, personalized welcome, badges)
+(+ 2 cron intermediate commits)
+
+## Current Goals / Completed Modifications / Verification Results
+
+**Completed (fase 4):**
+1. ✅ Context-aware quick replies (usePathname, store-aware menu)
+2. ✅ Structured price-list bubble (cards per game, deep-link to store)
+3. ✅ Quick reply "Cara Order" (step-by-step guide, badge AUTO)
+4. ✅ Personalized welcome (returning user → "Halo lagi!")
+5. ✅ Badge system (⚡ Auto / 📱 Admin) di bubble CS
+6. ✅ Count indicator "{N} joki tersedia" di quick replies header
+7. ✅ Styling: cards dengan pixel-corner, accent color per game, tag badges, yellow border untuk Cara Order
+8. ✅ QA end-to-end via agent-browser (8 skenario all passed)
+9. ✅ Lint 0 error, 0 warning
+
+**Verification results (agent-browser):**
+- Homepage: 5 quick replies + count "11 joki tersedia" + welcome first-visit ✅
+- Cek Harga Joki: structured 3 cards with deep-links, NO wa.me ✅
+- Deep-link: navigasi ke /store/blox-fruits ✅
+- Store page: context-aware menu (4 items, "Cek Harga Game Ini"), header badge ⚔️ BLOX FRUITS ✅
+- Cek Harga Game Ini: single card (Blox Fruits only), NO wa.me ✅
+- Cara Order: step-by-step 1️⃣-6️⃣, badge ⚡ AUTO ✅
+- Chat Admin: redirect wa.me/6282131561301, badge 📱 ADMIN ✅
+- Personalized welcome: "Halo lagi!" untuk returning user ✅
+- Zero console/runtime errors ✅
+
+## Unresolved Issues / Risks / Priority Recommendations
+
+### ❌ UNRESOLVED — CRITICAL: Push ke GitHub MASIH GAGAL (token invalid)
+- Token dari user (`ghp_...NLQ`) → HTTP 401. 4 commit feat + 2 cron intermediate siap di lokal.
+- **Rekomendasi #1**: User berikan token baru (classic PAT, scope `repo`).
+
+### 📋 REKOMENDASI NEXT PHASE (fase 5)
+1. **Checkout integration**: di `/checkout`, auto-reply "Status Pesanan" baca order dari `useAkumaStore` → tampilkan status real (product dipilih, harga, instruksi).
+2. **Quick reply "Syarat & Ketentuan"** ke-6 → auto-reply S&K joki (refund policy, estimasi waktu, dll).
+3. **Multi-bahasa ID/EN**: toggle bahasa untuk welcome & quick replies (pakai next-intl yang sudah ter-install).
+4. **Sound option**: pilih variasi blip (retro 8-bit / modern).
+5. **A11y audit**: jalankan axe-core via agent-browser untuk audit WCAG penuh.
+6. **Quick reply "Bantuan"** → FAQ auto-reply (5-6 Q&A umum).
+7. **Persist last game context**: jika user pernah buka di /store/blox-fruits, welcome mention "Mau lanjut lihat Blox Fruits?".
+8. **Emoji quick reply search**: filter quick replies by typing (mis. ketik "harga" → highlight Cek Harga).
+9. **Animated count indicator**: count-up animation saat quick replies muncul.
+10. **Price-list card collapse**: di mobile, card game bisa collapse/expand untuk hemat space.
+
+### Konfigurasi widget v4 (untuk referensi)
+```ts
+// src/lib/games-data.ts (source of truth)
+export const WHATSAPP_NUMBER = "6282131561301"; // +62 821-3156-1301
+
+// src/components/akuma/whatsapp-widget.tsx
+QUICK_REPLIES_DEFAULT = [Cek Harga Joki 💰(price-all), Cara Order 🚀(cara-order),
+  Status Pesanan 📦(status), Jam Operasional 🕐(hours), Chat Admin 👤(redirect)]
+QUICK_REPLIES_STORE = [Cek Harga Game Ini 💰(price-game), Cara Order 🚀(cara-order),
+  Jam Operasional 🕐(hours), Chat Admin 👤(redirect)]
+// localStorage: akuma-wa-chat-v3, akuma-wa-mute-v3, akuma-wa-auto-v3, akuma-wa-seen-v3
+// Msg.variant: "text" | "price-list" (structured cards with deep-links)
+// Msg.badge: "AUTO" (⚡ green) | "ADMIN" (📱 purple)
+```
