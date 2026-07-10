@@ -187,7 +187,14 @@
       "description": "test",
       "emoji": "⚔️",
       "accent": "#a020f0",
-      "categories": []
+      "categories": [
+        {
+          "id": "hai",
+          "name": "HAI",
+          "icon": "🐄",
+          "items": []
+        }
+      ]
     }
   ],
   "announcement": null,
@@ -200,5 +207,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T19:42:23.756Z"
+  "updatedAt": "2026-07-10T19:42:34.254Z"
 }
