@@ -32,9 +32,9 @@ const SUBSTATUS = "Biasanya balas dalam beberapa menit";
 /* ===================================================================== */
 
 type Role = "cs" | "user";
-type Msg = { id: number; role: Role; text: string; ts: number };
+type Msg = { id: number; role: Role; text: string; ts?: number };
 
-/** Ikon WhatsApp resmi (inline SVG) supaya tetap on-brand tanpa依赖 tambahan. */
+/** Ikon WhatsApp resmi (inline SVG) supaya tetap on-brand tanpa dependency tambahan. */
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -61,7 +61,6 @@ function formatTime(ts: number) {
 
 export function WhatsAppWidget() {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [hasNew, setHasNew] = useState(true); // badge notif sebelum dibuka
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState("");
@@ -70,18 +69,12 @@ export function WhatsAppWidget() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [messages, setMessages] = useState<Msg[]>([
-    { id: 1, role: "cs", text: WELCOME_MESSAGE, ts: 0 },
+    // Welcome message: tanpa ts agar tidak menyebabkan hydration mismatch (rendered hanya server-side).
+    // Timestamp hanya diisi untuk pesan yang dibuat client-side (user / konfirmasi CS).
+    { id: 1, role: "cs", text: WELCOME_MESSAGE },
   ]);
 
   /* ---------- effects ---------- */
-  useEffect(() => {
-    setMounted(true);
-    // set timestamp welcome setelah mount (hindari hydration mismatch)
-    setMessages((m) =>
-      m.map((msg) => (msg.id === 1 ? { ...msg, ts: Date.now() } : msg))
-    );
-  }, []);
-
   // auto-scroll ke bawah saat pesan/typing berubah
   useEffect(() => {
     const el = bodyRef.current;
@@ -240,7 +233,7 @@ export function WhatsAppWidget() {
               </div>
 
               {messages.map((m) => (
-                <Bubble key={m.id} msg={m} mounted={mounted} />
+                <Bubble key={m.id} msg={m} />
               ))}
 
               {/* typing indicator */}
@@ -394,7 +387,7 @@ export function WhatsAppWidget() {
 
 /* ============================ Sub-components ============================ */
 
-function Bubble({ msg, mounted }: { msg: Msg; mounted: boolean }) {
+function Bubble({ msg }: { msg: Msg }) {
   const isUser = msg.role === "user";
   return (
     <motion.div
@@ -421,7 +414,7 @@ function Bubble({ msg, mounted }: { msg: Msg; mounted: boolean }) {
             isUser ? "text-right" : "text-left"
           )}
         >
-          {mounted && msg.ts ? formatTime(msg.ts) : ""}
+          {msg.ts ? formatTime(msg.ts) : ""}
         </p>
       </div>
     </motion.div>
