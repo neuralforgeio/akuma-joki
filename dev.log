@@ -88,3 +88,1560 @@ https://nextjs.org/telemetry
  GET / 200 in 62ms (compile: 14ms, proxy.ts: 4ms, render: 45ms)
  GET / 200 in 57ms (compile: 4ms, proxy.ts: 7ms, render: 46ms)
  GET / 200 in 46ms (compile: 3ms, proxy.ts: 4ms, render: 38ms)
+ GET / 200 in 101ms (compile: 8ms, proxy.ts: 5ms, render: 88ms)
+ GET / 200 in 65ms (compile: 8ms, proxy.ts: 6ms, render: 51ms)
+ GET / 200 in 51ms (compile: 3ms, proxy.ts: 3ms, render: 45ms)
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 575ms
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET / 500 in 2.2s (compile: 2.0s, proxy.ts: 5ms, render: 140ms)
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET / 500 in 72ms (compile: 55ms, proxy.ts: 5ms, render: 12ms)
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET / 500 in 62ms (compile: 29ms, proxy.ts: 5ms, render: 28ms)
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET / 500 in 64ms (compile: 51ms, proxy.ts: 3ms, render: 10ms)
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/components/akuma/whatsapp-widget.tsx:33:1
+Module not found: Can't resolve '@lib/games-data'
+[0m [90m 31 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mSend[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 32 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 33 |[39m [36mimport[39m { [33mGAMES[39m[33m,[39m [33mWHATSAPP_NUMBER[39m } [36mfrom[39m [32m"@lib/games-data"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 34 |[39m
+ [90m 35 |[39m [90m/* ============================ KONFIGURASI ============================ */[39m
+ [90m 36 |[39m [90m// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./src/components/akuma/whatsapp-widget.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Client Component Browser]
+    ./src/components/akuma/whatsapp-widget-loader.tsx [Server Component]
+    ./src/app/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET / 500 in 56ms (compile: 42ms, proxy.ts: 4ms, render: 11ms)
+✓ Compiled in 247ms
+ GET / 200 in 263ms (compile: 90ms, proxy.ts: 3ms, render: 170ms)
+ GET / 200 in 54ms (compile: 4ms, proxy.ts: 4ms, render: 45ms)
+ GET /checkout 200 in 636ms (compile: 401ms, proxy.ts: 5ms, render: 230ms)
+ GET / 200 in 35ms (compile: 6ms, proxy.ts: 6ms, render: 22ms)
+ GET / 200 in 45ms (compile: 11ms, proxy.ts: 4ms, render: 31ms)
+ GET / 200 in 194ms (compile: 18ms, proxy.ts: 46ms, render: 130ms)
+ GET / 200 in 67ms (compile: 5ms, proxy.ts: 10ms, render: 51ms)

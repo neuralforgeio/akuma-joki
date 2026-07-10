@@ -248,3 +248,133 @@ AUTO_OPEN_DELAY = 12000  // ms
 // localStorage keys: akuma-wa-chat-v2, akuma-wa-mute-v2
 // sessionStorage key: akuma-wa-auto-v2
 ```
+
+---
+
+## Task ID: 3
+Agent: Main (Z.ai Code) — user request
+Task: Perbaiki nomor admin ke +62 821-3156-1301, buat chat template (Cek Harga Joki, Status Pesanan, Chat Admin, Jam Operasional) auto-menjawab dengan list product, pesan non-template langsung redirect ke WA admin, tambah instruksi tegas di UI, push ke GitHub.
+
+Work Log:
+- Membaca `src/lib/games-data.ts` — menemukan bahwa `WHATSAPP_NUMBER = "6282131561301"` **sudah ada dan sudah benar** (= +62 821-3156-1301). Ini adalah single source of truth yang juga dipakai komponen lain (store-view, dll).
+- Membaca `src/components/akuma/store-view.tsx` & struktur `GAMES` data: 3 game (Blox Fruits ⚔️, Expedition Antarctica 🏔️, Retail Tycoon 2 🏪), masing-masing dengan categories & items (name, priceLabel, tag, requirement, description).
+- **Refactor `src/components/akuma/whatsapp-widget.tsx`** (+169/-48 baris):
+  - Hapus hardcode `WHATSAPP_NUMBER` placeholder → import dari `@/lib/games-data` (source of truth).
+  - Tambah import `GAMES` untuk auto-generate list harga.
+  - Tipe `QUICK_REPLIES` diperluas dengan field `kind: "auto" | "redirect"`:
+    - `Cek Harga Joki` 💰 → `auto`
+    - `Status Pesanan` 📦 → `auto`
+    - `Jam Operasional` 🕐 → `auto`
+    - `Chat Admin` 👤 → `redirect`
+  - Tambah helper `buildPriceListReply()` — generate list harga lengkap dari `GAMES` (format: emoji game, kategori dengan icon, item dengan price + tag + requirement). Sama persis dengan data di halaman store.
+  - Tambah konstanta: `STATUS_REPLY` (instruksi Order ID), `CHAT_ADMIN_REPLY` (instruksi redirect), `AUTO_REPLY_HINT`.
+  - Update `WELCOME_MESSAGE` agar menjelaskan kedua jalur: "Pilih menu cepat untuk jawaban otomatis, atau ketik pesanmu untuk langsung chat admin".
+  - Tambah helper `pushUserAndAutoReply(userText, csReply)` — pattern untuk auto-reply (push bubble user + typing + bubble CS, tanpa redirect WA).
+  - Refactor `sendMessage(text)` — sekarang eksplisit dokumen: **free-text/non-template → LANGSUNG redirect ke WA admin** dengan teks user (tidak berubah behavior, tapi diperjelas).
+  - Rewrite `handleQuickReply(q)`:
+    - `kind: "auto"` → cari reply sesuai label (Cek Harga → `buildPriceListReply()`, Status → `STATUS_REPLY`, Jam → `HOURS_REPLY`), pakai `pushUserAndAutoReply`. **TIDAK buka wa.me.**
+    - `kind: "redirect"` (Chat Admin) → push bubble user + redirect ke `wa.me/${WHATSAPP_NUMBER}?text=Halo Admin Akuma Joki, saya mau bertanya/${q.label}` + bubble CS instruksi (`CHAT_ADMIN_REPLY` + `REDIRECT_MSG`).
+  - **UI instruksi tegas**:
+    - Label "MENU CEPAT — AUTO JAWAB" (hijau, dengan dot glow) di atas quick replies.
+    - Color-coded chips: hijau `#25D366` (auto) vs neon purple `#a020f0` (redirect) — visual distinction jelas.
+    - Hint line di bawah menu: "👆 = jawaban otomatis di sini · 👤 = lanjut ke WA admin".
+    - Input placeholder: "Ketik pesan → langsung ke WA admin".
+    - Footer notice: "✦ Pesan ini → WA Admin" (warna purple).
+- **Verifikasi end-to-end via agent-browser** (semua skenario passed):
+  - **Cek Harga Joki** (auto): list lengkap muncul — "💰 *DAFTAR HARGA JOKI AKUMA*" + Blox Fruits (LEVELING: 100/200/300 Level, RAID: 1-10/Full Skill, SENJATA: CDK/SG/SH/GH dengan requirement), Expedition Antarctica (Muncak 1-10/1-25, NPC all), Retail Tycoon 2 (Benerin Toko, Main Sampai Pro). **Tab count tetap (tidak buka wa.me)**. ✅
+  - **Status Pesanan** (auto): jawaban "Untuk cek status pesanan, mohon beritahu kami Order ID..." muncul. **Tidak buka wa.me**. ✅
+  - **Jam Operasional** (auto): jawaban "Kami online setiap hari 09.00–23.00 WIB..." muncul. **Tidak buka wa.me**. ✅
+  - **Chat Admin** (redirect): buka tab `wa.me/6282131561301?text=Halo+Admin+Akuma+Joki%2C+saya+mau+bertanya%2FChat+Admin`. Nomor BENAR. Teks ter-encode. ✅
+  - **Free-text input** "Halo, saya mau joki Blox Fruits 200 Level, bisa?": buka tab `wa.me/6282131561301?text=Halo%2C+saya+mau+joki+Blox+Fruits+200+Level%2C+bisa%3F`. Nomor BENAR, teks user ter-encode. ✅
+  - Welcome message + "MENU CEPAT — AUTO JAWAB" + hint + placeholder + footer notice semua terverifikasi di a11y tree.
+  - Zero console errors, zero runtime errors.
+- `bun run lint` → 0 error, 0 warning.
+- Commit `0a82d36` (lokal).
+- **Push ke GitHub GAGAL**: token `ghp_...NLQ` mengembalikan HTTP 401 (invalid/expired). Verifikasi via `api.github.com/user` → 401. Push attempt → "Invalid username or token".
+
+Stage Summary:
+- Nomor admin BENAR: `6282131561301` (+62 821-3156-1301), single source of truth di `games-data.ts`.
+- Auto-reply engine lengkap: 3 template auto-answer di-chat (Cek Harga = list product lengkap dari GAMES, Status = instruksi Order ID, Jam = jam operasional), 1 template redirect (Chat Admin), free-text input = redirect WA admin.
+- UI instruksi tegas & color-coded (hijau=auto, purple=redirect).
+- QA end-to-end passed semua skenario, lint clean, zero errors.
+- Commit `0a82d36` siap di lokal, **belum ter-push** (token invalid).
+
+---
+
+## Status Project Saat Ini (Assessment — Fase 3)
+
+**Stabil & feature-complete untuk widget.** Widget WhatsApp v3 dengan auto-reply engine penuh. Semua route 200. Lint 0 error. QA end-to-end passed semua skenario. Nomor admin benar (+62 821-3156-1301). UI instruksi tegas (color-coded, label, hint, placeholder, footer notice).
+
+**Perubahan fase ini (commit `0a82d36`, +169/-48 baris):**
+- `src/components/akuma/whatsapp-widget.tsx` — auto-reply engine + import WHATSAPP_NUMBER dari games-data + UI instruksi
+
+**Commits lokal (belum ter-push — token GitHub invalid):**
+1. `99402a0` — feat: tambah widget floating whatsapp live chat (v1)
+2. `d0a06d2` — feat(whatsapp-widget): v2 — persistence, operating hours, sound, a11y, lazy-load
+3. `0a82d36` — feat(whatsapp-widget): auto-reply templates + correct admin number (v3)
+(+ 2 cron intermediate commits dari scheduled webDevReview)
+
+## Current Goals / Completed Modifications / Verification Results
+
+**Completed (fase 3):**
+1. ✅ Nomor admin BENAR: 6282131561301 (+62 821-3156-1301) — single source of truth di games-data.ts
+2. ✅ Auto-reply "Cek Harga Joki" → list lengkap semua product dari GAMES (3 game, semua kategori & item dengan price/tag/requirement), TANPA redirect WA
+3. ✅ Auto-reply "Status Pesanan" → instruksi Order ID, TANPA redirect WA
+4. ✅ Auto-reply "Jam Operasional" → jam buka 09:00-23:00 WIB, TANPA redirect WA
+5. ✅ "Chat Admin" → redirect ke wa.me/6282131561301 dengan teks bawaan
+6. ✅ Free-text input (non-template) → redirect langsung ke wa.me/6282131561301 dengan teks user ter-encode
+7. ✅ UI instruksi tegas: welcome message, label "MENU CEPAT — AUTO JAWAB", color-coded chips (hijau=auto/purple=redirect), hint line, placeholder, footer notice
+8. ✅ QA end-to-end via agent-browser (5 skenario all passed)
+9. ✅ Lint 0 error
+
+**Verification results (agent-browser):**
+- Cek Harga: list product render (Blox Fruits/Expedition/Retail Tycoon + semua item), NO wa.me tab. ✅
+- Status Pesanan: auto-reply muncul, NO wa.me tab. ✅
+- Jam Operasional: auto-reply muncul, NO wa.me tab. ✅
+- Chat Admin: redirect wa.me/6282131561301?text=Halo+Admin+Akuma+Joki... ✅
+- Free-text "Halo, saya mau joki Blox Fruits 200 Level, bisa?": redirect wa.me/6282131561301?text=Halo%2C+saya+mau+joki+Blox+Fruits+200+Level%2C+bisa%3F ✅
+- Nomor di URL: 6282131561301 (BENAR sesuai +62 821-3156-1301). ✅
+- Zero console errors, zero runtime errors.
+
+## Unresolved Issues / Risks / Priority Recommendations
+
+### ❌ UNRESOLVED — CRITICAL: Push ke GitHub MASIH GAGAL (token invalid)
+- Token `ghp_NRkAJQBau2P176FknCnWXEgsKIzsmQ30NLQ` (dari pesan awal user) → HTTP 401 saat verifikasi via `api.github.com/user`, dan "Invalid username or token" saat git push.
+- Kemungkinan: token expired, dicabut user, atau typo. GitHub classic PAT dengan scope `repo` diperlukan.
+- 3 commit feat + 2 cron intermediate siap di lokal branch `main`.
+- **Rekomendasi prioritas #1**: User buat GitHub Personal Access Token baru (Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token, centang `repo`), lalu:
+  ```bash
+  cd /home/z/my-project
+  git remote set-url origin https://x-access-token:<TOKEN_BARU>@github.com/luminarydearx/akuma-joki.git
+  git push origin main
+  git remote set-url origin https://github.com/luminarydearx/akuma-joki.git
+  ```
+
+### ✅ RESOLVED — Nomor admin
+- Sekarang `6282131561301` (+62 821-3156-1301), benar sesuai permintaan user. Single source of truth di `src/lib/games-data.ts`.
+
+### 📋 REKOMENDASI NEXT PHASE
+1. **Quick reply dinamis per halaman**: di `/store/blox-fruits`, ubah "Cek Harga Joki" jadi "Cek Harga Blox Fruits" (context-aware via `usePathname`).
+2. **Deep-link ke store**: di auto-reply "Cek Harga", tambahkan link clickable ke `/store/blox-fruits` (atau game terkait) untuk lihat detail.
+3. **Checkout integration**: di `/checkout`, auto-reply "Status Pesanan" baca order dari `useAkumaStore` → tampilkan status real.
+4. **Persist last admin message**: jika user sudah pernah chat admin via WA, simpan flag → welcome message personal "Halo lagi!".
+5. **Quick reply "Bantuan/Panduan"** ke-5 → auto-reply cara order step-by-step.
+6. **Quick reply "Syarat & Ketentuan"** → auto-reply S&K joki.
+7. **Multi-bahasa** ID/EN untuk welcome & quick replies.
+8. **A11y**: announce auto-reply via `aria-live="assertive"` agar screen reader baca jawaban CS.
+9. **Test edge case**: pesan dengan emoji/special char → pastikan encoding benar di wa.me.
+
+### Konfigurasi widget v3 (untuk referensi)
+```ts
+// src/lib/games-data.ts (source of truth)
+export const WHATSAPP_NUMBER = "6282131561301"; // +62 821-3156-1301
+
+// src/components/akuma/whatsapp-widget.tsx
+QUICK_REPLIES = [
+  { Cek Harga Joki 💰, kind: "auto" },     // → buildPriceListReply() dari GAMES
+  { Status Pesanan 📦, kind: "auto" },     // → STATUS_REPLY (instruksi Order ID)
+  { Jam Operasional 🕐, kind: "auto" },    // → HOURS_REPLY (09:00-23:00 WIB)
+  { Chat Admin 👤, kind: "redirect" },     // → wa.me/6282131561301?text=Halo Admin...
+]
+// Free-text input → sendMessage() → wa.me/6282131561301?text=<user text encoded>
+```
