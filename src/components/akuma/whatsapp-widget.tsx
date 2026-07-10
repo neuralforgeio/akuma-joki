@@ -605,7 +605,7 @@ export function WhatsAppWidget() {
         };
         writeChat([...readChat(), csFinal]);
         if (!muted) playBlip("recv");
-      }, 900);
+      }, 1500);
     },
     [messages, muted]
   );
@@ -659,7 +659,7 @@ export function WhatsAppWidget() {
           },
         ]);
         if (!muted) playBlip("recv");
-      }, 950);
+      }, 1500);
 
       if (!muted) playBlip("send");
     },
@@ -781,7 +781,7 @@ export function WhatsAppWidget() {
           },
         ]);
         if (!muted) playBlip("recv");
-      }, 950);
+      }, 1500);
     },
     [messages, muted, pushUserAndAutoReply, storeSlug]
   );
@@ -969,9 +969,9 @@ export function WhatsAppWidget() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="font-pixel text-[7px] uppercase tracking-wide text-[#c44bff]"
+                            className="text-[10px] text-violet-400"
                           >
-                            Sedang mengetik...
+                            Mengetik...
                           </motion.p>
                         ) : (
                           <motion.p
@@ -1095,25 +1095,24 @@ export function WhatsAppWidget() {
                 );
               })}
 
-              {/* typing indicator */}
+              {/* typing indicator — dengan teks "Mengetik..." */}
               <AnimatePresence>
                 {typing && (
                   <motion.div
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.2 }}
                     className="relative flex items-end gap-2"
                   >
-                    <motion.div
-                      animate={{ y: [0, -2, 0] }}
-                      transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <AvatarMini online={isOnline} avatar={csAvatar} />
-                    </motion.div>
-                    <div className="flex items-center gap-1 rounded-md rounded-bl-none border-2 border-[#2a2436] bg-[#1a1722] px-3 py-2.5">
-                      <Dot delay="0ms" />
-                      <Dot delay="150ms" />
-                      <Dot delay="300ms" />
+                    <AvatarMini online={isOnline} avatar={csAvatar} />
+                    <div className="flex flex-col gap-1">
+                      <div className="glass rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1.5">
+                        <span className="inline-block h-2 w-2 rounded-full bg-violet-400" style={{ animation: "wa-typing 1s 0ms ease-in-out infinite" }} />
+                        <span className="inline-block h-2 w-2 rounded-full bg-violet-400" style={{ animation: "wa-typing 1s 150ms ease-in-out infinite" }} />
+                        <span className="inline-block h-2 w-2 rounded-full bg-violet-400" style={{ animation: "wa-typing 1s 300ms ease-in-out infinite" }} />
+                      </div>
+                      <span className="text-[10px] text-zinc-500 ml-1">Mengetik...</span>
                     </div>
                   </motion.div>
                 )}
