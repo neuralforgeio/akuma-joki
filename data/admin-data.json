@@ -77,7 +77,7 @@
               "price": 20,
               "priceLabel": "20K",
               "tag": "Legendary",
-              "description": "Cursed Dual Katana — pedang legendaris.",
+              "description": "Cursed Dual Katana — pedang legendaris pada umumnya, serangan melee tajam khas swordsman.",
               "requirement": "Level 2300 - MAX"
             },
             {
@@ -85,7 +85,7 @@
               "name": "SG",
               "price": 10,
               "priceLabel": "10K",
-              "description": "Soul Guitar — pistol berbentuk gitar dengan serangan area (AoE).",
+              "description": "Soul Guitar — pistol berbentuk gitar dengan serangan area (AoE) yang mematikan.",
               "requirement": "Level 2300 - MAX"
             },
             {
@@ -179,6 +179,22 @@
           ]
         }
       ]
+    },
+    {
+      "slug": "test-new-game",
+      "name": "Test New Game",
+      "tagline": "gontol",
+      "description": "hai",
+      "emoji": "🔥",
+      "accent": "#ffd166",
+      "categories": [
+        {
+          "id": "juancoks",
+          "name": "JUANCOKS",
+          "icon": "📈",
+          "items": []
+        }
+      ]
     }
   ],
   "announcement": null,
@@ -191,5 +207,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T19:16:48.720Z"
+  "updatedAt": "2026-07-10T19:28:18.891Z"
 }
