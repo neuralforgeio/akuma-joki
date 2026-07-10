@@ -192,7 +192,17 @@
           "id": "hai",
           "name": "HAI",
           "icon": "🐄",
-          "items": []
+          "items": [
+            {
+              "id": "y",
+              "name": "Y",
+              "price": null,
+              "priceLabel": "9K",
+              "tag": "JS",
+              "description": "jekd",
+              "requirement": "poe"
+            }
+          ]
         }
       ]
     }
@@ -207,5 +217,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T19:42:34.254Z"
+  "updatedAt": "2026-07-10T19:42:51.424Z"
 }
