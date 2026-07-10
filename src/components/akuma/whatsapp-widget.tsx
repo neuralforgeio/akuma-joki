@@ -1,49 +1,77 @@
 "use client";
 
 /**
- * AKUMA JOKI — Floating WhatsApp Live Chat Widget (v2)
+ * AKUMA JOKI — Floating WhatsApp Live Chat Widget (v4)
  * --------------------------------------------------------------
  * 100% frontend-only. Pesan diteruskan via link wa.me (tab baru).
  * Tema: Retro PixelArt — font-pixel, pixel-corner, neon glow, scanlines.
  *
- * Fitur (v2):
- *  - Floating button bulat hijau WhatsApp + pulse ring + badge notif unread.
- *  - Popup chat box (slide-up + fade-in, Framer Motion spring).
- *  - Header: avatar "AJ", nama CS, status Online/Offline (jam operasional),
- *    tombol mute sound + tombol clear chat.
- *  - Body: welcome bubble + quick reply chips (dengan emoji) + typing indicator.
- *  - Input: text input + char counter + tombol kirim (paper plane).
- *  - Sound "blip" saat kirim/terima (Web Audio API, gated by mute).
- *  - Persistence: riwayat chat & mute disimpan ke localStorage (cross-session).
- *  - Auto-open: setelah 12s jika user belum interaksi (throttle via sessionStorage).
- *  - A11y: role="log", focus trap saat popup terbuka, restore focus saat tutup.
- *  - Kirim -> push bubble user -> window.open(wa.me) -> typing -> bubble CS konfirmasi.
+ * Fitur (v4):
+ *  - Context-aware quick replies: di /store/[slug], menu adaptif per game.
+ *  - Auto-reply engine: template menu jawab otomatis (Cek Harga, Status, Jam,
+ *    Cara Order) — TIDAK redirect ke WA admin. Free-text & Chat Admin → WA admin.
+ *  - Structured price-list bubble: render sebagai cards (bukan plain text) dengan
+ *    deep-link button ke halaman store game terkait.
+ *  - Personalized welcome: returning user (persist flag) → "Halo lagi!".
+ *  - Persistence: chat history, mute, seen-flag di localStorage (cross-session).
+ *  - A11y: role="log", focus trap, restore focus, aria-live.
+ *  - Sound (Web Audio), operating hours, auto-open throttle, lazy-load.
  */
 
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
 } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, BellOff, Send, Trash2, X } from "lucide-react";
+import { ArrowRight, Bell, BellOff, Send, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GAMES, WHATSAPP_NUMBER } from "@/lib/games-data";
+import {
+  GAMES,
+  WHATSAPP_NUMBER,
+  getGameBySlug,
+  type Game,
+} from "@/lib/games-data";
 
 /* ============================ KONFIGURASI ============================ */
 // WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)
 const CS_NAME = "Akuma Joki";
 const WELCOME_MESSAGE =
   "Halo! 👋 Selamat datang di Akuma Joki. Pilih menu cepat di bawah untuk jawaban otomatis, atau ketik pesanmu untuk langsung chat admin via WhatsApp. 🚀";
+const WELCOME_RETURNING =
+  "Halo lagi! 👋 Senang melihatmu kembali di Akuma Joki. Ada yang bisa kami bantu?";
 
-const QUICK_REPLIES: { label: string; emoji: string; kind: "auto" | "redirect" }[] = [
-  { label: "Cek Harga Joki", emoji: "💰", kind: "auto" },
-  { label: "Status Pesanan", emoji: "📦", kind: "auto" },
-  { label: "Jam Operasional", emoji: "🕐", kind: "auto" },
+type QuickReplyKind = "auto" | "redirect";
+type QuickReply = {
+  label: string;
+  emoji: string;
+  kind: QuickReplyKind;
+  /** Jika "auto", reply di-generate oleh function key ini. */
+  autoKey?: "price-all" | "price-game" | "status" | "hours" | "cara-order";
+};
+
+/** Menu default (di halaman non-store). */
+const QUICK_REPLIES_DEFAULT: QuickReply[] = [
+  { label: "Cek Harga Joki", emoji: "💰", kind: "auto", autoKey: "price-all" },
+  { label: "Cara Order", emoji: "🚀", kind: "auto", autoKey: "cara-order" },
+  { label: "Status Pesanan", emoji: "📦", kind: "auto", autoKey: "status" },
+  { label: "Jam Operasional", emoji: "🕐", kind: "auto", autoKey: "hours" },
   { label: "Chat Admin", emoji: "👤", kind: "redirect" },
 ];
+
+/** Menu context-aware di halaman /store/[slug]. */
+const QUICK_REPLIES_STORE: QuickReply[] = [
+  { label: "Cek Harga Game Ini", emoji: "💰", kind: "auto", autoKey: "price-game" },
+  { label: "Cara Order", emoji: "🚀", kind: "auto", autoKey: "cara-order" },
+  { label: "Jam Operasional", emoji: "🕐", kind: "auto", autoKey: "hours" },
+  { label: "Chat Admin", emoji: "👤", kind: "redirect" },
+];
+
 const REDIRECT_MSG = "Pesan dikirim! Mengarahkan ke WhatsApp admin...";
 const AUTO_REPLY_HINT =
   "👆 Pilih menu di bawah untuk jawaban otomatis. Ketik pesan sendiri akan langsung diteruskan ke admin.";
@@ -62,6 +90,10 @@ const STATUS_REPLY =
 const CHAT_ADMIN_REPLY =
   "👤 Baik! Kami arahkan kamu ke WhatsApp admin kami untuk dibantu lebih lanjut. 👇";
 
+/** Pesan auto-reply untuk "Cara Order" — panduan step-by-step. */
+const CARA_ORDER_REPLY =
+  "🚀 CARA ORDER JOKI AKUMA:\n\n1️⃣ Pilih game di menu atau halaman store\n2️⃣ Klik joki yang kamu mau (mis. '200 Level')\n3️⃣ Lanjut ke Checkout & isi data (username Roblox + kontak WA)\n4️⃣ Klik 'Pesan via WhatsApp' — pesananmu langsung ke admin\n5️⃣ Transfer DP/lunas sesuai instruksi admin\n6️⃣ Joki dikerjakan! Cek progres via 'Status Pesanan'\n\nButuh bantuan? Klik 'Chat Admin' ya! 🤝";
+
 /** Jam operasional (WIB). Di luar ini = offline. */
 const OPEN_HOUR = 9;
 const CLOSE_HOUR = 23;
@@ -70,6 +102,8 @@ const AUTO_OPEN_DELAY = 12000;
 /* ===================================================================== */
 
 type Role = "cs" | "user";
+/** Variant bubble CS untuk rendering khusus (structured content). */
+type MsgVariant = "text" | "price-list";
 type Msg = {
   id: number;
   role: Role;
@@ -77,12 +111,19 @@ type Msg = {
   ts?: number;
   /** Tandai pesan user sudah diteruskan ke WhatsApp (read receipt). */
   sent?: boolean;
+  /** Variant render khusus untuk bubble CS. */
+  variant?: MsgVariant;
+  /** Jika variant="price-list", game yang di-render (undefined = semua game). */
+  priceGameSlug?: string;
+  /** Badge label untuk bubble CS: "AUTO" atau "ADMIN". */
+  badge?: "AUTO" | "ADMIN";
 };
 
 /* ===================== EXTERNAL STORE (localStorage) ===================== */
-const CHAT_KEY = "akuma-wa-chat-v2";
-const MUTE_KEY = "akuma-wa-mute-v2";
-const AUTO_KEY = "akuma-wa-auto-v2";
+const CHAT_KEY = "akuma-wa-chat-v3";
+const MUTE_KEY = "akuma-wa-mute-v3";
+const AUTO_KEY = "akuma-wa-auto-v3";
+const SEEN_KEY = "akuma-wa-seen-v3";
 
 const SERVER_CHAT: Msg[] = [{ id: 1, role: "cs", text: WELCOME_MESSAGE }];
 
@@ -236,14 +277,21 @@ function getOperatingStatus(now: number) {
 }
 
 /**
- * Build daftar harga joki lengkap dari data GAMES (source of truth yang sama
- * dengan yang ditampilkan di halaman store). Dipakai untuk auto-reply
- * "Cek Harga Joki" — user tidak perlu redirect ke WA admin.
+ * Build Msg object untuk price-list (variant="price-list").
+ * Jika `gameSlug` diisi → hanya tampilkan game itu; jika undefined → semua game.
+ * Render sebagai structured bubble (cards) di Bubble component, dengan deep-link
+ * ke halaman store game terkait.
  */
-function buildPriceListReply(): string {
-  const lines: string[] = ["💰 *DAFTAR HARGA JOKI AKUMA*", ""];
-  for (const g of GAMES) {
-    lines.push(`${g.emoji} *${g.name}*`);
+function buildPriceListMsg(gameSlug?: string): Msg {
+  const game = gameSlug ? getGameBySlug(gameSlug) : undefined;
+  const title = game
+    ? `💰 Harga Joki ${game.name}`
+    : "💰 Daftar Harga Joki Akuma";
+  const games: Game[] = game ? [game] : GAMES;
+  // text fallback (untuk accessibility + screen reader + copy)
+  const lines: string[] = [title];
+  for (const g of games) {
+    lines.push(`${g.emoji} ${g.name}`);
     for (const cat of g.categories) {
       lines.push(`  ${cat.icon} ${cat.name}`);
       for (const item of cat.items) {
@@ -252,10 +300,49 @@ function buildPriceListReply(): string {
         lines.push(`    • ${item.name} — ${item.priceLabel}${tagStr}${reqStr}`);
       }
     }
-    lines.push("");
   }
-  lines.push("Ketik nama joki yang kamu mau, atau pilih 'Chat Admin' untuk order. 🚀");
-  return lines.join("\n");
+  lines.push("Klik 'Lihat di Store' untuk detail & order. 🚀");
+  return {
+    id: 0, // akan di-assign oleh nextId() di caller
+    role: "cs",
+    text: lines.join("\n"),
+    ts: 0,
+    variant: "price-list",
+    priceGameSlug: gameSlug,
+    badge: "AUTO",
+  };
+}
+
+/** Tandai user sudah pernah buka widget (returning user detection). */
+function isReturningUser(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+function markSeen() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SEEN_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Ganti welcome bubble (id:1) dari WELCOME_MESSAGE ke WELCOME_RETURNING jika
+ * user adalah returning user. Hanya berlaku jika chat masih welcome-default
+ * (belum ada percakapan). Dipanggil di mount effect.
+ */
+function setMessagesWelcomeToReturning() {
+  if (typeof window === "undefined") return;
+  const cur = readChat();
+  // hanya replace jika chat hanya 1 pesan (welcome) DAN text-nya default
+  if (cur.length === 1 && cur[0].id === 1 && cur[0].text === WELCOME_MESSAGE) {
+    writeChat([{ ...cur[0], text: WELCOME_RETURNING }]);
+  }
 }
 
 /* ============================ ICONS ============================ */
@@ -303,6 +390,7 @@ export function WhatsAppWidget() {
     getServerMute
   );
 
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [hasNew, setHasNew] = useState(true);
   const [typing, setTyping] = useState(false);
@@ -320,6 +408,22 @@ export function WhatsAppWidget() {
   const unreadCount = open
     ? 0
     : messages.filter((m) => m.role === "cs" && m.id > 1).length;
+
+  /* ---------- context-aware: deteksi halaman store ---------- */
+  // /store/blox-fruits → slug "blox-fruits"; /checkout → tidak context-store
+  const storeSlug = useMemo(() => {
+    if (!pathname) return undefined;
+    const m = pathname.match(/^\/store\/([^/]+)$/);
+    return m ? m[1] : undefined;
+  }, [pathname]);
+  const currentGame = storeSlug ? getGameBySlug(storeSlug) : undefined;
+  const quickReplies = currentGame ? QUICK_REPLIES_STORE : QUICK_REPLIES_DEFAULT;
+  const totalItems = currentGame
+    ? currentGame.categories.reduce((a, c) => a + c.items.length, 0)
+    : GAMES.reduce(
+        (a, g) => a + g.categories.reduce((b, c) => b + c.items.length, 0),
+        0
+      );
 
   /* ---------- effects ---------- */
   // clock untuk update status online/offline tiap menit
@@ -392,11 +496,12 @@ export function WhatsAppWidget() {
   /* ---------- logic ---------- */
 
   /**
-   * Helper: push bubble user + (opsional) bubble CS auto-reply setelah jeda typing.
-   * Dipakai untuk SEMUA quick-reply bertipe "auto" (tidak redirect ke WA admin).
+   * Helper: push bubble user + bubble CS auto-reply (Msg object, bisa structured)
+   * setelah jeda typing. Dipakai untuk SEMUA quick-reply bertipe "auto".
+   * csMsg.id & csMsg.ts akan di-assign di sini (caller pakai 0).
    */
   const pushUserAndAutoReply = useCallback(
-    (userText: string, csReply: string) => {
+    (userText: string, csMsg: Msg) => {
       const userMsg: Msg = {
         id: nextId(),
         role: "user",
@@ -410,10 +515,13 @@ export function WhatsAppWidget() {
       setTyping(true);
       window.setTimeout(() => {
         setTyping(false);
-        writeChat([
-          ...readChat(),
-          { id: nextId(), role: "cs", text: csReply, ts: Date.now() },
-        ]);
+        const csFinal: Msg = {
+          ...csMsg,
+          id: nextId(),
+          ts: Date.now(),
+          badge: csMsg.badge ?? "AUTO",
+        };
+        writeChat([...readChat(), csFinal]);
         if (!muted) playBlip("recv");
       }, 900);
     },
@@ -455,13 +563,19 @@ export function WhatsAppWidget() {
         );
       }, 500);
 
-      // CS konfirmasi (dengan jeda typing)
+      // CS konfirmasi (dengan jeda typing) — badge ADMIN karena terkait redirect
       setTyping(true);
       window.setTimeout(() => {
         setTyping(false);
         writeChat([
           ...readChat(),
-          { id: nextId(), role: "cs", text: REDIRECT_MSG, ts: Date.now() },
+          {
+            id: nextId(),
+            role: "cs",
+            text: REDIRECT_MSG,
+            ts: Date.now(),
+            badge: "ADMIN",
+          },
         ]);
         if (!muted) playBlip("recv");
       }, 950);
@@ -476,19 +590,44 @@ export function WhatsAppWidget() {
    *  - kind "auto"     → jawab otomatis di chat box (TIDAK redirect ke WA admin).
    *  - kind "redirect" → tampilkan instruksi di chat box + redirect ke WA admin.
    *
-   * Pesan yang diketik user bebas (input manual) TIDAK lewat sini — itu langsung
-   * ke sendMessage() = redirect ke admin.
+   * autoKey dispatcher: price-all / price-game / status / hours / cara-order.
    */
   const handleQuickReply = useCallback(
-    (q: { label: string; emoji: string; kind: "auto" | "redirect" }) => {
+    (q: QuickReply) => {
       // === AUTO-REPLY (tidak redirect ke WA admin) ===
-      if (q.kind === "auto") {
-        let reply = "";
-        if (q.label === "Cek Harga Joki") reply = buildPriceListReply();
-        else if (q.label === "Status Pesanan") reply = STATUS_REPLY;
-        else if (q.label === "Jam Operasional") reply = HOURS_REPLY;
-        if (reply) {
-          pushUserAndAutoReply(`${q.emoji} ${q.label}`, reply);
+      if (q.kind === "auto" && q.autoKey) {
+        let csMsg: Msg | null = null;
+        switch (q.autoKey) {
+          case "price-all":
+            csMsg = buildPriceListMsg();
+            break;
+          case "price-game":
+            csMsg = buildPriceListMsg(storeSlug);
+            break;
+          case "status":
+            csMsg = {
+              id: 0,
+              role: "cs",
+              text: STATUS_REPLY,
+              ts: 0,
+              badge: "AUTO",
+            };
+            break;
+          case "hours":
+            csMsg = { id: 0, role: "cs", text: HOURS_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "cara-order":
+            csMsg = {
+              id: 0,
+              role: "cs",
+              text: CARA_ORDER_REPLY,
+              ts: 0,
+              badge: "AUTO",
+            };
+            break;
+        }
+        if (csMsg) {
+          pushUserAndAutoReply(`${q.emoji} ${q.label}`, csMsg);
           return;
         }
       }
@@ -520,19 +659,31 @@ export function WhatsAppWidget() {
         );
       }, 500);
 
-      // CS reply instruksi + konfirmasi redirect
+      // CS reply instruksi + konfirmasi redirect (badge ADMIN)
       setTyping(true);
       window.setTimeout(() => {
         setTyping(false);
         writeChat([
           ...readChat(),
-          { id: nextId(), role: "cs", text: CHAT_ADMIN_REPLY, ts: Date.now() },
-          { id: nextId(), role: "cs", text: REDIRECT_MSG, ts: Date.now() },
+          {
+            id: nextId(),
+            role: "cs",
+            text: CHAT_ADMIN_REPLY,
+            ts: Date.now(),
+            badge: "ADMIN",
+          },
+          {
+            id: nextId(),
+            role: "cs",
+            text: REDIRECT_MSG,
+            ts: Date.now(),
+            badge: "ADMIN",
+          },
         ]);
         if (!muted) playBlip("recv");
       }, 950);
     },
-    [messages, muted, pushUserAndAutoReply]
+    [messages, muted, pushUserAndAutoReply, storeSlug]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -543,6 +694,7 @@ export function WhatsAppWidget() {
   const toggle = () => {
     setOpen((o) => !o);
     setHasNew(false);
+    markSeen();
   };
 
   const toggleMute = () => writeMute(!muted);
@@ -553,6 +705,13 @@ export function WhatsAppWidget() {
 
   const charCount = input.length;
   const nearLimit = charCount > 400;
+
+  // personalized welcome: jika returning user & chat masih welcome-default,
+  // ganti welcome bubble (id:1) ke welcome-returning. Jalankan sekali di mount.
+  useEffect(() => {
+    if (!isReturningUser()) return;
+    setMessagesWelcomeToReturning();
+  }, []);
 
   /* ============================ RENDER ============================ */
   return (
@@ -628,6 +787,19 @@ export function WhatsAppWidget() {
                   <span className="rounded-sm bg-[#25D366]/15 px-1.5 py-0.5 font-pixel text-[7px] uppercase tracking-wide text-[#25D366]">
                     CS
                   </span>
+                  {currentGame && (
+                    <span
+                      className="rounded-sm px-1.5 py-0.5 font-pixel text-[7px] uppercase tracking-wide"
+                      style={{
+                        background: `${currentGame.accent}22`,
+                        color: currentGame.accent,
+                        border: `1px solid ${currentGame.accent}66`,
+                      }}
+                      title={`Kamu di store ${currentGame.name}`}
+                    >
+                      {currentGame.emoji} {currentGame.name}
+                    </span>
+                  )}
                 </div>
                 <div className="mt-1 flex items-center gap-1.5">
                   {isOnline ? (
@@ -786,15 +958,20 @@ export function WhatsAppWidget() {
                   exit={{ opacity: 0, height: 0 }}
                   className="border-t-2 border-[#25D366]/30 bg-[#0a0a0a] px-3 py-2.5"
                 >
-                  {/* instruksi tegas: menu = auto, ketik = WA admin */}
-                  <div className="mb-2 flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 shrink-0 bg-[#25D366] shadow-[0_0_6px_#25D366]" />
-                    <p className="font-pixel text-[7px] uppercase tracking-wide text-[#6ee7b7]">
-                      Menu Cepat — Auto Jawab
-                    </p>
+                  {/* instruksi tegas: menu = auto, ketik = WA admin + count */}
+                  <div className="mb-2 flex items-center justify-between gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 shrink-0 bg-[#25D366] shadow-[0_0_6px_#25D366]" />
+                      <p className="font-pixel text-[7px] uppercase tracking-wide text-[#6ee7b7]">
+                        Menu Cepat — Auto Jawab
+                      </p>
+                    </div>
+                    <span className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
+                      {totalItems} joki tersedia
+                    </span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {QUICK_REPLIES.map((q) => (
+                    {quickReplies.map((q) => (
                       <button
                         key={q.label}
                         type="button"
@@ -973,6 +1150,15 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
   const isUser = msg.role === "user";
   const isRedirect = msg.role === "cs" && msg.text === REDIRECT_MSG;
   const isHours = msg.role === "cs" && msg.text === HOURS_REPLY;
+  const isPriceList = msg.variant === "price-list";
+  const isCaraOrder = msg.role === "cs" && msg.text === CARA_ORDER_REPLY;
+  // games untuk price-list: jika priceGameSlug diisi → 1 game, else semua
+  const priceGames: Game[] = isPriceList
+    ? msg.priceGameSlug
+      ? [getGameBySlug(msg.priceGameSlug)].filter(Boolean) as Game[]
+      : GAMES
+    : [];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8, scale: 0.92 }}
@@ -985,7 +1171,22 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
       className={cn("flex items-end gap-2", isUser ? "justify-end" : "justify-start")}
     >
       {!isUser && <AvatarMini online={isOnline} />}
-      <div className={cn("max-w-[80%]", isUser && "order-1")}>
+      <div className={cn("max-w-[88%]", isUser && "order-1")}>
+        {/* badge AUTO/ADMIN di atas bubble CS */}
+        {!isUser && msg.badge && (
+          <div className="mb-1 flex items-center gap-1">
+            <span
+              className={cn(
+                "rounded-sm px-1.5 py-0.5 font-pixel text-[6px] uppercase tracking-wide pixel-corner",
+                msg.badge === "AUTO"
+                  ? "bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/40"
+                  : "bg-[#a020f0]/15 text-[#c44bff] border border-[#a020f0]/40"
+              )}
+            >
+              {msg.badge === "AUTO" ? "⚡ Auto" : "📱 Admin"}
+            </span>
+          </div>
+        )}
         <div
           className={cn(
             "px-3 py-2 font-sans text-sm leading-relaxed",
@@ -993,10 +1194,18 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
               ? "rounded-md rounded-br-none border-2 border-[#0a0a0a] bg-[#25D366] text-[#0a0a0a]"
               : isHours
                 ? "rounded-md rounded-bl-none border-2 border-[#a020f0]/60 bg-[#1a1722] text-[#e5e5e5]"
-                : "rounded-md rounded-bl-none border-2 border-[#2a2436] bg-[#1a1722] text-[#e5e5e5]"
+                : isCaraOrder
+                  ? "rounded-md rounded-bl-none border-2 border-[#ffd166]/50 bg-[#1a1722] text-[#e5e5e5] whitespace-pre-line"
+                  : "rounded-md rounded-bl-none border-2 border-[#2a2436] bg-[#1a1722] text-[#e5e5e5]"
           )}
         >
-          {msg.text}
+          {isPriceList ? (
+            <PriceListContent games={priceGames} single={!!msg.priceGameSlug} />
+          ) : isCaraOrder ? (
+            msg.text
+          ) : (
+            msg.text
+          )}
         </div>
         <div
           className={cn(
@@ -1018,6 +1227,87 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
         </div>
       </div>
     </motion.div>
+  );
+}
+
+/**
+ * Render structured price-list content (cards per game) dengan deep-link
+ * ke halaman store game terkait.
+ */
+function PriceListContent({
+  games,
+  single,
+}: {
+  games: Game[];
+  single: boolean;
+}) {
+  return (
+    <div className="space-y-2.5">
+      <p className="font-pixel text-[9px] uppercase tracking-wide text-[#25D366]">
+        {single ? "💰 Harga Game Ini" : "💰 Semua Game"}
+      </p>
+      {games.map((g) => (
+        <div
+          key={g.slug}
+          className="border border-[#2a2436] bg-[#0a0a0a]/60 pixel-corner p-2"
+        >
+          {/* game header + deep-link */}
+          <Link
+            href={`/store/${g.slug}`}
+            className="flex items-center justify-between gap-2 group"
+          >
+            <span className="flex items-center gap-1.5 min-w-0">
+              <span aria-hidden="true">{g.emoji}</span>
+              <span
+                className="font-pixel text-[8px] uppercase tracking-wide truncate"
+                style={{ color: g.accent }}
+              >
+                {g.name}
+              </span>
+            </span>
+            <span
+              className="flex items-center gap-0.5 font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8] group-hover:text-[#25D366] transition-colors shrink-0"
+            >
+              Store <ArrowRight className="size-2.5" />
+            </span>
+          </Link>
+          {/* categories + items */}
+          <div className="mt-1.5 space-y-1.5">
+            {g.categories.map((cat) => (
+              <div key={cat.id}>
+                <p className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
+                  {cat.icon} {cat.name}
+                </p>
+                <ul className="mt-1 space-y-0.5">
+                  {cat.items.map((item) => (
+                    <li
+                      key={item.id}
+                      className="flex items-center justify-between gap-2 text-[11px] leading-tight"
+                    >
+                      <span className="flex items-center gap-1 min-w-0">
+                        <span className="text-[#9a93a8]">•</span>
+                        <span className="text-[#e5e5e5] truncate">{item.name}</span>
+                        {item.tag && (
+                          <span className="font-pixel text-[5px] uppercase tracking-wide px-1 py-0.5 rounded-sm shrink-0" style={{ background: `${g.accent}22`, color: g.accent }}>
+                            {item.tag}
+                          </span>
+                        )}
+                      </span>
+                      <span className="font-pixel text-[8px] text-[#c44bff] shrink-0">
+                        {item.priceLabel}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      <p className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8] pt-1">
+        Klik nama game → lihat detail & order 🚀
+      </p>
+    </div>
   );
 }
 
