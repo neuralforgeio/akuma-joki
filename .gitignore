@@ -38,3 +38,7 @@ server.log
 /mini-services/
 Caddyfile
 download/
+
+# local handover doc & uploads (contain non-committed context)
+worklog.md
+/upload/
