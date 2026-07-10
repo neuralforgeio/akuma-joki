@@ -5,11 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { GAMES } from "@/lib/games-data";
+import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
+import { useAdminStore } from "@/lib/admin-store";
 import { PixelButton } from "./pixel-button";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
+  // Baca games dari admin store (ter-sync dari GitHub). Fallback ke DEFAULT_GAMES.
+  const adminGames = useAdminStore((s) => s.games);
+  const hydrated = useAdminStore((s) => s._hasHydrated);
+  const games = hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -56,7 +61,7 @@ export function Navbar() {
           <NavTab active={isHome} href="/">
             Home
           </NavTab>
-          {GAMES.map((g) => (
+          {games.map((g) => (
             <NavTab key={g.slug} active={isActiveStore(g.slug)} href={`/store/${g.slug}`}>
               <span className="mr-1">{g.emoji}</span>
               {g.name}
@@ -92,7 +97,7 @@ export function Navbar() {
           <MobileTab active={isHome} href="/" onClick={() => setMobileOpen(false)}>
             🏠 Home
           </MobileTab>
-          {GAMES.map((g) => (
+          {games.map((g) => (
             <MobileTab key={g.slug} active={isActiveStore(g.slug)} href={`/store/${g.slug}`} onClick={() => setMobileOpen(false)}>
               {g.emoji} {g.name}
             </MobileTab>

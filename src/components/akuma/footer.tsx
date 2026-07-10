@@ -3,9 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MessageCircle, ShieldCheck, Zap, Wallet } from "lucide-react";
-import { GAMES, WHATSAPP_NUMBER } from "@/lib/games-data";
+import { GAMES as DEFAULT_GAMES, WHATSAPP_NUMBER } from "@/lib/games-data";
+import { useAdminStore } from "@/lib/admin-store";
 
 export function Footer() {
+  // Baca games dari admin store (ter-sync). Fallback ke DEFAULT_GAMES.
+  const adminGames = useAdminStore((s) => s.games);
+  const hydrated = useAdminStore((s) => s._hasHydrated);
+  const games = hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
   const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     "Halo AKUMA JOKI, saya mau tanya-tanya soal joki 🔥"
   )}`;
@@ -45,7 +50,7 @@ export function Footer() {
           <div>
             <p className="font-pixel text-[10px] uppercase text-[#c44bff] mb-4">Games</p>
             <ul className="space-y-2 text-sm">
-              {GAMES.map((g) => (
+              {games.map((g) => (
                 <li key={g.slug}>
                   <Link
                     href={`/store/${g.slug}`}

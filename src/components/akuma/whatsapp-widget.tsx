@@ -37,6 +37,7 @@ import {
   getGameBySlug,
   type Game,
 } from "@/lib/games-data";
+import { useAdminStore } from "@/lib/admin-store";
 
 /* ============================ KONFIGURASI ============================ */
 // WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)
@@ -454,9 +455,12 @@ export function WhatsAppWidget() {
   }, [pathname]);
   const currentGame = storeSlug ? getGameBySlug(storeSlug) : undefined;
   const quickReplies = currentGame ? QUICK_REPLIES_STORE : QUICK_REPLIES_DEFAULT;
+  // Baca games dari admin store (ter-sync). Fallback ke GAMES default.
+  const adminGames = useAdminStore((s) => s.games);
+  const allGames = adminGames.length > 0 ? adminGames : GAMES;
   const totalItems = currentGame
     ? currentGame.categories.reduce((a, c) => a + c.items.length, 0)
-    : GAMES.reduce(
+    : allGames.reduce(
         (a, g) => a + g.categories.reduce((b, c) => b + c.items.length, 0),
         0
       );

@@ -198,7 +198,9 @@ export const SYNCED_UPDATED_AT = parsed.updatedAt ?? null;
 
 export function getGameBySlug(slug: string | null): Game | undefined {
   if (!slug) return undefined;
-  return GAMES.find((g) => g.slug === slug);
+  // Cari di SYNCED_GAMES dulu (data terbaru dari admin dashboard),
+  // fallback ke GAMES default jika tidak ketemu.
+  return SYNCED_GAMES.find((g) => g.slug === slug) ?? GAMES.find((g) => g.slug === slug);
 }
 
 export function findProduct(gameSlug: string | null, productId: string | null) {
@@ -211,5 +213,7 @@ export function findProduct(gameSlug: string | null, productId: string | null) {
   return { game, category: undefined, item: undefined };
 }
 
-/** Slugs that are valid store routes — used for static-ish validation. */
-export const VALID_SLUGS = GAMES.map((g) => g.slug);
+/** Slugs that are valid store routes — gabungan SYNCED + default. */
+export const VALID_SLUGS = Array.from(
+  new Set([...SYNCED_GAMES.map((g) => g.slug), ...GAMES.map((g) => g.slug)])
+);

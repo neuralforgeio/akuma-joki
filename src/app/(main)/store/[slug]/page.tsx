@@ -1,12 +1,22 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getGameBySlug, VALID_SLUGS } from "@/lib/games-data";
+import { getGameBySlug, VALID_SLUGS, SYNCED_GAMES, GAMES } from "@/lib/games-data";
 import { StoreView } from "@/components/akuma/store-view";
 
-export const dynamicParams = false;
+// dynamicParams = true agar game baru yang di-add via dashboard (sync ke GitHub)
+// tetap bisa diakses setelah redeploy, meski tidak ada di generateStaticParams awal.
+export const dynamicParams = true;
 
 export function generateStaticParams() {
-  return VALID_SLUGS.map((slug) => ({ slug }));
+  // Gabungan slug dari SYNCED_GAMES (data terbaru) + GAMES default.
+  // Setelah admin add game + sync → Vercel redeploys → slug baru ter-generate.
+  const allSlugs = Array.from(
+    new Set([
+      ...SYNCED_GAMES.map((g) => g.slug),
+      ...GAMES.map((g) => g.slug),
+    ])
+  );
+  return allSlugs.map((slug) => ({ slug }));
 }
 
 export function generateMetadata({

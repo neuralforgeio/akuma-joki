@@ -17,7 +17,9 @@ import {
   Headphones,
   Clock,
 } from "lucide-react";
-import { GAMES } from "@/lib/games-data";
+import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
+import type { Game } from "@/lib/games-data";
+import { useAdminStore } from "@/lib/admin-store";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { Starfield, MovingGrid } from "./backgrounds";
@@ -104,6 +106,11 @@ function AnimatedHeading() {
 
 export function HomeView() {
   const gamesRef = useRef<HTMLDivElement>(null);
+  // Baca games dari admin store (ter-sync dari GitHub). Fallback ke DEFAULT_GAMES.
+  const adminGames = useAdminStore((s) => s.games);
+  const hydrated = useAdminStore((s) => s._hasHydrated);
+  const games: Game[] =
+    hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
 
   const scrollToGames = () => {
     gamesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -204,7 +211,7 @@ export function HomeView() {
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {GAMES.map((g, idx) => (
+          {games.map((g, idx) => (
             <Reveal key={g.slug} delay={idx * 90}>
               <Link href={`/store/${g.slug}`} className="group block h-full text-left">
                 <GameCard game={g} />
@@ -306,7 +313,7 @@ function Stat({
   );
 }
 
-function GameCard({ game }: { game: (typeof GAMES)[number] }) {
+function GameCard({ game }: { game: Game }) {
   return (
     <div className="relative h-full akuma-card-hover border-2 border-[#a020f0]/50 bg-[#121017] pixel-corner overflow-hidden group-hover:border-[#a020f0] group-hover:shadow-[0_0_30px_rgba(160,32,240,0.5)]">
       {/* header band */}
