@@ -196,7 +196,41 @@
     "csName": "Akuma Joki"
   },
   "faq": [],
-  "waReplies": [],
+  "waReplies": [
+    {
+      "label": "Cek Harga Joki",
+      "emoji": "💰",
+      "kind": "auto",
+      "autoKey": "price-all",
+      "reply": ""
+    },
+    {
+      "label": "Cara Order",
+      "emoji": "🚀",
+      "kind": "auto",
+      "autoKey": "cara-order",
+      "reply": "🚀 CARA ORDER:\n1. Pilih game\n2. Klik joki\n3. Checkout\n4. Bayar via WA"
+    },
+    {
+      "label": "Status Pesanan",
+      "emoji": "📦",
+      "kind": "auto",
+      "autoKey": "status",
+      "reply": "📦 Beritahu kami Order ID untuk cek status."
+    },
+    {
+      "label": "Jam Operasional",
+      "emoji": "🕐",
+      "kind": "auto",
+      "autoKey": "hours",
+      "reply": "🕐 Online 09.00-23.00 WIB setiap hari."
+    },
+    {
+      "label": "Chat Admin",
+      "emoji": "👤",
+      "kind": "redirect"
+    }
+  ],
   "version": 1,
-  "updatedAt": "2026-07-10T22:01:36.341Z"
+  "updatedAt": "2026-07-10T22:05:16.763Z"
 }
