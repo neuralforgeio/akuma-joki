@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import WhatsAppWidget from "@/components/akuma/whatsapp-widget-loader";
 import { AnnouncementBanner } from "@/components/admin/announcement-banner";
 import { VisitorTracker } from "@/components/admin/visitor-tracker";
+import { CookieConsent } from "@/components/akuma/cookie-consent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
         <VisitorTracker />
         {children}
         <WhatsAppWidget />
+        <CookieConsent />
         <Toaster />
       </body>
     </html>
