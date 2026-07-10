@@ -1441,6 +1441,8 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
   const isRedirect = msg.role === "cs" && msg.text === REDIRECT_MSG;
   const isHours = msg.role === "cs" && msg.text === HOURS_REPLY;
   const isPriceList = msg.variant === "price-list";
+  // Baca csAvatar langsung dari store (Bubble adalah sub-component, tidak punya akses ke scope parent)
+  const csAvatar = useAdminStore((s) => s.settings.csAvatar);
   const isCaraOrder = msg.role === "cs" && msg.text === CARA_ORDER_REPLY;
   // games untuk price-list: jika priceGameSlug diisi → 1 game, else semua
   const priceGames: Game[] = isPriceList
