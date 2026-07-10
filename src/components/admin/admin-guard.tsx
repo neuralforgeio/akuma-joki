@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated, refreshSession } from "@/lib/auth";
 
 /**
  * AdminGuard — wrap halaman admin yang butuh auth.
@@ -18,6 +18,8 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
       router.replace("/admin/login");
       return;
     }
+    // Perpanjang session (refresh expiry 7 hari) setiap kali admin navigasi
+    refreshSession();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setChecked(true);
   }, [router, pathname]);
