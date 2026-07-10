@@ -181,7 +181,14 @@
       ]
     }
   ],
-  "announcement": null,
+  "announcement": {
+    "id": "mrfhd843",
+    "title": "PEMBUKAAN AKUMA JOKI - OWNER",
+    "body": "🎉 Selamat datang di website Joki Roblox kami, nikmati pengalaman pemesanan yang lebih mudah, cepat, dan aman!",
+    "type": "info",
+    "active": true,
+    "createdAt": 1783720896339
+  },
   "takedown": false,
   "takedownReason": "Website sedang dalam perbaikan sistem (Maintenance). Kami akan kembali secepatnya! - AKUMA JOKI",
   "settings": {
@@ -191,5 +198,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T21:45:39.906Z"
+  "updatedAt": "2026-07-10T22:01:36.341Z"
 }
