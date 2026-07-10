@@ -517,17 +517,18 @@ export function WhatsAppWidget() {
     lastFocusRef.current?.focus?.();
   }, [open]);
 
-  // auto-open setelah delay (throttle via sessionStorage, sekali per session)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (sessionStorage.getItem(AUTO_KEY)) return;
-    const id = window.setTimeout(() => {
-      sessionStorage.setItem(AUTO_KEY, "1");
-      setOpen(true);
-      setHasNew(false);
-    }, AUTO_OPEN_DELAY);
-    return () => window.clearTimeout(id);
-  }, []);
+  // auto-open DISABLED — biarkan user yang buka manual (sesuai request owner)
+  // kode auto-open lama di-comment untuk reference, tidak dijalankan.
+  // useEffect(() => {
+  //   if (typeof window === "undefined") return;
+  //   if (sessionStorage.getItem(AUTO_KEY)) return;
+  //   const id = window.setTimeout(() => {
+  //     sessionStorage.setItem(AUTO_KEY, "1");
+  //     setOpen(true);
+  //     setHasNew(false);
+  //   }, AUTO_OPEN_DELAY);
+  //   return () => window.clearTimeout(id);
+  // }, []);
 
   /* ---------- logic ---------- */
 

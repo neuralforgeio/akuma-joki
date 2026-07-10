@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout, getSession } from "@/lib/auth";
@@ -19,6 +20,8 @@ import {
   HelpCircle,
   Settings,
   LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const MENU = [
@@ -36,10 +39,34 @@ const MENU = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
+const COLLAPSE_KEY = "akuma-admin-sidebar-collapsed";
+
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const session = getSession();
+  const [collapsed, setCollapsed] = useState(false);
+
+  // load collapsed state from localStorage
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCollapsed(localStorage.getItem(COLLAPSE_KEY) === "1");
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const toggleCollapse = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    try {
+      localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0");
+      window.dispatchEvent(new Event("akuma-sidebar-toggle"));
+    } catch {
+      /* ignore */
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -47,17 +74,37 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r-2 border-[#a020f0]/40 bg-[#0a0a0a] scanlines">
+    <aside
+      className={cn(
+        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r-2 border-[#a020f0]/40 bg-[#0a0a0a] scanlines transition-all duration-300",
+        collapsed ? "w-16" : "w-56"
+      )}
+    >
       {/* logo */}
-      <div className="border-b-2 border-[#a020f0]/40 px-4 py-4">
-        <Link href="/admin" className="block">
-          <p className="font-pixel text-[10px] uppercase text-[#c44bff] text-glow-neon">
-            AKUMA
-          </p>
-          <p className="font-pixel text-[8px] uppercase text-[#9a93a8] tracking-widest">
-            Admin Panel
-          </p>
-        </Link>
+      <div className="relative border-b-2 border-[#a020f0]/40 px-4 py-4">
+        <div className="flex items-center justify-between">
+          {collapsed ? (
+            <div className="flex h-8 w-8 items-center justify-center border-2 border-[#a020f0] pixel-corner bg-[#a020f0]/10">
+              <span className="font-pixel text-[8px] text-[#c44bff]">A</span>
+            </div>
+          ) : (
+            <Link href="/admin" className="block">
+              <p className="font-pixel text-[10px] uppercase text-[#c44bff] text-glow-neon">
+                AKUMA
+              </p>
+              <p className="font-pixel text-[8px] uppercase text-[#9a93a8] tracking-widest">
+                Admin Panel
+              </p>
+            </Link>
+          )}
+          <button
+            onClick={toggleCollapse}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="flex h-6 w-6 items-center justify-center border-2 border-[#2a2436] text-[#9a93a8] pixel-corner hover:border-[#a020f0] hover:text-[#c44bff] transition-colors"
+          >
+            {collapsed ? <ChevronRight className="size-3" /> : <ChevronLeft className="size-3" />}
+          </button>
+        </div>
       </div>
 
       {/* menu */}
@@ -72,15 +119,17 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              title={collapsed ? item.label : undefined}
               className={cn(
                 "flex items-center gap-2.5 px-3 py-2.5 font-pixel text-[8px] uppercase tracking-wide pixel-corner transition-all",
+                collapsed && "justify-center px-0",
                 active
                   ? "bg-[#a020f0]/20 text-[#c44bff] border-2 border-[#a020f0] shadow-[0_0_10px_rgba(160,32,240,0.4)]"
                   : "text-[#9a93a8] border-2 border-transparent hover:text-[#e5e5e5] hover:bg-[#a020f0]/10"
               )}
             >
               <Icon className="size-3.5 shrink-0" />
-              <span className="truncate">{item.label}</span>
+              {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
           );
         })}
@@ -88,18 +137,24 @@ export function AdminSidebar() {
 
       {/* footer: user + logout */}
       <div className="border-t-2 border-[#a020f0]/40 px-3 py-3">
-        <div className="mb-2">
-          <p className="font-pixel text-[7px] uppercase text-[#9a93a8]">Login</p>
-          <p className="font-pixel text-[8px] text-[#6ee7b7] truncate">
-            {session?.user ?? "admin"}
-          </p>
-        </div>
+        {!collapsed && (
+          <div className="mb-2">
+            <p className="font-pixel text-[7px] uppercase text-[#9a93a8]">Login</p>
+            <p className="font-pixel text-[8px] text-[#6ee7b7] truncate">
+              {session?.user ?? "admin"}
+            </p>
+          </div>
+        )}
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-2 px-3 py-2 font-pixel text-[8px] uppercase text-[#ff3b6b] border-2 border-[#ff3b6b]/40 pixel-corner transition-all hover:bg-[#ff3b6b]/10"
+          title={collapsed ? "Logout" : undefined}
+          className={cn(
+            "flex items-center gap-2 font-pixel text-[8px] uppercase text-[#ff3b6b] border-2 border-[#ff3b6b]/40 pixel-corner transition-all hover:bg-[#ff3b6b]/10",
+            collapsed ? "w-full justify-center px-0 py-2.5" : "w-full px-3 py-2"
+          )}
         >
           <LogOut className="size-3" />
-          Logout
+          {!collapsed && "Logout"}
         </button>
       </div>
     </aside>

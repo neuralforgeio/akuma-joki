@@ -50,22 +50,22 @@ function AnimatedHeading() {
 
   return (
     <div className="mt-6 flex flex-col items-start">
-      <div className="relative h-[1.2em] sm:h-[1.15em] md:h-[1.1em] overflow-visible">
+      <div className="relative min-h-[1.4em] sm:min-h-[1.3em] md:min-h-[1.2em] mb-3">
         <AnimatePresence mode="wait">
           <motion.h1
             key={idx}
-            initial={{ opacity: 0, y: 30, scale: 0.8, filter: "blur(8px)" }}
+            initial={{ opacity: 0, y: 12, scale: 0.92, filter: "blur(6px)" }}
             animate={{
               opacity: 1,
-              y: [30, -4, 0],
+              y: [12, -2, 0],
               scale: 1,
               filter: "blur(0px)",
             }}
-            exit={{ opacity: 0, y: -20, scale: 1.1, filter: "blur(6px)" }}
+            exit={{ opacity: 0, y: -8, scale: 1.05, filter: "blur(4px)" }}
             transition={{
-              duration: 0.6,
+              duration: 0.5,
               ease: "easeOut",
-              y: { duration: 1.2, times: [0, 0.6, 1], ease: "easeOut" },
+              y: { duration: 0.8, times: [0, 0.6, 1], ease: "easeOut" },
             }}
             className="font-pixel text-3xl sm:text-5xl md:text-6xl leading-tight text-[#e5e5e5] text-glow-neon inline-flex"
           >
@@ -77,11 +77,11 @@ function AnimatedHeading() {
       <AnimatePresence mode="wait">
         <motion.p
           key={`sub-${idx}`}
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-          className="mt-2 font-pixel text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#c44bff]"
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.35, delay: 0.12 }}
+          className="font-pixel text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#c44bff]"
         >
           {cur.subtitle}
         </motion.p>

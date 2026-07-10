@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "@/components/akuma/navbar";
 import { Footer } from "@/components/akuma/footer";
+import { BackToTop } from "@/components/akuma/back-to-top";
 
 /**
  * Wraps all "normal" routes (/, /store/*, /checkout) with the Navbar + Footer
@@ -38,6 +39,7 @@ export default function MainLayout({
         </AnimatePresence>
       </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }

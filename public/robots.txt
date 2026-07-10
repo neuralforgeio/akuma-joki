@@ -1,14 +1,37 @@
+# AKUMA JOKI — robots.txt
+# Sembunyikan admin & internal routes dari bot/scanner
+
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /takedown
+Disallow: /api
+Disallow: /_next
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /takedown
+Disallow: /api
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /admin
+Disallow: /admin/
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /admin
+Disallow: /admin/
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /takedown
+Disallow: /api
+Disallow: /_next
+
+Sitemap: /sitemap.xml
