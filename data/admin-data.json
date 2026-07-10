@@ -192,7 +192,17 @@
           "id": "juancoks",
           "name": "JUANCOKS",
           "icon": "📈",
-          "items": []
+          "items": [
+            {
+              "id": "montol",
+              "name": "MONTOL",
+              "price": 20000,
+              "priceLabel": "20K",
+              "tag": "kons",
+              "description": "kont",
+              "requirement": "kwont"
+            }
+          ]
         }
       ]
     }
@@ -207,5 +217,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T19:28:18.891Z"
+  "updatedAt": "2026-07-10T19:28:53.286Z"
 }
