@@ -706,6 +706,24 @@ export function WhatsAppWidget() {
   const charCount = input.length;
   const nearLimit = charCount > 400;
 
+  /* ---------- emoji picker ---------- */
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const EMOJI_SETS = [
+    // Ekspresi
+    ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "😉", "😍", "🥰", "😎", "🤔", "😴", "🤯", "🥳", "😭"],
+    // Jempol & gestur
+    ["👍", "👎", "👌", "✌️", "🤞", "🤟", "🤙", "👋", "🙏", "💪", "🔥", "✨", "💯", "❤️", "🧡", "💚", "💙", "💜", "🖤", "🤍"],
+    // Game & simbol
+    ["🎮", "🕹️", "⚔️", "🛡️", "🗡️", "🏹", "💎", "💰", "🏆", "🥇", "🚀", "⭐", "🌟", "🎯", "🎲", "🃏", "👑", "💀", "👻", "🤖"],
+    // Aktivitas & objek
+    ["📦", "🛒", "💳", "💸", "🎁", "🕐", "📅", "⚡", "🔔", "📌", "✅", "❌", "⚠️", "❓", "❗", "💬", "📧", "📱", "💻", "🌐"],
+  ] as const;
+  const [emojiTab, setEmojiTab] = useState(0);
+  const insertEmoji = (em: string) => {
+    setInput((v) => v + em);
+    inputRef.current?.focus();
+  };
+
   /* ---------- command picker (/ template) ---------- */
   // Ketik "/" di input → munculkan picker template chat (quick replies) lagi,
   // bahkan setelah user pernah kirim pesan. Filter by text setelah "/".
@@ -1020,7 +1038,7 @@ export function WhatsAppWidget() {
             >
               {/* ===== Command Picker (ketik "/" untuk template) ===== */}
               <AnimatePresence>
-                {showCommandPicker && (
+                {showCommandPicker && !showEmojiPicker && (
                   <motion.div
                     initial={{ opacity: 0, y: 8, scale: 0.96 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1093,13 +1111,91 @@ export function WhatsAppWidget() {
                 )}
               </AnimatePresence>
 
+              {/* ===== Emoji Picker ===== */}
+              <AnimatePresence>
+                {showEmojiPicker && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.16, ease: "easeOut" }}
+                    className="absolute bottom-full left-0 right-0 mb-2 bg-[#0a0a0a] border-2 border-[#25D366]/60 pixel-corner shadow-[0_0_0_2px_#0a0a0a,0_0_18px_rgba(37,211,102,0.35)]"
+                    role="dialog"
+                    aria-label="Pilih emoji"
+                  >
+                    {/* tabs */}
+                    <div className="flex border-b-2 border-[#25D366]/20 bg-[#121017]">
+                      {["😀", "👍", "🎮", "📦"].map((icon, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setEmojiTab(i)}
+                          aria-label={`Emoji kategori ${i + 1}`}
+                          aria-pressed={emojiTab === i}
+                          className={cn(
+                            "flex-1 py-2 text-lg transition-colors",
+                            emojiTab === i
+                              ? "bg-[#25D366]/15 border-b-2 border-[#25D366]"
+                              : "hover:bg-[#25D366]/5 border-b-2 border-transparent"
+                          )}
+                        >
+                          {icon}
+                        </button>
+                      ))}
+                    </div>
+                    {/* emoji grid */}
+                    <div className="grid grid-cols-8 gap-0.5 p-2 max-h-40 overflow-y-auto">
+                      {EMOJI_SETS[emojiTab].map((em, idx) => (
+                        <button
+                          key={`${emojiTab}-${idx}`}
+                          type="button"
+                          onClick={() => insertEmoji(em)}
+                          className="flex h-7 w-7 items-center justify-center text-base hover:bg-[#25D366]/15 rounded-sm transition-colors"
+                          aria-label={`Insert emoji ${em}`}
+                        >
+                          {em}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="border-t-2 border-[#25D366]/20 bg-[#121017] px-3 py-1.5">
+                      <p className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
+                        Klik emoji untuk sisipkan ke pesan
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="flex items-center gap-2">
+                {/* emoji toggle button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEmojiPicker((v) => !v);
+                    setShowCommandPicker(false);
+                  }}
+                  aria-label={showEmojiPicker ? "Tutup emoji picker" : "Buka emoji picker"}
+                  aria-pressed={showEmojiPicker}
+                  title="Emoji"
+                  className={cn(
+                    "flex h-11 w-11 shrink-0 items-center justify-center border-2 pixel-corner transition-all text-lg active:translate-y-[1px]",
+                    showEmojiPicker
+                      ? "bg-[#25D366] text-[#0a0a0a] border-[#25D366] shadow-[0_0_12px_rgba(37,211,102,0.6)]"
+                      : "bg-[#0a0a0a] text-[#e5e5e5] border-[#2a2436] hover:border-[#25D366] hover:text-[#25D366]"
+                  )}
+                >
+                  😀
+                </button>
                 <input
                   ref={inputRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ketik pesan → WA admin · atau ketik / untuk template"
-                  aria-label="Ketik pesan untuk diteruskan ke admin WhatsApp, atau ketik / untuk memilih template"
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    if (showEmojiPicker) setShowEmojiPicker(false);
+                  }}
+                  onFocus={() => showEmojiPicker && setShowEmojiPicker(false)}
+                  placeholder="Ketik pesan → WA admin · ketik / untuk template"
+                  aria-label="Ketik pesan untuk diteruskan ke admin WhatsApp, ketik / untuk template, atau klik emoji"
                   maxLength={500}
                   className={cn(
                     "min-w-0 flex-1 bg-[#0a0a0a] px-3 py-2.5 font-sans text-sm text-[#e5e5e5] placeholder:text-[#9a93a8] border-2 pixel-corner outline-none transition-colors",
@@ -1124,7 +1220,7 @@ export function WhatsAppWidget() {
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="font-pixel text-[6px] uppercase tracking-wide text-[#25D366]/80">
-                    / = template
+                    😀 = emoji · / = template
                   </span>
                   <p
                     className={cn(
