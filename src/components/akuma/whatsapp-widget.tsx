@@ -30,26 +30,37 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, BellOff, Send, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GAMES, WHATSAPP_NUMBER } from "@/lib/games-data";
 
 /* ============================ KONFIGURASI ============================ */
-const WHATSAPP_NUMBER = "6281234567890"; // Ganti dengan nomor asli nanti
+// WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)
 const CS_NAME = "Akuma Joki";
 const WELCOME_MESSAGE =
-  "Halo! 👋 Selamat datang di Akuma Joki. Ada yang bisa kami bantu?";
+  "Halo! 👋 Selamat datang di Akuma Joki. Pilih menu cepat di bawah untuk jawaban otomatis, atau ketik pesanmu untuk langsung chat admin via WhatsApp. 🚀";
 
-const QUICK_REPLIES: { label: string; emoji: string }[] = [
-  { label: "Cek Harga Joki", emoji: "💰" },
-  { label: "Status Pesanan", emoji: "📦" },
-  { label: "Chat Admin", emoji: "👤" },
-  { label: "Jam Operasional", emoji: "🕐" },
+const QUICK_REPLIES: { label: string; emoji: string; kind: "auto" | "redirect" }[] = [
+  { label: "Cek Harga Joki", emoji: "💰", kind: "auto" },
+  { label: "Status Pesanan", emoji: "📦", kind: "auto" },
+  { label: "Jam Operasional", emoji: "🕐", kind: "auto" },
+  { label: "Chat Admin", emoji: "👤", kind: "redirect" },
 ];
-const REDIRECT_MSG = "Pesan dikirim, mengarahkan ke WhatsApp...";
+const REDIRECT_MSG = "Pesan dikirim! Mengarahkan ke WhatsApp admin...";
+const AUTO_REPLY_HINT =
+  "👆 Pilih menu di bawah untuk jawaban otomatis. Ketik pesan sendiri akan langsung diteruskan ke admin.";
 const HOURS_REPLY =
   "🕐 Kami online setiap hari 09.00–23.00 WIB. Di luar jam itu, pesan akan dibalas saat kami kembali online!";
 const OFFLINE_WELCOME =
   "Halo! 👋 Saat ini kami sedang OFFLINE. Tinggalkan pesan, akan kami balas saat kembali online (09.00 WIB).";
 const SUBSTATUS_ONLINE = "Biasanya balas dalam beberapa menit";
 const SUBSTATUS_OFFLINE = "Online 09.00–23.00 WIB";
+
+/** Pesan auto-reply untuk "Status Pesanan" (tidak ada sistem order tracking backend). */
+const STATUS_REPLY =
+  "📦 Untuk cek status pesanan, mohon beritahu kami Order ID / nomor WhatsApp yang dipakai saat order. Kamu bisa ketik detailnya di bawah ini, lalu akan diteruskan ke admin kami untuk dicek ya!";
+
+/** Pesan auto-reply untuk "Chat Admin" — tetap di chat box (instruksi), redirect terpisah. */
+const CHAT_ADMIN_REPLY =
+  "👤 Baik! Kami arahkan kamu ke WhatsApp admin kami untuk dibantu lebih lanjut. 👇";
 
 /** Jam operasional (WIB). Di luar ini = offline. */
 const OPEN_HOUR = 9;
@@ -224,6 +235,29 @@ function getOperatingStatus(now: number) {
   return open;
 }
 
+/**
+ * Build daftar harga joki lengkap dari data GAMES (source of truth yang sama
+ * dengan yang ditampilkan di halaman store). Dipakai untuk auto-reply
+ * "Cek Harga Joki" — user tidak perlu redirect ke WA admin.
+ */
+function buildPriceListReply(): string {
+  const lines: string[] = ["💰 *DAFTAR HARGA JOKI AKUMA*", ""];
+  for (const g of GAMES) {
+    lines.push(`${g.emoji} *${g.name}*`);
+    for (const cat of g.categories) {
+      lines.push(`  ${cat.icon} ${cat.name}`);
+      for (const item of cat.items) {
+        const tagStr = item.tag ? ` [${item.tag}]` : "";
+        const reqStr = item.requirement ? ` ⚠️${item.requirement}` : "";
+        lines.push(`    • ${item.name} — ${item.priceLabel}${tagStr}${reqStr}`);
+      }
+    }
+    lines.push("");
+  }
+  lines.push("Ketik nama joki yang kamu mau, atau pilih 'Chat Admin' untuk order. 🚀");
+  return lines.join("\n");
+}
+
 /* ============================ ICONS ============================ */
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -356,6 +390,40 @@ export function WhatsAppWidget() {
   }, []);
 
   /* ---------- logic ---------- */
+
+  /**
+   * Helper: push bubble user + (opsional) bubble CS auto-reply setelah jeda typing.
+   * Dipakai untuk SEMUA quick-reply bertipe "auto" (tidak redirect ke WA admin).
+   */
+  const pushUserAndAutoReply = useCallback(
+    (userText: string, csReply: string) => {
+      const userMsg: Msg = {
+        id: nextId(),
+        role: "user",
+        text: userText,
+        ts: Date.now(),
+        sent: true,
+      };
+      writeChat([...messages, userMsg]);
+      if (!muted) playBlip("send");
+
+      setTyping(true);
+      window.setTimeout(() => {
+        setTyping(false);
+        writeChat([
+          ...readChat(),
+          { id: nextId(), role: "cs", text: csReply, ts: Date.now() },
+        ]);
+        if (!muted) playBlip("recv");
+      }, 900);
+    },
+    [messages, muted]
+  );
+
+  /**
+   * Kirim pesan FREE-TEXT (bukan dari template) → LANGSUNG redirect ke WhatsApp
+   * admin dengan teks yang user ketik. Tidak ada auto-reply.
+   */
   const sendMessage = useCallback(
     (text: string) => {
       const t = text.trim();
@@ -403,33 +471,68 @@ export function WhatsAppWidget() {
     [messages, muted]
   );
 
-  // quick reply khusus "Jam Operasional" → jawab langsung tanpa buka wa.me
+  /**
+   * Handle quick-reply:
+   *  - kind "auto"     → jawab otomatis di chat box (TIDAK redirect ke WA admin).
+   *  - kind "redirect" → tampilkan instruksi di chat box + redirect ke WA admin.
+   *
+   * Pesan yang diketik user bebas (input manual) TIDAK lewat sini — itu langsung
+   * ke sendMessage() = redirect ke admin.
+   */
   const handleQuickReply = useCallback(
-    (q: { label: string; emoji: string }) => {
-      if (q.label === "Jam Operasional") {
-        const userMsg: Msg = {
-          id: nextId(),
-          role: "user",
-          text: q.label,
-          ts: Date.now(),
-          sent: true,
-        };
-        writeChat([...messages, userMsg]);
-        setTyping(true);
-        window.setTimeout(() => {
-          setTyping(false);
-          writeChat([
-            ...readChat(),
-            { id: nextId(), role: "cs", text: HOURS_REPLY, ts: Date.now() },
-          ]);
-          if (!muted) playBlip("recv");
-        }, 900);
-        if (!muted) playBlip("send");
-        return;
+    (q: { label: string; emoji: string; kind: "auto" | "redirect" }) => {
+      // === AUTO-REPLY (tidak redirect ke WA admin) ===
+      if (q.kind === "auto") {
+        let reply = "";
+        if (q.label === "Cek Harga Joki") reply = buildPriceListReply();
+        else if (q.label === "Status Pesanan") reply = STATUS_REPLY;
+        else if (q.label === "Jam Operasional") reply = HOURS_REPLY;
+        if (reply) {
+          pushUserAndAutoReply(`${q.emoji} ${q.label}`, reply);
+          return;
+        }
       }
-      sendMessage(q.label);
+
+      // === REDIRECT ke WhatsApp admin ===
+      // (Chat Admin, atau fallback): tampilkan instruksi dulu, lalu buka wa.me
+      const userMsg: Msg = {
+        id: nextId(),
+        role: "user",
+        text: `${q.emoji} ${q.label}`,
+        ts: Date.now(),
+        sent: false,
+      };
+      writeChat([...messages, userMsg]);
+      if (!muted) playBlip("send");
+
+      // redirect ke WA admin dengan teks bawaan
+      const waText = `Halo Admin Akuma Joki, saya mau bertanya/${q.label}`;
+      window.open(
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waText)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      // tandai user message sent
+      window.setTimeout(() => {
+        writeChat(
+          readChat().map((m) => (m.id === userMsg.id ? { ...m, sent: true } : m))
+        );
+      }, 500);
+
+      // CS reply instruksi + konfirmasi redirect
+      setTyping(true);
+      window.setTimeout(() => {
+        setTyping(false);
+        writeChat([
+          ...readChat(),
+          { id: nextId(), role: "cs", text: CHAT_ADMIN_REPLY, ts: Date.now() },
+          { id: nextId(), role: "cs", text: REDIRECT_MSG, ts: Date.now() },
+        ]);
+        if (!muted) playBlip("recv");
+      }, 950);
     },
-    [messages, muted, sendMessage]
+    [messages, muted, pushUserAndAutoReply]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -681,19 +784,37 @@ export function WhatsAppWidget() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="flex flex-wrap gap-2 border-t-2 border-[#25D366]/30 bg-[#0a0a0a] px-3 py-2.5"
+                  className="border-t-2 border-[#25D366]/30 bg-[#0a0a0a] px-3 py-2.5"
                 >
-                  {QUICK_REPLIES.map((q) => (
-                    <button
-                      key={q.label}
-                      type="button"
-                      onClick={() => handleQuickReply(q)}
-                      className="btn-shine flex items-center gap-1 font-pixel text-[8px] uppercase tracking-wide text-[#25D366] border-2 border-[#25D366]/60 px-2.5 py-1.5 pixel-corner transition-all hover:bg-[#25D366] hover:text-[#0a0a0a] hover:shadow-[0_0_12px_rgba(37,211,102,0.6)] active:translate-y-[1px]"
-                    >
-                      <span aria-hidden="true">{q.emoji}</span>
-                      {q.label}
-                    </button>
-                  ))}
+                  {/* instruksi tegas: menu = auto, ketik = WA admin */}
+                  <div className="mb-2 flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 shrink-0 bg-[#25D366] shadow-[0_0_6px_#25D366]" />
+                    <p className="font-pixel text-[7px] uppercase tracking-wide text-[#6ee7b7]">
+                      Menu Cepat — Auto Jawab
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {QUICK_REPLIES.map((q) => (
+                      <button
+                        key={q.label}
+                        type="button"
+                        onClick={() => handleQuickReply(q)}
+                        className={cn(
+                          "btn-shine flex items-center gap-1 font-pixel text-[8px] uppercase tracking-wide pixel-corner px-2.5 py-1.5 transition-all active:translate-y-[1px]",
+                          q.kind === "auto"
+                            ? "text-[#25D366] border-2 border-[#25D366]/60 hover:bg-[#25D366] hover:text-[#0a0a0a] hover:shadow-[0_0_12px_rgba(37,211,102,0.6)]"
+                            : "text-[#c44bff] border-2 border-[#a020f0]/60 hover:bg-[#a020f0] hover:text-[#ffffff] hover:shadow-[0_0_12px_rgba(160,32,240,0.6)]"
+                        )}
+                      >
+                        <span aria-hidden="true">{q.emoji}</span>
+                        {q.label}
+                      </button>
+                    ))}
+                  </div>
+                  {/* hint kecil di bawah menu */}
+                  <p className="mt-2 font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]/80 leading-relaxed">
+                    👆 = jawaban otomatis di sini &nbsp;·&nbsp; 👤 = lanjut ke WA admin
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -708,8 +829,8 @@ export function WhatsAppWidget() {
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ketik pesan..."
-                  aria-label="Ketik pesan"
+                  placeholder="Ketik pesan → langsung ke WA admin"
+                  aria-label="Ketik pesan untuk diteruskan ke admin WhatsApp"
                   maxLength={500}
                   className="min-w-0 flex-1 bg-[#0a0a0a] px-3 py-2.5 font-sans text-sm text-[#e5e5e5] placeholder:text-[#9a93a8] border-2 border-[#2a2436] pixel-corner outline-none transition-colors focus:border-[#25D366] focus:shadow-[0_0_10px_rgba(37,211,102,0.4)]"
                 />
@@ -724,8 +845,8 @@ export function WhatsAppWidget() {
               </div>
               {/* char counter + footer notice */}
               <div className="mt-1.5 flex items-center justify-between px-1">
-                <p className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
-                  Diteruskan ke WhatsApp
+                <p className="font-pixel text-[6px] uppercase tracking-wide text-[#c44bff]">
+                  ✦ Pesan ini → WA Admin
                 </p>
                 <p
                   className={cn(
