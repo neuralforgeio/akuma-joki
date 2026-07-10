@@ -497,6 +497,7 @@ export function WhatsAppWidget() {
     : defaultQuickReplies;
   // Baca games dari admin store (ter-sync). Fallback ke GAMES default.
   const adminGames = useAdminStore((s) => s.games);
+  const csAvatar = useAdminStore((s) => s.settings.csAvatar);
   const allGames = adminGames.length > 0 ? adminGames : GAMES;
   const totalItems = currentGame
     ? currentGame.categories.reduce((a, c) => a + c.items.length, 0)
@@ -904,7 +905,7 @@ export function WhatsAppWidget() {
                 />
                 <div
                   className={cn(
-                    "relative flex h-11 w-11 items-center justify-center rounded-full font-pixel text-[11px] text-[#0a0a0a]",
+                    "relative flex h-11 w-11 items-center justify-center rounded-full font-pixel text-[11px] text-[#0a0a0a] overflow-hidden",
                     isOnline ? "bg-[#25D366]" : "bg-[#6b6478]"
                   )}
                   style={{
@@ -914,7 +915,11 @@ export function WhatsAppWidget() {
                   }}
                   aria-hidden="true"
                 >
-                  AJ
+                  {csAvatar ? (
+                    <img src={csAvatar} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    "AJ"
+                  )}
                 </div>
                 {/* status dot */}
                 <span
@@ -1103,7 +1108,7 @@ export function WhatsAppWidget() {
                       animate={{ y: [0, -2, 0] }}
                       transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
                     >
-                      <AvatarMini online={isOnline} />
+                      <AvatarMini online={isOnline} avatar={csAvatar} />
                     </motion.div>
                     <div className="flex items-center gap-1 rounded-md rounded-bl-none border-2 border-[#2a2436] bg-[#1a1722] px-3 py-2.5">
                       <Dot delay="0ms" />
@@ -1456,7 +1461,7 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
       }
       className={cn("flex items-end gap-2", isUser ? "justify-end" : "justify-start")}
     >
-      {!isUser && <AvatarMini online={isOnline} />}
+      {!isUser && <AvatarMini online={isOnline} avatar={csAvatar} />}
       <div className={cn("max-w-[88%]", isUser && "order-1")}>
         {/* badge AUTO/ADMIN di atas bubble CS */}
         {!isUser && msg.badge && (
@@ -1597,11 +1602,11 @@ function PriceListContent({
   );
 }
 
-function AvatarMini({ online }: { online: boolean }) {
+function AvatarMini({ online, avatar }: { online: boolean; avatar?: string }) {
   return (
     <div
       className={cn(
-        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-pixel text-[8px] text-[#0a0a0a]",
+        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-pixel text-[8px] text-[#0a0a0a] overflow-hidden",
         online ? "bg-[#25D366]" : "bg-[#6b6478]"
       )}
       style={{
@@ -1611,7 +1616,11 @@ function AvatarMini({ online }: { online: boolean }) {
       }}
       aria-hidden="true"
     >
-      AJ
+      {avatar ? (
+        <img src={avatar} alt="" className="h-full w-full object-cover" />
+      ) : (
+        "AJ"
+      )}
     </div>
   );
 }

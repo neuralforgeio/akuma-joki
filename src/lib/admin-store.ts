@@ -103,6 +103,8 @@ export type FAQItem = {
 export type AdminSettings = {
   whatsappNumber: string;
   csName: string;
+  /** Avatar CS (base64 data URL, hasil crop). Dipakai di WA widget. */
+  csAvatar?: string;
 };
 
 /* ============================ Store ============================ */

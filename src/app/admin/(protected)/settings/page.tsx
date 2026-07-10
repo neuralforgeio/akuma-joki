@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useAdminStore } from "@/lib/admin-store";
-import { PixelButton } from "@/components/akuma/pixel-button";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Save, Download, Upload, RefreshCw, MessageCircle } from "lucide-react";
+import { Save, Download, Upload, RefreshCw } from "lucide-react";
+import { AvatarCrop } from "@/components/admin/avatar-crop";
 
 export default function SettingsPage() {
   const settings = useAdminStore((s) => s.settings);
@@ -15,14 +15,21 @@ export default function SettingsPage() {
 
   const [waNumber, setWaNumber] = useState(settings.whatsappNumber);
   const [csName, setCsName] = useState(settings.csName);
+  const [csAvatar, setCsAvatar] = useState(settings.csAvatar || "");
 
   const handleSave = () => {
-    updateSettings({ whatsappNumber: waNumber, csName: csName });
+    updateSettings({ whatsappNumber: waNumber, csName: csName, csAvatar: csAvatar || undefined });
     toast({ title: "Settings disimpan!" });
   };
 
+  const handleAvatarSave = (dataUrl: string) => {
+    setCsAvatar(dataUrl);
+    updateSettings({ csAvatar: dataUrl || undefined });
+    toast({ title: dataUrl ? "Foto profile disimpan!" : "Foto profile dihapus!" });
+  };
+
   const handleExport = () => {
-    const data = JSON.stringify({ games, settings }, null, 2);
+    const data = JSON.stringify({ games, settings: { ...settings, csAvatar } }, null, 2);
     const blob = new Blob([data], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -38,95 +45,72 @@ export default function SettingsPage() {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result as string);
-        if (data.games && Array.isArray(data.games)) {
-          // import games via store
-          useAdminStore.setState({ games: data.games });
-          if (data.settings) useAdminStore.setState({ settings: data.settings });
-          toast({ title: "Data diimpor!" });
-        } else {
-          toast({ title: "Format tidak valid", variant: "destructive" });
-        }
-      } catch {
-        toast({ title: "Gagal parse JSON", variant: "destructive" });
-      }
+        if (data.games) useAdminStore.setState({ games: data.games });
+        if (data.settings) { useAdminStore.setState({ settings: data.settings }); setWaNumber(data.settings.whatsappNumber || ""); setCsName(data.settings.csName || ""); setCsAvatar(data.settings.csAvatar || ""); }
+        toast({ title: "Data diimpor!" });
+      } catch { toast({ title: "Gagal parse JSON", variant: "destructive" }); }
     };
     reader.readAsText(file);
   };
 
-  const handleReset = () => {
-    if (confirm("Reset SEMUA data ke default? Games, announcement, orders, dll akan direset.")) {
-      resetAll();
-      toast({ title: "Data direset ke default!" });
-    }
-  };
+  const handleReset = () => { if (confirm("Reset SEMUA data ke default?")) { resetAll(); toast({ title: "Data direset!" }); } };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="font-pixel text-base sm:text-lg text-[#e5e5e5] text-glow-neon">
-          SETTINGS
-        </h1>
-        <p className="mt-1 text-sm text-[#9a93a8]">Konfigurasi global website.</p>
+        <h1 className="text-xl font-bold text-gradient">Settings</h1>
+        <p className="mt-1 text-sm text-zinc-500">Konfigurasi global website.</p>
       </div>
 
-      {/* WA settings */}
-      <div className="border-2 border-[#a020f0]/50 bg-[#121017] pixel-corner p-5 space-y-4 max-w-2xl">
-        <h2 className="font-pixel text-[9px] uppercase text-[#c44bff]">WhatsApp & CS</h2>
+      {/* WA & CS settings */}
+      <div className="glass rounded-2xl p-5 space-y-4 max-w-2xl">
+        <h2 className="text-sm font-semibold text-violet-400 uppercase tracking-wider">WhatsApp & CS</h2>
+
+        {/* Avatar crop */}
+        <AvatarCrop currentAvatar={csAvatar} onSave={handleAvatarSave} label="Foto Profile CS (WA Widget)" />
+
         <div>
-          <label className="font-pixel text-[8px] uppercase text-[#9a93a8]">Nomor WhatsApp Admin</label>
-          <input
-            type="text"
-            value={waNumber}
-            onChange={(e) => setWaNumber(e.target.value)}
-            placeholder="6282131561301"
-            className="mt-2 w-full bg-[#0a0a0a] border-2 border-[#2a2436] focus:border-[#a020f0] text-[#e5e5e5] px-4 py-3 text-sm pixel-corner outline-none"
-          />
-          <p className="mt-1 font-pixel text-[6px] text-[#5a5266]">
-            Format: kode negara + nomor (tanpa + atau spasi)
-          </p>
+          <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Nomor WhatsApp Admin</label>
+          <input type="text" value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="6282131561301"
+            className="mt-1.5 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-100 outline-none focus:border-violet-500/40" />
+          <p className="mt-1 text-[10px] text-zinc-600">Format: kode negara + nomor (tanpa + atau spasi)</p>
         </div>
+
         <div>
-          <label className="font-pixel text-[8px] uppercase text-[#9a93a8]">Nama CS</label>
-          <input
-            type="text"
-            value={csName}
-            onChange={(e) => setCsName(e.target.value)}
-            className="mt-2 w-full bg-[#0a0a0a] border-2 border-[#2a2436] focus:border-[#a020f0] text-[#e5e5e5] px-4 py-3 text-sm pixel-corner outline-none"
-          />
+          <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Nama CS</label>
+          <input type="text" value={csName} onChange={(e) => setCsName(e.target.value)}
+            className="mt-1.5 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-100 outline-none focus:border-violet-500/40" />
         </div>
-        <PixelButton size="sm" onClick={handleSave}>
-          <Save className="size-3" /> Simpan
-        </PixelButton>
+
+        <button onClick={handleSave} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-5 py-2.5 text-sm text-white hover:from-violet-500 hover:to-violet-400 transition-all">
+          <Save className="size-4" /> Simpan
+        </button>
       </div>
 
-      {/* backup & restore */}
-      <div className="border-2 border-[#2a2436] bg-[#121017] pixel-corner p-5 max-w-2xl">
-        <h2 className="mb-4 font-pixel text-[9px] uppercase text-[#c44bff]">Backup & Restore</h2>
-        <div className="flex flex-wrap gap-3">
-          <PixelButton size="sm" variant="silver" onClick={handleExport}>
-            <Download className="size-3" /> Export JSON
-          </PixelButton>
+      {/* Backup & Restore */}
+      <div className="glass rounded-2xl p-5 max-w-2xl">
+        <h2 className="mb-4 text-sm font-semibold text-violet-400 uppercase tracking-wider">Backup & Restore</h2>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={handleExport} className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 transition-all">
+            <Download className="size-4" /> Export JSON
+          </button>
           <label>
             <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-            <span className="inline-flex items-center gap-2 font-pixel text-[8px] uppercase text-[#e5e5e5] border-2 border-[#2a2436] hover:border-[#a020f0] hover:text-[#c44bff] px-4 py-3 pixel-corner cursor-pointer transition-all">
-              <Upload className="size-3" /> Import JSON
+            <span className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 cursor-pointer transition-all">
+              <Upload className="size-4" /> Import JSON
             </span>
           </label>
         </div>
-        <p className="mt-3 font-pixel text-[6px] text-[#5a5266] leading-relaxed">
-          Export: unduh semua data games + settings sebagai JSON. Import: upload backup JSON untuk restore.
-        </p>
+        <p className="mt-3 text-[10px] text-zinc-600">Export: unduh semua data sebagai JSON. Import: upload backup untuk restore.</p>
       </div>
 
-      {/* danger zone */}
-      <div className="border-2 border-[#ff3b6b]/40 bg-[#ff3b6b]/5 pixel-corner p-5 max-w-2xl">
-        <h2 className="mb-4 font-pixel text-[9px] uppercase text-[#ff3b6b]">Danger Zone</h2>
-        <PixelButton size="sm" variant="danger" onClick={handleReset}>
-          <RefreshCw className="size-3" /> Reset Semua Data
-        </PixelButton>
-        <p className="mt-3 font-pixel text-[6px] text-[#9a93a8] leading-relaxed">
-          Reset semua data (games, announcement, orders, commits, dll) ke default. Tidak bisa diundo.
-        </p>
+      {/* Danger Zone */}
+      <div className="glass rounded-2xl p-5 max-w-2xl border-red-500/20">
+        <h2 className="mb-4 text-sm font-semibold text-red-400 uppercase tracking-wider">Danger Zone</h2>
+        <button onClick={handleReset} className="inline-flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500/20 transition-all">
+          <RefreshCw className="size-4" /> Reset Semua Data
+        </button>
+        <p className="mt-3 text-[10px] text-zinc-600">Reset semua data ke default. Tidak bisa diundo.</p>
       </div>
     </div>
   );
