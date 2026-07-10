@@ -43,9 +43,9 @@ import { useAdminStore } from "@/lib/admin-store";
 // WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)
 const CS_NAME = "Akuma Joki";
 const WELCOME_MESSAGE =
-  "Halo! 👋 Selamat datang di Akuma Joki. Pilih menu cepat di bawah untuk jawaban otomatis, atau ketik pesanmu untuk langsung chat admin via WhatsApp. 💡 Tip: ketik / di kolom pesan untuk memunculkan kembali template chat kapan saja!";
+  "Halo! 👋 Selamat datang di Akuma Joki. Ketik / untuk melihat menu cepat, atau ketik pesan langsung untuk chat admin via WhatsApp.";
 const WELCOME_RETURNING =
-  "Halo lagi! 👋 Senang melihatmu kembali di Akuma Joki. Ada yang bisa kami bantu? 💡 Ketik / untuk memunculkan template chat.";
+  "Halo lagi! 👋 Senang melihatmu kembali. Ketik / untuk melihat menu cepat.";
 
 type QuickReplyKind = "auto" | "redirect";
 type QuickReply = {
@@ -62,7 +62,8 @@ type QuickReply = {
     | "syarat"
     | "pembayaran"
     | "garansi"
-    | "estimasi";
+    | "estimasi"
+    | "custom";
 };
 
 /** Menu default (di halaman non-store). */
@@ -483,7 +484,17 @@ export function WhatsAppWidget() {
     return m ? m[1] : undefined;
   }, [pathname]);
   const currentGame = storeSlug ? getGameBySlug(storeSlug) : undefined;
-  const quickReplies = currentGame ? QUICK_REPLIES_STORE : QUICK_REPLIES_DEFAULT;
+  // Baca templates dari admin store (ter-sync dari dashboard). Fallback ke default.
+  const adminWaReplies = useAdminStore((s) => s.waReplies);
+  const defaultQuickReplies = currentGame ? QUICK_REPLIES_STORE : QUICK_REPLIES_DEFAULT;
+  const quickReplies: QuickReply[] = adminWaReplies.length > 0
+    ? adminWaReplies.map((r) => ({
+        label: r.label,
+        emoji: r.emoji,
+        kind: r.kind,
+        autoKey: r.autoKey as QuickReply["autoKey"] | undefined,
+      }))
+    : defaultQuickReplies;
   // Baca games dari admin store (ter-sync). Fallback ke GAMES default.
   const adminGames = useAdminStore((s) => s.games);
   const allGames = adminGames.length > 0 ? adminGames : GAMES;
@@ -705,6 +716,17 @@ export function WhatsAppWidget() {
             break;
           case "estimasi":
             csMsg = { id: 0, role: "cs", text: ESTIMASI_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "custom":
+            // Template custom dari admin dashboard — reply diambil dari waReplies store
+            {
+              const customReply = useAdminStore.getState().waReplies.find(
+                (r) => r.label === q.label
+              );
+              if (customReply?.reply) {
+                csMsg = { id: 0, role: "cs", text: customReply.reply, ts: 0, badge: "AUTO" };
+              }
+            }
             break;
         }
         if (csMsg) {
@@ -1024,10 +1046,24 @@ export function WhatsAppWidget() {
 
               {/* tanggal chip */}
               <div className="relative flex justify-center">
-                <span className="rounded-sm border border-[#2a2436] bg-[#121017] px-2 py-1 font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]">
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] text-zinc-500">
                   Hari ini
                 </span>
               </div>
+
+              {/* Hint "/" — muncul saat belum ada pesan user */}
+              {!userSent && !typing && (
+                <div className="relative flex justify-center mt-3 mb-1">
+                  <div className="glass rounded-2xl px-4 py-3 text-center max-w-[85%]">
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      💡 Ketik <span className="inline-flex items-center justify-center h-5 w-5 rounded-md bg-violet-500/20 border border-violet-500/30 text-violet-400 font-mono text-[10px] font-bold">/</span> di kolom pesan untuk melihat menu cepat
+                    </p>
+                    <p className="text-[10px] text-zinc-600 mt-1">
+                      {quickReplies.length} template tersedia · atau ketik pesan langsung ke admin
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {messages.map((m, i) => {
                 const prev = messages[i - 1];
@@ -1079,52 +1115,8 @@ export function WhatsAppWidget() {
               </AnimatePresence>
             </div>
 
-            {/* ===== Quick Replies (sebelum user kirim pesan) ===== */}
-            <AnimatePresence>
-              {!userSent && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="border-t-2 border-[#25D366]/30 bg-[#0a0a0a] px-3 py-2.5"
-                >
-                  {/* instruksi tegas: menu = auto, ketik = WA admin + count */}
-                  <div className="mb-2 flex items-center justify-between gap-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 shrink-0 bg-[#25D366] shadow-[0_0_6px_#25D366]" />
-                      <p className="font-pixel text-[7px] uppercase tracking-wide text-[#6ee7b7]">
-                        Menu Cepat — Auto Jawab
-                      </p>
-                    </div>
-                    <span className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
-                      {totalItems} joki tersedia
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {quickReplies.map((q) => (
-                      <button
-                        key={q.label}
-                        type="button"
-                        onClick={() => handleQuickReply(q)}
-                        className={cn(
-                          "btn-shine flex items-center gap-1 font-pixel text-[8px] uppercase tracking-wide pixel-corner px-2.5 py-1.5 transition-all active:translate-y-[1px]",
-                          q.kind === "auto"
-                            ? "text-[#25D366] border-2 border-[#25D366]/60 hover:bg-[#25D366] hover:text-[#0a0a0a] hover:shadow-[0_0_12px_rgba(37,211,102,0.6)]"
-                            : "text-[#c44bff] border-2 border-[#a020f0]/60 hover:bg-[#a020f0] hover:text-[#ffffff] hover:shadow-[0_0_12px_rgba(160,32,240,0.6)]"
-                        )}
-                      >
-                        <span aria-hidden="true">{q.emoji}</span>
-                        {q.label}
-                      </button>
-                    ))}
-                  </div>
-                  {/* hint kecil di bawah menu */}
-                  <p className="mt-2 font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]/80 leading-relaxed">
-                    👆 = jawaban otomatis di sini &nbsp;·&nbsp; 👤 = lanjut ke WA admin
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* ===== Quick Replies DIHAPUS — ganti dengan hint "/" di chat body ===== */}
+            {/* User lihat hint "/" di chat body, ketik / untuk munculkan picker */}
 
             {/* ===== Input Area ===== */}
             <form
