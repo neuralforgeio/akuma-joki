@@ -53,7 +53,16 @@ type QuickReply = {
   emoji: string;
   kind: QuickReplyKind;
   /** Jika "auto", reply di-generate oleh function key ini. */
-  autoKey?: "price-all" | "price-game" | "status" | "hours" | "cara-order";
+  autoKey?:
+    | "price-all"
+    | "price-game"
+    | "status"
+    | "hours"
+    | "cara-order"
+    | "syarat"
+    | "pembayaran"
+    | "garansi"
+    | "estimasi";
 };
 
 /** Menu default (di halaman non-store). */
@@ -61,6 +70,10 @@ const QUICK_REPLIES_DEFAULT: QuickReply[] = [
   { label: "Cek Harga Joki", emoji: "💰", kind: "auto", autoKey: "price-all" },
   { label: "Cara Order", emoji: "🚀", kind: "auto", autoKey: "cara-order" },
   { label: "Status Pesanan", emoji: "📦", kind: "auto", autoKey: "status" },
+  { label: "Syarat & Ketentuan", emoji: "📜", kind: "auto", autoKey: "syarat" },
+  { label: "Metode Pembayaran", emoji: "💳", kind: "auto", autoKey: "pembayaran" },
+  { label: "Garansi Joki", emoji: "🛡️", kind: "auto", autoKey: "garansi" },
+  { label: "Estimasi Waktu", emoji: "⏱️", kind: "auto", autoKey: "estimasi" },
   { label: "Jam Operasional", emoji: "🕐", kind: "auto", autoKey: "hours" },
   { label: "Chat Admin", emoji: "👤", kind: "redirect" },
 ];
@@ -78,11 +91,11 @@ const CLIPBOARD_HINT = "Pesan disalin ke clipboard. Jika teks tidak muncul di Wh
 const AUTO_REPLY_HINT =
   "👆 Pilih menu di bawah untuk jawaban otomatis. Ketik pesan sendiri akan langsung diteruskan ke admin.";
 const HOURS_REPLY =
-  "🕐 Kami online setiap hari 09.00-23.00 WIB. Di luar jam itu, pesan akan dibalas saat kami kembali online!";
+  "🕐 Kami online setiap hari 13.00-21.00 WIB. Di luar jam itu, pesan akan dibalas saat kami kembali online!";
 const OFFLINE_WELCOME =
-  "Halo! 👋 Saat ini kami sedang OFFLINE. Tinggalkan pesan, akan kami balas saat kembali online (09.00 WIB).";
+  "Halo! 👋 Saat ini kami sedang OFFLINE. Tinggalkan pesan, akan kami balas saat kembali online (13.00 WIB).";
 const SUBSTATUS_ONLINE = "Biasanya balas dalam beberapa menit";
-const SUBSTATUS_OFFLINE = "Online 09.00-23.00 WIB";
+const SUBSTATUS_OFFLINE = "Online 13.00-21.00 WIB";
 
 /** Pesan auto-reply untuk "Status Pesanan" (tidak ada sistem order tracking backend). */
 const STATUS_REPLY =
@@ -96,9 +109,25 @@ const CHAT_ADMIN_REPLY =
 const CARA_ORDER_REPLY =
   "🚀 CARA ORDER JOKI AKUMA:\n\n1. Pilih game di menu atau halaman store\n2. Klik joki yang kamu mau (mis. '200 Level')\n3. Lanjut ke Checkout & isi data (username Roblox + kontak WA)\n4. Klik 'Pesan via WhatsApp' - pesananmu langsung ke admin\n5. Transfer DP/lunas sesuai instruksi admin\n6. Joki dikerjakan! Cek progres via 'Status Pesanan'\n\nButuh bantuan? Klik 'Chat Admin' ya! 🤝";
 
+/** Pesan auto-reply untuk "Syarat & Ketentuan" */
+const SYARAT_REPLY =
+  "📜 SYARAT & KETENTUAN JOKI:\n\n- Akun Roblox harus valid & bisa login\n- Joki tidak bertanggung jawab atas ban akibat cheat pihak ketiga\n- Pembayaran DP 50% atau lunas di awal\n- Proses joki bisa dipause kapan saja dengan konfirmasi\n- Refund hanya jika joki belum dimulai\n\nDengan order, kamu setuju dengan S&K di atas. 🤝";
+
+/** Pesan auto-reply untuk "Metode Pembayaran" */
+const PEMBAYARAN_REPLY =
+  "💳 METODE PEMBAYARAN:\n\n- Transfer Bank (BCA, BRI, Mandiri)\n- E-Wallet (DANA, OVO, GoPay, ShopeePay)\n- QRIS (semua bank & e-wallet)\n- Robux (untuk pembayaran in-game)\n\nDP 50% di awal, pelunasan setelah joki selesai. Konfirmasi pembayaran via WhatsApp admin ya! 💰";
+
+/** Pesan auto-reply untuk "Garansi Joki" */
+const GARANSI_REPLY =
+  "🛡️ GARANSI JOKI AKUMA:\n\n- Joki dijamin aman (tanpa cheat/autoban)\n- Jika akun kena ban saat proses joki (bukan kesalahan user) → refund 100%\n- Jika item/level hilang dalam 24 jam setelah joki → dikerjakan ulang gratis\n- Garansi tidak berlaku jika user login selama proses joki\n\nKami prioritaskan keamanan akunmu! 🔒";
+
+/** Pesan auto-reply untuk "Estimasi Waktu" */
+const ESTIMASI_REPLY =
+  "⏱️ ESTIMASI WAKTU JOKI:\n\n- Leveling 100 Level: 1-2 jam\n- Leveling 200 Level: 2-4 jam\n- Leveling 300 Level: 4-6 jam\n- Raid: 1-3 jam per raid\n- Senjata (CDK/SG/SH/GH): 2-8 jam (tergantung requirement)\n- Expedition: 3-8 jam\n- Retail Tycoon: 2-5 jam\n\nEstimasi bisa berubah tergantung kondisi server. Admin akan update progres via WA! 📊";
+
 /** Jam operasional (WIB). Di luar ini = offline. */
-const OPEN_HOUR = 9;
-const CLOSE_HOUR = 23;
+const OPEN_HOUR = 13;
+const CLOSE_HOUR = 21;
 /** Detik tunggu sebelum auto-open (engagement). */
 const AUTO_OPEN_DELAY = 12000;
 /* ===================================================================== */
@@ -664,6 +693,18 @@ export function WhatsAppWidget() {
               ts: 0,
               badge: "AUTO",
             };
+            break;
+          case "syarat":
+            csMsg = { id: 0, role: "cs", text: SYARAT_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "pembayaran":
+            csMsg = { id: 0, role: "cs", text: PEMBAYARAN_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "garansi":
+            csMsg = { id: 0, role: "cs", text: GARANSI_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "estimasi":
+            csMsg = { id: 0, role: "cs", text: ESTIMASI_REPLY, ts: 0, badge: "AUTO" };
             break;
         }
         if (csMsg) {

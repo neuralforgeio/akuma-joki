@@ -12,10 +12,6 @@ const BackToTop = dynamic(() => import("@/components/akuma/back-to-top").then(m 
   ssr: false,
   loading: () => null,
 });
-const SocialProofNotification = dynamic(() => import("@/components/akuma/social-proof").then(m => ({ default: m.SocialProofNotification })), {
-  ssr: false,
-  loading: () => null,
-});
 
 /**
  * Wraps all "normal" routes (/, /store/*, /checkout) with the Navbar + Footer
@@ -52,7 +48,6 @@ export default function MainLayout({
       {/* Non-critical floating components: deferred load (2s atau user interact) */}
       <DeferredLoader delay={2000}>
         <BackToTop />
-        <SocialProofNotification />
       </DeferredLoader>
     </div>
   );

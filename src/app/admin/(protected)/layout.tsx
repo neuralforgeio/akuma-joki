@@ -56,10 +56,10 @@ export default function AdminLayout({
         <AdminSidebar />
         <main
           className={`min-h-screen p-4 sm:p-6 transition-all duration-300 ${
-            collapsed ? "ml-16" : "ml-56"
+            collapsed ? "md:ml-16" : "md:ml-56"
           }`}
         >
-          <div className="mx-auto max-w-6xl">{children}</div>
+          <div className="mx-auto max-w-6xl pt-12 md:pt-0">{children}</div>
         </main>
       </div>
     </AdminGuard>

@@ -472,3 +472,150 @@ input[type="number"]::-webkit-inner-spin-button {
   transform: translate3d(0, -6px, 0);
 }
 
+/* ============================================================
+   V2.0 — LUXURY DESIGN ENHANCEMENTS
+   ============================================================ */
+
+/* Glassmorphism — frosted glass effect untuk cards & panels */
+.akuma-glass {
+  background: rgba(18, 16, 23, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(160, 32, 240, 0.2);
+}
+
+/* Premium card hover — lift + glow + border shimmer */
+.akuma-card-hover:hover {
+  transform: translate3d(0, -8px, 0);
+  box-shadow: 0 12px 40px -8px rgba(160, 32, 240, 0.35),
+              0 0 0 1px rgba(160, 32, 240, 0.3);
+}
+
+/* Luxury gradient text — untuk headings premium */
+.akuma-gradient-text {
+  background: linear-gradient(135deg, #e5e5e5 0%, #c44bff 50%, #a020f0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+}
+
+/* Shimmer loading effect */
+.akuma-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(42, 36, 54, 0) 0%,
+    rgba(160, 32, 240, 0.15) 50%,
+    rgba(42, 36, 54, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: akuma-shimmer 1.5s infinite;
+}
+@keyframes akuma-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Premium border glow — animated border untuk featured elements */
+.akuma-border-glow {
+  position: relative;
+}
+.akuma-border-glow::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, #a020f0, #c44bff, #a020f0);
+  background-size: 200% 200%;
+  animation: akuma-border-shift 3s ease infinite;
+  z-index: -1;
+  opacity: 0.6;
+  clip-path: inherit;
+}
+@keyframes akuma-border-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Enhanced smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Luxury focus ring — untuk semua interactive elements */
+*:focus-visible {
+  outline: 2px solid #c44bff;
+  outline-offset: 2px;
+}
+
+/* Premium scrollbar (enhanced) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a020f0, #c44bff);
+  border-radius: 0;
+  border: 1px solid #0a0a0a;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #c44bff, #e5e5e5);
+}
+
+/* Luxury fade-in animation untuk page content */
+@keyframes akuma-fade-up {
+  from { opacity: 0; transform: translate3d(0, 20px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.akuma-fade-up {
+  animation: akuma-fade-up 0.5s ease-out forwards;
+}
+
+/* Premium glow pulse — untuk badges & indicators */
+@keyframes akuma-glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(160, 32, 240, 0.4); }
+  50% { box-shadow: 0 0 16px rgba(160, 32, 240, 0.7); }
+}
+.akuma-glow-pulse {
+  animation: akuma-glow-pulse 2s ease-in-out infinite;
+}
+
+/* Luxury gradient border — untuk premium cards */
+.akuma-gradient-border {
+  position: relative;
+  background: #121017;
+}
+.akuma-gradient-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(135deg, #a020f0, transparent 40%, transparent 60%, #c44bff);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Smooth ease for luxury feel */
+.akuma-ease-lux {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium text shimmer — untuk "coming soon" / featured text */
+@keyframes akuma-text-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.akuma-text-shimmer {
+  background: linear-gradient(90deg, #9a93a8 25%, #e5e5e5 50%, #9a93a8 75%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: akuma-text-shimmer 3s linear infinite;
+}
+
