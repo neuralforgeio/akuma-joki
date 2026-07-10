@@ -13,11 +13,14 @@ import {
   Gamepad2,
   Trash2,
   ShieldCheck,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useAkumaStore, useHasHydrated } from "@/lib/store";
 import { WHATSAPP_NUMBER, getGameBySlug } from "@/lib/games-data";
 import { PixelButton } from "./pixel-button";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export function CheckoutView() {
   const hydrated = useHasHydrated();
@@ -26,6 +29,7 @@ export function CheckoutView() {
   const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
   // Until the persisted store rehydrates on the client, render a neutral
@@ -132,10 +136,14 @@ export function CheckoutView() {
                   <Field
                     label="Password Roblox"
                     icon={<Lock className="size-4" />}
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    toggleVisibility={{
+                      show: showPassword,
+                      onToggle: () => setShowPassword((v) => !v),
+                    }}
                   />
 
                   {/* agreement */}
@@ -197,6 +205,7 @@ export function CheckoutView() {
                       clearOrder();
                       setUsername("");
                       setPassword("");
+                      setShowPassword(false);
                       setAgreed(false);
                     }}
                     className="text-[#9a93a8] hover:text-[#ff3b6b] transition-colors"
@@ -265,6 +274,7 @@ function Field({
   placeholder,
   value,
   onChange,
+  toggleVisibility,
 }: {
   label: string;
   icon: React.ReactNode;
@@ -272,20 +282,53 @@ function Field({
   placeholder: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Jika diisi, tampilkan tombol eye untuk show/hide password. */
+  toggleVisibility?: { show: boolean; onToggle: () => void };
 }) {
   return (
     <div>
       <label className="font-pixel text-[9px] uppercase tracking-wide text-[#9a93a8] flex items-center gap-2">
         <span className="text-[#c44bff]">{icon}</span>
         {label}
+        {toggleVisibility && (
+          <span className="ml-auto font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]">
+            {toggleVisibility.show ? "Terlihat" : "Tersembunyi"}
+          </span>
+        )}
       </label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="mt-2 w-full bg-[#0a0a0a] border-2 border-[#2a2436] focus:border-[#a020f0] text-[#e5e5e5] placeholder:text-[#5a5266] px-4 py-3 text-sm pixel-corner outline-none transition-colors focus:shadow-[0_0_14px_rgba(160,32,240,0.4)]"
-      />
+      <div className="relative mt-2">
+        <input
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          className={cn(
+            "w-full bg-[#0a0a0a] border-2 border-[#2a2436] focus:border-[#a020f0] text-[#e5e5e5] placeholder:text-[#5a5266] py-3 text-sm pixel-corner outline-none transition-colors focus:shadow-[0_0_14px_rgba(160,32,240,0.4)]",
+            toggleVisibility ? "pl-4 pr-12" : "px-4"
+          )}
+        />
+        {toggleVisibility && (
+          <button
+            type="button"
+            onClick={toggleVisibility.onToggle}
+            aria-label={toggleVisibility.show ? "Sembunyikan password" : "Tampilkan password"}
+            aria-pressed={toggleVisibility.show}
+            title={toggleVisibility.show ? "Sembunyikan password" : "Tampilkan password untuk cek penulisan"}
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center border-2 border-[#2a2436] text-[#9a93a8] pixel-corner transition-colors hover:border-[#a020f0] hover:text-[#c44bff]"
+          >
+            {toggleVisibility.show ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
+          </button>
+        )}
+      </div>
+      {toggleVisibility && (
+        <p className="mt-1.5 font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8] leading-relaxed">
+          👁 Klik ikon mata untuk cek apakah password sudah benar penulisannya
+        </p>
+      )}
     </div>
   );
 }

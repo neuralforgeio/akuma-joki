@@ -42,9 +42,9 @@ import {
 // WHATSAPP_NUMBER di-import dari @/lib/games-data (source of truth: 6282131561301)
 const CS_NAME = "Akuma Joki";
 const WELCOME_MESSAGE =
-  "Halo! 👋 Selamat datang di Akuma Joki. Pilih menu cepat di bawah untuk jawaban otomatis, atau ketik pesanmu untuk langsung chat admin via WhatsApp. 🚀";
+  "Halo! 👋 Selamat datang di Akuma Joki. Pilih menu cepat di bawah untuk jawaban otomatis, atau ketik pesanmu untuk langsung chat admin via WhatsApp. 💡 Tip: ketik / di kolom pesan untuk memunculkan kembali template chat kapan saja!";
 const WELCOME_RETURNING =
-  "Halo lagi! 👋 Senang melihatmu kembali di Akuma Joki. Ada yang bisa kami bantu?";
+  "Halo lagi! 👋 Senang melihatmu kembali di Akuma Joki. Ada yang bisa kami bantu? 💡 Ketik / untuk memunculkan template chat.";
 
 type QuickReplyKind = "auto" | "redirect";
 type QuickReply = {
@@ -706,6 +706,23 @@ export function WhatsAppWidget() {
   const charCount = input.length;
   const nearLimit = charCount > 400;
 
+  /* ---------- command picker (/ template) ---------- */
+  // Ketik "/" di input → munculkan picker template chat (quick replies) lagi,
+  // bahkan setelah user pernah kirim pesan. Filter by text setelah "/".
+  const trimmedInput = input.trim();
+  const showCommandPicker = trimmedInput.startsWith("/");
+  const commandQuery = trimmedInput.slice(1).toLowerCase();
+  const filteredCommands = showCommandPicker
+    ? quickReplies.filter((q) =>
+        q.label.toLowerCase().includes(commandQuery)
+      )
+    : [];
+
+  const handleCommandPick = (q: QuickReply) => {
+    setInput("");
+    handleQuickReply(q);
+  };
+
   // personalized welcome: jika returning user & chat masih welcome-default,
   // ganti welcome bubble (id:1) ke welcome-returning. Jalankan sekali di mount.
   useEffect(() => {
@@ -1001,38 +1018,123 @@ export function WhatsAppWidget() {
               onSubmit={handleSubmit}
               className="relative border-t-2 border-[#25D366]/40 bg-[#121017] px-2.5 py-2.5"
             >
+              {/* ===== Command Picker (ketik "/" untuk template) ===== */}
+              <AnimatePresence>
+                {showCommandPicker && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.16, ease: "easeOut" }}
+                    className="absolute bottom-full left-0 right-0 mb-2 max-h-56 overflow-y-auto bg-[#0a0a0a] border-2 border-[#25D366]/60 pixel-corner shadow-[0_0_0_2px_#0a0a0a,0_0_18px_rgba(37,211,102,0.35)]"
+                    role="listbox"
+                    aria-label="Pilih template chat"
+                  >
+                    {/* header picker */}
+                    <div className="sticky top-0 flex items-center justify-between gap-2 border-b-2 border-[#25D366]/30 bg-[#0a0a0a] px-3 py-2">
+                      <span className="font-pixel text-[7px] uppercase tracking-wide text-[#6ee7b7]">
+                        ⌘ Template Chat
+                      </span>
+                      <span className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
+                        {filteredCommands.length} menu
+                      </span>
+                    </div>
+                    {filteredCommands.length === 0 ? (
+                      <p className="px-3 py-4 text-center font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]">
+                        Tidak ada template cocok
+                      </p>
+                    ) : (
+                      <div className="p-1.5">
+                        {filteredCommands.map((q) => (
+                          <button
+                            key={q.label}
+                            type="button"
+                            onClick={() => handleCommandPick(q)}
+                            className="group flex w-full items-center gap-2 px-2.5 py-2 text-left transition-colors hover:bg-[#25D366]/10 pixel-corner"
+                            role="option"
+                            aria-selected="false"
+                          >
+                            <span
+                              className={cn(
+                                "flex h-6 w-6 shrink-0 items-center justify-center border-2 pixel-corner text-xs",
+                                q.kind === "auto"
+                                  ? "border-[#25D366]/60 text-[#25D366]"
+                                  : "border-[#a020f0]/60 text-[#c44bff]"
+                              )}
+                              aria-hidden="true"
+                            >
+                              {q.emoji}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block font-pixel text-[8px] uppercase tracking-wide text-[#e5e5e5] truncate group-hover:text-[#6ee7b7]">
+                                {q.label}
+                              </span>
+                              <span className="block font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
+                                {q.kind === "auto" ? "⚡ Auto-reply" : "📱 Ke admin"}
+                              </span>
+                            </span>
+                            <span
+                              className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8] group-hover:text-[#25D366] shrink-0"
+                              aria-hidden="true"
+                            >
+                              ↵
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {/* panduan footer picker */}
+                    <div className="border-t-2 border-[#25D366]/20 bg-[#121017] px-3 py-1.5">
+                      <p className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8] leading-relaxed">
+                        Ketik "/" + kata kunci untuk filter. Klik menu = jalankan.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="flex items-center gap-2">
                 <input
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ketik pesan → langsung ke WA admin"
-                  aria-label="Ketik pesan untuk diteruskan ke admin WhatsApp"
+                  placeholder="Ketik pesan → WA admin · atau ketik / untuk template"
+                  aria-label="Ketik pesan untuk diteruskan ke admin WhatsApp, atau ketik / untuk memilih template"
                   maxLength={500}
-                  className="min-w-0 flex-1 bg-[#0a0a0a] px-3 py-2.5 font-sans text-sm text-[#e5e5e5] placeholder:text-[#9a93a8] border-2 border-[#2a2436] pixel-corner outline-none transition-colors focus:border-[#25D366] focus:shadow-[0_0_10px_rgba(37,211,102,0.4)]"
+                  className={cn(
+                    "min-w-0 flex-1 bg-[#0a0a0a] px-3 py-2.5 font-sans text-sm text-[#e5e5e5] placeholder:text-[#9a93a8] border-2 pixel-corner outline-none transition-colors",
+                    showCommandPicker
+                      ? "border-[#25D366] shadow-[0_0_12px_rgba(37,211,102,0.5)]"
+                      : "border-[#2a2436] focus:border-[#25D366] focus:shadow-[0_0_10px_rgba(37,211,102,0.4)]"
+                  )}
                 />
                 <button
                   type="submit"
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || showCommandPicker}
                   aria-label="Kirim pesan"
                   className="btn-shine flex h-11 w-11 shrink-0 items-center justify-center bg-[#25D366] text-[#0a0a0a] border-2 border-[#25D366] pixel-corner transition-all hover:bg-[#1ebe5d] hover:shadow-[0_0_14px_rgba(37,211,102,0.7)] active:translate-y-[1px] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
                 >
                   <Send className="size-4" />
                 </button>
               </div>
-              {/* char counter + footer notice */}
+              {/* char counter + footer notice + command hint */}
               <div className="mt-1.5 flex items-center justify-between px-1">
                 <p className="font-pixel text-[6px] uppercase tracking-wide text-[#c44bff]">
                   ✦ Pesan ini → WA Admin
                 </p>
-                <p
-                  className={cn(
-                    "font-pixel text-[6px] uppercase tracking-wide transition-colors",
-                    nearLimit ? "text-[#ff3b6b]" : "text-[#9a93a8]/60"
-                  )}
-                >
-                  {charCount}/500
-                </p>
+                <div className="flex items-center gap-2">
+                  <span className="font-pixel text-[6px] uppercase tracking-wide text-[#25D366]/80">
+                    / = template
+                  </span>
+                  <p
+                    className={cn(
+                      "font-pixel text-[6px] uppercase tracking-wide transition-colors",
+                      nearLimit ? "text-[#ff3b6b]" : "text-[#9a93a8]/60"
+                    )}
+                  >
+                    {charCount}/500
+                  </p>
+                </div>
               </div>
             </form>
           </motion.div>
