@@ -1,14 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ShoppingCart, Tag, Check, AlertTriangle, Lock } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Tag, Check, AlertTriangle, Lock, Star } from "lucide-react";
 import type { Game } from "@/lib/games-data";
 import { GAMES } from "@/lib/games-data";
 import { useAkumaStore } from "@/lib/store";
+import { useReviews } from "@/lib/reviews";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { SkeletonGrid } from "./skeleton";
+import { WishlistButton } from "./wishlist-button";
+import { cn } from "@/lib/utils";
 
 export function StoreView({ game }: { game: Game }) {
   const router = useRouter();
@@ -140,7 +144,7 @@ export function StoreView({ game }: { game: Game }) {
                   <Reveal key={item.id} delay={i * 60}>
                     <ProductCard
                       item={item}
-                      accent={game.accent}
+                      game={game}
                       selected={!!isSelected}
                       onPick={() => handlePick(item, cat.name)}
                     />
@@ -151,6 +155,9 @@ export function StoreView({ game }: { game: Game }) {
           </div>
         ))}
       </section>
+
+      {/* Reviews section */}
+      <StoreReviews game={game} />
 
       {/* other games */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
@@ -186,7 +193,7 @@ export function StoreView({ game }: { game: Game }) {
 
 function ProductCard({
   item,
-  accent,
+  game,
   selected,
   onPick,
 }: {
@@ -198,7 +205,7 @@ function ProductCard({
     description?: string;
     requirement?: string;
   };
-  accent: string;
+  game: Game;
   selected: boolean;
   onPick: () => void;
 }) {
@@ -212,8 +219,8 @@ function ProductCard({
       ? "#ff3b6b"
       : item.tag?.toLowerCase() === "popular"
       ? "#6ee7b7"
-      : accent
-    : accent;
+      : game.accent
+    : game.accent;
 
   return (
     <div
@@ -253,7 +260,7 @@ function ProductCard({
               isPromo ? "animate-pulse" : ""
             }`}
             style={{
-              background: isPromo ? `${promoColor}22` : accent,
+              background: isPromo ? `${promoColor}22` : game.accent,
               color: isPromo ? promoColor : "#0a0a0a",
               border: isPromo ? `1px solid ${promoColor}` : "none",
               boxShadow: isPromo ? `0 0 8px ${promoColor}66` : "none",
@@ -290,10 +297,10 @@ function ProductCard({
       </div>
 
       {/* action */}
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 flex items-center gap-2">
         <PixelButton
           variant={selected ? "silver" : "neon"}
-          className="w-full"
+          className="flex-1"
           onClick={onPick}
         >
           {selected ? (
@@ -306,7 +313,91 @@ function ProductCard({
             </>
           )}
         </PixelButton>
+        <WishlistButton
+          gameSlug={game.slug}
+          gameName={game.name}
+          productId={item.id}
+          productName={item.name}
+          priceLabel={item.priceLabel}
+          emoji={game.emoji}
+          accent={game.accent}
+        />
       </div>
     </div>
+  );
+}
+
+/* ============================ Store Reviews ============================ */
+function StoreReviews({ game }: { game: Game }) {
+  const reviews = useReviews((s) => s.reviews.filter((r) => r.gameSlug === game.slug));
+  const addReview = useReviews((s) => s.addReview);
+  const hydrated = useReviews((s) => s._hasHydrated);
+  const [name, setName] = useState("");
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const avgRating = reviews.length > 0 ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !comment.trim()) return;
+    addReview({ gameSlug: game.slug, gameName: game.name, productName: game.name, customerName: name.trim(), rating, comment: comment.trim() });
+    setName(""); setRating(5); setComment("");
+  };
+
+  if (!hydrated) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
+      <div className="flex items-center gap-2 mb-6">
+        <Star className="size-5 text-amber-400" />
+        <h2 className="text-lg font-bold text-zinc-100">Review & Rating</h2>
+        {reviews.length > 0 && (
+          <span className="ml-2 inline-flex items-center gap-1 rounded-lg bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 text-xs text-amber-400">
+            {avgRating.toFixed(1)} ★ · {reviews.length} review
+          </span>
+        )}
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <form onSubmit={handleSubmit} className="glass rounded-2xl p-5 space-y-3">
+          <h3 className="text-sm font-semibold text-zinc-300">Tulis Review</h3>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama kamu" required
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40" />
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-zinc-500">Rating:</span>
+            {[1,2,3,4,5].map((s) => (
+              <button key={s} type="button" onClick={() => setRating(s)} className="transition-transform hover:scale-110">
+                <Star className={cn("size-5", s <= rating ? "fill-amber-400 text-amber-400" : "text-zinc-600")} />
+              </button>
+            ))}
+          </div>
+          <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Bagikan pengalaman joki kamu..." rows={3} required
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40 resize-none" />
+          <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-2 text-sm text-white hover:from-violet-500 hover:to-violet-400 transition-all">
+            Kirim Review
+          </button>
+        </form>
+        <div className="space-y-3 max-h-80 overflow-y-auto">
+          {reviews.length === 0 ? (
+            <div className="glass rounded-2xl p-8 text-center">
+              <Star className="mx-auto size-8 text-zinc-700 mb-2" />
+              <p className="text-sm text-zinc-500">Belum ada review. Jadikan yang pertama!</p>
+            </div>
+          ) : (
+            reviews.map((r) => (
+              <div key={r.id} className="glass rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-zinc-200">{r.customerName}</span>
+                  <div className="flex gap-0.5">{Array.from({length: 5}).map((_, i) => (
+                    <Star key={i} className={cn("size-3", i < r.rating ? "fill-amber-400 text-amber-400" : "text-zinc-700")} />
+                  ))}</div>
+                </div>
+                <p className="text-sm text-zinc-400 leading-relaxed">{r.comment}</p>
+                <p className="text-[10px] text-zinc-600 mt-2">{new Date(r.createdAt).toLocaleDateString("id-ID")}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
