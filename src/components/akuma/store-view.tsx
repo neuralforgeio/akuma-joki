@@ -201,6 +201,19 @@ function ProductCard({
   selected: boolean;
   onPick: () => void;
 }) {
+  // Promo tags yang dapat badge khusus (glowing + animasi)
+  const PROMO_TAGS = ["hot", "popular", "legendary", "starter", "max", "pro", "full climb", "completionist", "quick fix"];
+  const isPromo = item.tag && PROMO_TAGS.includes(item.tag.toLowerCase());
+  const promoColor = isPromo
+    ? item.tag?.toLowerCase() === "legendary"
+      ? "#ffd166"
+      : item.tag?.toLowerCase() === "hot"
+      ? "#ff3b6b"
+      : item.tag?.toLowerCase() === "popular"
+      ? "#6ee7b7"
+      : accent
+    : accent;
+
   return (
     <div
       className={`group relative h-full akuma-card-hover border-2 bg-[#121017] pixel-corner overflow-hidden ${
@@ -209,6 +222,20 @@ function ProductCard({
           : "border-[#a020f0]/50 group-hover:border-[#a020f0] group-hover:shadow-[0_0_24px_rgba(160,32,240,0.45)]"
       }`}
     >
+      {/* Promo ribbon (pojok kanan atas) untuk tag promo */}
+      {isPromo && !selected && (
+        <div
+          className="absolute right-0 top-0 z-10 px-3 py-1 font-pixel text-[7px] uppercase text-[#0a0a0a]"
+          style={{
+            background: promoColor,
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 15% 100%)",
+            boxShadow: `0 0 12px ${promoColor}`,
+          }}
+        >
+          PROMO
+        </div>
+      )}
+
       {/* top: price tag + status */}
       <div className="relative flex items-center justify-between px-4 py-3 border-b-2 border-[#2a2436] bg-[#0a0a0a]/60">
         <div className="flex items-center gap-1.5">
@@ -221,8 +248,15 @@ function ProductCard({
           </span>
         ) : item.tag ? (
           <span
-            className="font-pixel text-[7px] uppercase px-2 py-1 pixel-corner"
-            style={{ background: accent, color: "#0a0a0a" }}
+            className={`font-pixel text-[7px] uppercase px-2 py-1 pixel-corner ${
+              isPromo ? "animate-pulse" : ""
+            }`}
+            style={{
+              background: isPromo ? `${promoColor}22` : accent,
+              color: isPromo ? promoColor : "#0a0a0a",
+              border: isPromo ? `1px solid ${promoColor}` : "none",
+              boxShadow: isPromo ? `0 0 8px ${promoColor}66` : "none",
+            }}
           >
             {item.tag}
           </span>
