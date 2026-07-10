@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import WhatsAppWidget from "@/components/akuma/whatsapp-widget-loader";
 import { AnnouncementBanner } from "@/components/admin/announcement-banner";
 import { VisitorTracker } from "@/components/admin/visitor-tracker";
-import { CookieConsent } from "@/components/akuma/cookie-consent";
 import { NetworkStatus } from "@/components/akuma/network-status";
+import { ClientFloatingComponents } from "@/components/akuma/client-floating";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,8 +64,8 @@ export default function RootLayout({
         <AnnouncementBanner />
         <VisitorTracker />
         {children}
-        <WhatsAppWidget />
-        <CookieConsent />
+        {/* Non-critical floating components: deferred load (3s atau user interact) */}
+        <ClientFloatingComponents />
         <Toaster />
       </body>
     </html>
