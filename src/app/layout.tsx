@@ -6,6 +6,7 @@ import WhatsAppWidget from "@/components/akuma/whatsapp-widget-loader";
 import { AnnouncementBanner } from "@/components/admin/announcement-banner";
 import { VisitorTracker } from "@/components/admin/visitor-tracker";
 import { CookieConsent } from "@/components/akuma/cookie-consent";
+import { NetworkStatus } from "@/components/akuma/network-status";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,6 +61,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${pixelFont.variable} font-sans antialiased bg-background text-foreground`}
       >
+        <NetworkStatus />
         <AnnouncementBanner />
         <VisitorTracker />
         {children}
