@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
+import type { Game, ProductItem } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
 import { PixelButton } from "./pixel-button";
 import { cn } from "@/lib/utils";
@@ -16,8 +18,105 @@ export function Navbar() {
   const hydrated = useAdminStore((s) => s._hasHydrated);
   const games = hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
   const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Build search index: all games + all items
+  type SearchEntry = {
+    type: "game" | "item";
+    label: string;
+    sublabel: string;
+    href: string;
+    emoji: string;
+    accent: string;
+    priceLabel?: string;
+  };
+  const searchIndex = useMemo<SearchEntry[]>(() => {
+    const entries: SearchEntry[] = [];
+    for (const g of games) {
+      entries.push({
+        type: "game",
+        label: g.name,
+        sublabel: g.tagline,
+        href: `/store/${g.slug}`,
+        emoji: g.emoji,
+        accent: g.accent,
+      });
+      for (const cat of g.categories) {
+        for (const item of cat.items as ProductItem[]) {
+          entries.push({
+            type: "item",
+            label: item.name,
+            sublabel: `${g.name} · ${cat.name}`,
+            href: `/store/${g.slug}`,
+            emoji: g.emoji,
+            accent: g.accent,
+            priceLabel: item.priceLabel,
+          });
+        }
+      }
+    }
+    return entries;
+  }, [games]);
+
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    return searchIndex
+      .filter(
+        (e) =>
+          e.label.toLowerCase().includes(q) ||
+          e.sublabel.toLowerCase().includes(q)
+      )
+      .slice(0, 8);
+  }, [searchQuery, searchIndex]);
+
+  // close search on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(e.target as Node)
+      ) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // close search on route change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchOpen(false);
+    setSearchQuery("");
+  }, [pathname]);
+
+  // focus input when search opens
+  useEffect(() => {
+    if (searchOpen) {
+      const t = window.setTimeout(() => searchInputRef.current?.focus(), 100);
+      return () => window.clearTimeout(t);
+    }
+  }, [searchOpen]);
+
+  // keyboard shortcut: Ctrl/Cmd + K
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((v) => !v);
+      }
+      if (e.key === "Escape") setSearchOpen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -69,7 +168,83 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="hidden md:block">
+        {/* Search + Checkout */}
+        <div className="hidden md:flex items-center gap-3">
+          {/* Search */}
+          <div ref={searchContainerRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setSearchOpen((v) => !v)}
+              aria-label="Cari game atau joki"
+              aria-expanded={searchOpen}
+              className="flex h-9 w-9 items-center justify-center border-2 border-[#2a2436] text-[#9a93a8] pixel-corner transition-colors hover:border-[#a020f0] hover:text-[#c44bff]"
+            >
+              <Search className="size-4" />
+            </button>
+
+            {/* Search dropdown */}
+            {searchOpen && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-[#0a0a0a] border-2 border-[#a020f0]/60 pixel-corner shadow-[0_0_0_2px_#0a0a0a,0_0_18px_rgba(160,32,240,0.35)] z-50">
+                <div className="border-b-2 border-[#a020f0]/30 p-2">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari game atau joki..."
+                    aria-label="Cari game atau joki"
+                    className="w-full bg-transparent px-2 py-1.5 text-sm text-[#e5e5e5] placeholder:text-[#9a93a8] outline-none"
+                  />
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {searchResults.length === 0 ? (
+                    <p className="px-3 py-4 text-center font-pixel text-[7px] uppercase tracking-wide text-[#5a5266]">
+                      {searchQuery ? "Tidak ada hasil" : "Ketik untuk mencari"}
+                    </p>
+                  ) : (
+                    searchResults.map((r, i) => (
+                      <Link
+                        key={`${r.type}-${r.label}-${i}`}
+                        href={r.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setSearchQuery("");
+                        }}
+                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-[#a020f0]/10 transition-colors border-b border-[#2a2436] last:border-0"
+                      >
+                        <span
+                          className="flex h-7 w-7 shrink-0 items-center justify-center border pixel-corner text-sm"
+                          style={{ borderColor: r.accent }}
+                        >
+                          {r.emoji}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-[#e5e5e5] truncate">{r.label}</p>
+                          <p className="text-[10px] text-[#9a93a8] truncate">{r.sublabel}</p>
+                        </div>
+                        {r.priceLabel && (
+                          <span className="font-pixel text-[8px] text-[#c44bff] shrink-0">
+                            {r.priceLabel}
+                          </span>
+                        )}
+                        {r.type === "game" && (
+                          <span className="font-pixel text-[6px] uppercase text-[#9a93a8] shrink-0">
+                            Game
+                          </span>
+                        )}
+                      </Link>
+                    ))
+                  )}
+                </div>
+                <div className="border-t-2 border-[#a020f0]/20 bg-[#121017] px-3 py-1.5">
+                  <p className="font-pixel text-[6px] uppercase tracking-wide text-[#5a5266]">
+                    Ctrl+K · Esc tutup
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
           <PixelButton size="sm" variant={isCheckout ? "neon" : "silver"} asChild>
             <Link href="/checkout">🛒 Checkout</Link>
           </PixelButton>
@@ -94,6 +269,38 @@ export function Navbar() {
         )}
       >
         <div className="flex flex-col gap-2 p-4">
+          {/* Mobile search */}
+          <div className="relative mb-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari game atau joki..."
+              aria-label="Cari game atau joki"
+              className="w-full bg-[#121017] border-2 border-[#2a2436] focus:border-[#a020f0] text-[#e5e5e5] placeholder:text-[#9a93a8] px-3 py-2.5 text-sm pixel-corner outline-none"
+            />
+            {searchQuery && searchResults.length > 0 && (
+              <div className="mt-1 space-y-1">
+                {searchResults.slice(0, 5).map((r, i) => (
+                  <Link
+                    key={`m-${r.type}-${r.label}-${i}`}
+                    href={r.href}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      setSearchQuery("");
+                    }}
+                    className="flex items-center gap-2 px-2 py-2 bg-[#121017] border border-[#2a2436] pixel-corner"
+                  >
+                    <span className="text-sm">{r.emoji}</span>
+                    <span className="text-xs text-[#e5e5e5] truncate flex-1">{r.label}</span>
+                    {r.priceLabel && (
+                      <span className="font-pixel text-[7px] text-[#c44bff]">{r.priceLabel}</span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           <MobileTab active={isHome} href="/" onClick={() => setMobileOpen(false)}>
             🏠 Home
           </MobileTab>
