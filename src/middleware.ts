@@ -34,6 +34,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   // Run on everything except static assets, Next internals, and downloadable files.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|akuma-logo.png|config.json|akuma-joki-source.zip|robots.txt|logo.svg).*)",
+    "/((?!_next/static|_next/image|favicon.ico|akuma-logo.png|config.json|robots.txt).*)",
   ],
 };

@@ -20,6 +20,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # env files
+.env
 .env*.local
 
 # vercel
@@ -29,16 +30,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# sandbox / local dev artifacts
+# local dev artifacts
 dev.log
 server.log
-/db/
-/.zscripts/
-/examples/
-/mini-services/
-Caddyfile
-download/
-
-# local handover doc & uploads (contain non-committed context)
 worklog.md
 /upload/
