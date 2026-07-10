@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ShieldCheck,
   Zap,
@@ -20,6 +21,86 @@ import { GAMES } from "@/lib/games-data";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { Starfield, MovingGrid } from "./backgrounds";
+
+/**
+ * AnimatedHeading — heading "AKUMA JOKI" dengan animasi timbul-timbul looping
+ * yang berganti-ganti teks dengan efek transition keren. Setiap teks muncul
+ * dengan efek scale+blur+glow, hold beberapa detik, lalu fade out ke teks berikutnya.
+ */
+const HEADING_TEXTS = [
+  { main: "AKUMA", accent: "JOKI", subtitle: "Joki & Store Roblox" },
+  { main: "LEVEL", accent: "UP", subtitle: "Naik level cepat" },
+  { main: "RAID", accent: "CLEAR", subtitle: "Taklukkan semua raid" },
+  { main: "SAFE", accent: "& FAST", subtitle: "Aman & harga bersahabat" },
+  { main: "PRO", accent: "JOKI", subtitle: "Joki profesional" },
+];
+
+function AnimatedHeading() {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    // ganti teks setiap 3.5 detik
+    const id = window.setInterval(() => {
+      setIdx((i) => (i + 1) % HEADING_TEXTS.length);
+    }, 3500);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const cur = HEADING_TEXTS[idx];
+
+  return (
+    <div className="mt-6 flex flex-col items-start">
+      <div className="relative h-[1.2em] sm:h-[1.15em] md:h-[1.1em] overflow-visible">
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={idx}
+            initial={{ opacity: 0, y: 30, scale: 0.8, filter: "blur(8px)" }}
+            animate={{
+              opacity: 1,
+              y: [30, -4, 0],
+              scale: 1,
+              filter: "blur(0px)",
+            }}
+            exit={{ opacity: 0, y: -20, scale: 1.1, filter: "blur(6px)" }}
+            transition={{
+              duration: 0.6,
+              ease: "easeOut",
+              y: { duration: 1.2, times: [0, 0.6, 1], ease: "easeOut" },
+            }}
+            className="font-pixel text-3xl sm:text-5xl md:text-6xl leading-tight text-[#e5e5e5] text-glow-neon inline-flex"
+          >
+            {cur.main} <span className="text-[#a020f0] ml-3">{cur.accent}</span>
+          </motion.h1>
+        </AnimatePresence>
+      </div>
+      {/* subtitle dengan fade sync */}
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={`sub-${idx}`}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="mt-2 font-pixel text-[8px] sm:text-[10px] uppercase tracking-[0.2em] text-[#c44bff]"
+        >
+          {cur.subtitle}
+        </motion.p>
+      </AnimatePresence>
+      {/* progress dots */}
+      <div className="mt-3 flex gap-1.5">
+        {HEADING_TEXTS.map((_, i) => (
+          <span
+            key={i}
+            className={`h-1 transition-all duration-300 ${
+              i === idx ? "w-6 bg-[#a020f0] shadow-[0_0_6px_#a020f0]" : "w-1.5 bg-[#2a2436]"
+            }`}
+            style={{ borderRadius: 0 }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function HomeView() {
   const gamesRef = useRef<HTMLDivElement>(null);
@@ -60,10 +141,8 @@ export function HomeView() {
               </span>
             </div>
 
-            {/* title */}
-            <h1 className="mt-6 font-pixel text-3xl sm:text-5xl md:text-6xl leading-tight text-[#e5e5e5] text-glow-neon">
-              AKUMA <span className="text-[#a020f0]">JOKI</span>
-            </h1>
+            {/* title — animated cycling heading */}
+            <AnimatedHeading />
 
             <p className="mt-6 max-w-2xl text-sm sm:text-base text-[#bcb4c9] leading-relaxed">
               Joki &amp; Store Roblox premium dengan vibe{" "}

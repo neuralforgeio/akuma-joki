@@ -73,6 +73,7 @@ const QUICK_REPLIES_STORE: QuickReply[] = [
 ];
 
 const REDIRECT_MSG = "Pesan dikirim! Mengarahkan ke WhatsApp admin...";
+const CLIPBOARD_HINT = "Pesan disalin ke clipboard. Jika teks tidak muncul di WhatsApp, paste (Ctrl+V) ya!";
 const AUTO_REPLY_HINT =
   "👆 Pilih menu di bawah untuk jawaban otomatis. Ketik pesan sendiri akan langsung diteruskan ke admin.";
 const HOURS_REPLY =
@@ -256,6 +257,40 @@ function nextId(): number {
   return cachedId++;
 }
 
+/**
+ * Buka WhatsApp dengan teks pesan. Strategi:
+ * 1. Copy pesan ke clipboard (backup jika URL corrupt oleh proxy)
+ * 2. Anchor click untuk buka wa.me (lebih reliable dari window.open)
+ * 3. Fallback: window.open jika anchor gagal
+ *
+ * Di production (Vercel, no proxy): emoji terkirim benar via URL param.
+ * Di sandbox (ada proxy): emoji di URL mungkin corrupt, user bisa paste dari clipboard.
+ */
+async function openWhatsApp(phone: string, text: string) {
+  // 1. copy pesan ke clipboard sebagai backup
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    /* clipboard might be blocked, ignore */
+  }
+
+  // 2. coba anchor click (bypass beberapa proxy yang intercept window.open)
+  const encoded = encodeURIComponent(text);
+  const url = `https://wa.me/${phone}?text=${encoded}`;
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch {
+    // 3. fallback: window.open
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
 function formatTime(ts?: number) {
   if (!ts) return "";
   try {
@@ -396,6 +431,7 @@ export function WhatsAppWidget() {
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const [showHint, setShowHint] = useState(false);
 
   const bodyRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -548,13 +584,12 @@ export function WhatsAppWidget() {
       writeChat(withUser);
       setInput("");
 
-      // buka wa.me dengan teks ter-encode
-      const encoded = encodeURIComponent(t);
-      window.open(
-        `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`,
-        "_blank",
-        "noopener,noreferrer"
-      );
+      // buka wa.me via anchor click (hindari proxy corrupt emoji)
+      openWhatsApp(WHATSAPP_NUMBER, t);
+
+      // show clipboard hint (auto-hide setelah 5 detik)
+      setShowHint(true);
+      window.setTimeout(() => setShowHint(false), 5000);
 
       // tandai pesan user sebagai "sent" (read receipt) setelah jeda singkat
       window.setTimeout(() => {
@@ -644,13 +679,9 @@ export function WhatsAppWidget() {
       writeChat([...messages, userMsg]);
       if (!muted) playBlip("send");
 
-      // redirect ke WA admin dengan teks bawaan
+      // redirect ke WA admin dengan teks bawaan (anchor click untuk emoji-safe)
       const waText = `Halo Admin Akuma Joki, saya mau bertanya/${q.label}`;
-      window.open(
-        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waText)}`,
-        "_blank",
-        "noopener,noreferrer"
-      );
+      openWhatsApp(WHATSAPP_NUMBER, waText);
 
       // tandai user message sent
       window.setTimeout(() => {
@@ -754,6 +785,24 @@ export function WhatsAppWidget() {
       className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] print:hidden"
       aria-live="polite"
     >
+      {/* ===== Clipboard Hint Toast ===== */}
+      <AnimatePresence>
+        {showHint && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.9 }}
+            transition={{ duration: 0.2 }}
+            className="absolute bottom-full right-0 mb-2 w-[min(20rem,calc(100vw-2rem))] bg-[#0a0a0a] border-2 border-[#ffd166]/60 pixel-corner p-3 shadow-[0_0_0_2px_#0a0a0a,0_0_16px_rgba(255,209,102,0.4)]"
+            role="status"
+          >
+            <p className="font-pixel text-[7px] uppercase tracking-wide text-[#ffd166] leading-relaxed">
+              {CLIPBOARD_HINT}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ===== Popup Chat Box ===== */}
       <AnimatePresence>
         {open && (
@@ -1172,7 +1221,8 @@ export function WhatsAppWidget() {
                   type="button"
                   onClick={() => {
                     setShowEmojiPicker((v) => !v);
-                    setShowCommandPicker(false);
+                    // hide command picker by clearing "/" prefix
+                    if (input.trim().startsWith("/")) setInput("");
                   }}
                   aria-label={showEmojiPicker ? "Tutup emoji picker" : "Buka emoji picker"}
                   aria-pressed={showEmojiPicker}

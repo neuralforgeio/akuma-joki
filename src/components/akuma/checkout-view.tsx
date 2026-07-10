@@ -73,7 +73,18 @@ export function CheckoutView() {
 
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
-    window.open(url, "_blank");
+    // anchor click untuk hindari proxy corrupt emoji di URL
+    try {
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch {
+      window.open(url, "_blank");
+    }
 
     toast({
       title: "Membuka WhatsApp…",
