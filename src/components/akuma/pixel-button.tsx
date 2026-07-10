@@ -8,7 +8,6 @@ type PixelButtonProps = React.ComponentProps<"button"> & {
   variant?: "neon" | "silver" | "ghost" | "danger";
   size?: "sm" | "md" | "lg" | "xl";
   shine?: boolean;
-  /** When true, render as the child element (e.g. next/link) via Radix Slot. */
   asChild?: boolean;
 };
 
@@ -21,13 +20,13 @@ const sizeMap: Record<NonNullable<PixelButtonProps["size"]>, string> = {
 
 const variantMap: Record<NonNullable<PixelButtonProps["variant"]>, string> = {
   neon:
-    "bg-[#a020f0] text-white border-[#a020f0] hover:bg-[#c44bff] hover:border-[#c44bff] shadow-[0_0_14px_rgba(160,32,240,0.55)] hover:shadow-[0_0_22px_rgba(160,32,240,0.85)]",
+    "bg-gradient-to-r from-violet-600 to-violet-500 text-white border border-violet-400/30 hover:from-violet-500 hover:to-violet-400 shadow-[0_4px_20px_-4px_rgba(139,92,246,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(139,92,246,0.6)]",
   silver:
-    "bg-transparent text-[#e5e5e5] border-[#e5e5e5] hover:bg-[#e5e5e5] hover:text-[#0a0a0a] shadow-[0_0_10px_rgba(229,229,229,0.25)]",
+    "bg-white/5 text-zinc-200 border border-white/10 hover:bg-white/10 hover:border-white/20 backdrop-blur-sm",
   ghost:
-    "bg-transparent text-[#e5e5e5] border-transparent hover:bg-[#a020f0]/15 hover:text-[#c44bff]",
+    "bg-transparent text-zinc-300 border border-transparent hover:bg-white/5 hover:text-white",
   danger:
-    "bg-[#ff3b6b] text-white border-[#ff3b6b] hover:bg-[#ff5c84] shadow-[0_0_14px_rgba(255,59,107,0.55)]",
+    "bg-gradient-to-r from-red-600 to-red-500 text-white border border-red-400/30 hover:from-red-500 hover:to-red-400 shadow-[0_4px_20px_-4px_rgba(239,68,68,0.5)]",
 };
 
 export const PixelButton = React.forwardRef<HTMLButtonElement, PixelButtonProps>(
@@ -38,9 +37,9 @@ export const PixelButton = React.forwardRef<HTMLButtonElement, PixelButtonProps>
         ref={ref}
         data-slot="pixel-button"
         className={cn(
-          "font-pixel relative inline-flex items-center justify-center gap-2 uppercase tracking-wide select-none",
-          "border-2 pixel-corner transition-all duration-200 active:translate-y-[2px] active:shadow-none",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none",
+          "relative inline-flex items-center justify-center gap-2 uppercase tracking-wide select-none",
+          "rounded-xl font-pixel transition-all duration-300 active:scale-[0.97]",
+          "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none",
           sizeMap[size],
           variantMap[variant],
           shine && "btn-shine",
