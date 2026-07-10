@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "@/components/akuma/navbar";
 import { Footer } from "@/components/akuma/footer";
 import { BackToTop } from "@/components/akuma/back-to-top";
+import { SocialProofNotification } from "@/components/akuma/social-proof";
 
 /**
  * Wraps all "normal" routes (/, /store/*, /checkout) with the Navbar + Footer
@@ -40,6 +41,7 @@ export default function MainLayout({
       </main>
       <Footer />
       <BackToTop />
+      <SocialProofNotification />
     </div>
   );
 }
