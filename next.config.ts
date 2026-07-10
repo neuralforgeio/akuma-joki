@@ -32,7 +32,12 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "frame-ancestors 'none';",
+            value:
+              "frame-ancestors 'self' https://*.space-z.ai https://*.chatglm.cn https://*.z.ai https://*.vercel.app http://localhost:*;",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "ALLOWALL",
           },
         ],
       },

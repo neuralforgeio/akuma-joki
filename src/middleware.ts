@@ -123,15 +123,11 @@ export function middleware(request: NextRequest) {
   // === PERFORMANCE: add caching & security headers ===
   const response = NextResponse.next();
 
-  // Security headers — X-Frame-Options hanya untuk /admin (anti clickjacking).
-  // Public routes TIDAK pakai X-Frame-Options agar bisa di-iframe oleh preview panel Z.ai.
+  // Security headers — admin & public routes sama-sama allow iframe dari Z.ai preview.
+  // X-Frame-Options & CSP frame-ancestors sudah di-handle di next.config.ts headers().
+  // Middleware hanya set no-cache untuk admin (prevent sensitive page caching).
   if (pathname.startsWith("/admin")) {
-    response.headers.set("X-Frame-Options", "DENY");
     response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
-  } else {
-    // Public routes: allow iframe dari Z.ai preview (tidak set X-Frame-Options,
-    // atau set ALLOWALL agar preview panel bisa render di iframe)
-    response.headers.set("X-Frame-Options", "ALLOWALL");
   }
 
   response.headers.set("X-Content-Type-Options", "nosniff");
