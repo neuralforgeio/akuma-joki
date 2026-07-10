@@ -33,6 +33,14 @@ export const metadata: Metadata = {
   authors: [{ name: "AKUMA JOKI" }],
   icons: {
     icon: "/akuma-logo.png",
+    apple: "/akuma-logo.png",
+  },
+  manifest: "/manifest.json",
+  themeColor: "#a020f0",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "AKUMA JOKI",
   },
   openGraph: {
     title: "AKUMA JOKI — Joki & Store Roblox",

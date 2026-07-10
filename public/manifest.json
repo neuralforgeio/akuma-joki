@@ -1,0 +1,56 @@
+{
+  "name": "AKUMA JOKI — Joki & Store Roblox",
+  "short_name": "AKUMA JOKI",
+  "description": "Joki & Store Roblox premium. Blox Fruits, Expedition Antarctica, Retail Tycoon 2. Aman, cepat, harga bersahabat.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0a",
+  "theme_color": "#a020f0",
+  "categories": ["games", "shopping", "entertainment"],
+  "lang": "id",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/akuma-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/akuma-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/akuma-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/akuma-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Blox Fruits Store",
+      "short_name": "Blox Fruits",
+      "description": "Joki Blox Fruits",
+      "url": "/store/blox-fruits",
+      "icons": [{ "src": "/akuma-logo.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Checkout",
+      "short_name": "Checkout",
+      "description": "Selesaikan order",
+      "url": "/checkout",
+      "icons": [{ "src": "/akuma-logo.png", "sizes": "96x96", "type": "image/png" }]
+    }
+  ],
+  "screenshots": []
+}
