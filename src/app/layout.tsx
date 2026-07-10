@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { WhatsAppWidget } from "@/components/akuma/whatsapp-widget";
+import WhatsAppWidget from "@/components/akuma/whatsapp-widget-loader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -1,23 +1,34 @@
 "use client";
 
 /**
- * AKUMA JOKI — Floating WhatsApp Live Chat Widget
+ * AKUMA JOKI — Floating WhatsApp Live Chat Widget (v2)
  * --------------------------------------------------------------
  * 100% frontend-only. Pesan diteruskan via link wa.me (tab baru).
  * Tema: Retro PixelArt — font-pixel, pixel-corner, neon glow, scanlines.
  *
- * Perilaku:
- *  - Floating button (bulat, hijau WhatsApp #25D366) dengan pulse ring.
- *  - Toggle popup chat box (slide-up + fade-in via Framer Motion).
- *  - Header: avatar "AJ", nama CS, status Online.
- *  - Body: bubble sambutan CS + quick reply chips.
- *  - Input area: text input + tombol kirim (paper plane).
- *  - Kirim -> push bubble user -> window.open(wa.me) -> bubble CS konfirmasi.
+ * Fitur (v2):
+ *  - Floating button bulat hijau WhatsApp + pulse ring + badge notif unread.
+ *  - Popup chat box (slide-up + fade-in, Framer Motion spring).
+ *  - Header: avatar "AJ", nama CS, status Online/Offline (jam operasional),
+ *    tombol mute sound + tombol clear chat.
+ *  - Body: welcome bubble + quick reply chips (dengan emoji) + typing indicator.
+ *  - Input: text input + char counter + tombol kirim (paper plane).
+ *  - Sound "blip" saat kirim/terima (Web Audio API, gated by mute).
+ *  - Persistence: riwayat chat & mute disimpan ke localStorage (cross-session).
+ *  - Auto-open: setelah 12s jika user belum interaksi (throttle via sessionStorage).
+ *  - A11y: role="log", focus trap saat popup terbuka, restore focus saat tutup.
+ *  - Kirim -> push bubble user -> window.open(wa.me) -> typing -> bubble CS konfirmasi.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Send, X } from "lucide-react";
+import { Bell, BellOff, Send, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ============================ KONFIGURASI ============================ */
@@ -26,15 +37,194 @@ const CS_NAME = "Akuma Joki";
 const WELCOME_MESSAGE =
   "Halo! 👋 Selamat datang di Akuma Joki. Ada yang bisa kami bantu?";
 
-const QUICK_REPLIES = ["Cek Harga Joki", "Status Pesanan", "Chat Admin"];
+const QUICK_REPLIES: { label: string; emoji: string }[] = [
+  { label: "Cek Harga Joki", emoji: "💰" },
+  { label: "Status Pesanan", emoji: "📦" },
+  { label: "Chat Admin", emoji: "👤" },
+  { label: "Jam Operasional", emoji: "🕐" },
+];
 const REDIRECT_MSG = "Pesan dikirim, mengarahkan ke WhatsApp...";
-const SUBSTATUS = "Biasanya balas dalam beberapa menit";
+const HOURS_REPLY =
+  "🕐 Kami online setiap hari 09.00–23.00 WIB. Di luar jam itu, pesan akan dibalas saat kami kembali online!";
+const OFFLINE_WELCOME =
+  "Halo! 👋 Saat ini kami sedang OFFLINE. Tinggalkan pesan, akan kami balas saat kembali online (09.00 WIB).";
+const SUBSTATUS_ONLINE = "Biasanya balas dalam beberapa menit";
+const SUBSTATUS_OFFLINE = "Online 09.00–23.00 WIB";
+
+/** Jam operasional (WIB). Di luar ini = offline. */
+const OPEN_HOUR = 9;
+const CLOSE_HOUR = 23;
+/** Detik tunggu sebelum auto-open (engagement). */
+const AUTO_OPEN_DELAY = 12000;
 /* ===================================================================== */
 
 type Role = "cs" | "user";
-type Msg = { id: number; role: Role; text: string; ts?: number };
+type Msg = {
+  id: number;
+  role: Role;
+  text: string;
+  ts?: number;
+  /** Tandai pesan user sudah diteruskan ke WhatsApp (read receipt). */
+  sent?: boolean;
+};
 
-/** Ikon WhatsApp resmi (inline SVG) supaya tetap on-brand tanpa dependency tambahan. */
+/* ===================== EXTERNAL STORE (localStorage) ===================== */
+const CHAT_KEY = "akuma-wa-chat-v2";
+const MUTE_KEY = "akuma-wa-mute-v2";
+const AUTO_KEY = "akuma-wa-auto-v2";
+
+const SERVER_CHAT: Msg[] = [{ id: 1, role: "cs", text: WELCOME_MESSAGE }];
+
+let cachedChat: Msg[] | null = null;
+let cachedMute: boolean | null = null;
+let cachedId: number = 2;
+
+function readChat(): Msg[] {
+  if (cachedChat) return cachedChat;
+  if (typeof window === "undefined") return SERVER_CHAT;
+  try {
+    const raw = window.localStorage.getItem(CHAT_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Msg[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        cachedChat = parsed;
+        // sinkronkan id counter agar tidak collision
+        cachedId = parsed.reduce((mx, m) => Math.max(mx, m.id), 1) + 1;
+        return parsed;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  cachedChat = SERVER_CHAT;
+  return cachedChat;
+}
+
+function writeChat(msgs: Msg[]) {
+  cachedChat = msgs;
+  cachedId = msgs.reduce((mx, m) => Math.max(mx, m.id), 1) + 1;
+  try {
+    window.localStorage.setItem(CHAT_KEY, JSON.stringify(msgs));
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event("akuma-wa-chat-change"));
+}
+
+function clearChat() {
+  cachedChat = [{ id: 1, role: "cs", text: WELCOME_MESSAGE }];
+  cachedId = 2;
+  try {
+    window.localStorage.removeItem(CHAT_KEY);
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event("akuma-wa-chat-change"));
+}
+
+function readMute(): boolean {
+  if (cachedMute !== null) return cachedMute;
+  if (typeof window === "undefined") return false;
+  try {
+    cachedMute = window.localStorage.getItem(MUTE_KEY) === "1";
+  } catch {
+    cachedMute = false;
+  }
+  return cachedMute;
+}
+
+function writeMute(v: boolean) {
+  cachedMute = v;
+  try {
+    window.localStorage.setItem(MUTE_KEY, v ? "1" : "0");
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event("akuma-wa-mute-change"));
+}
+
+function subscribeChat(cb: () => void) {
+  window.addEventListener("akuma-wa-chat-change", cb);
+  window.addEventListener("storage", cb);
+  return () => {
+    window.removeEventListener("akuma-wa-chat-change", cb);
+    window.removeEventListener("storage", cb);
+  };
+}
+function subscribeMute(cb: () => void) {
+  window.addEventListener("akuma-wa-mute-change", cb);
+  window.addEventListener("storage", cb);
+  return () => {
+    window.removeEventListener("akuma-wa-mute-change", cb);
+    window.removeEventListener("storage", cb);
+  };
+}
+const getChatSnapshot = () => readChat();
+const getMuteSnapshot = () => readMute();
+const getServerChat = () => SERVER_CHAT;
+const getServerMute = () => false;
+
+/* ============================ SOUND (Web Audio) ============================ */
+let audioCtx: AudioContext | null = null;
+function playBlip(kind: "send" | "recv") {
+  try {
+    if (typeof window === "undefined") return;
+    const AC =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+    if (!AC) return;
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === "suspended") void audioCtx.resume();
+    const ctx = audioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    // send = rising blip, recv = falling blip
+    const t0 = ctx.currentTime;
+    osc.type = "square";
+    osc.frequency.setValueAtTime(kind === "send" ? 520 : 740, t0);
+    osc.frequency.exponentialRampToValueAtTime(
+      kind === "send" ? 780 : 480,
+      t0 + 0.09
+    );
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.08, t0 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.16);
+    osc.start(t0);
+    osc.stop(t0 + 0.18);
+  } catch {
+    /* ignore */
+  }
+}
+
+/* ============================ UTIL ============================ */
+function nextId(): number {
+  return cachedId++;
+}
+
+function formatTime(ts?: number) {
+  if (!ts) return "";
+  try {
+    return new Date(ts).toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
+
+/** Jam operasional berbasis WIB (UTC+7). */
+function getOperatingStatus(now: number) {
+  const wib = new Date(now + (7 * 60 - new Date().getTimezoneOffset()) * 60000);
+  const hour = wib.getHours();
+  const open = hour >= OPEN_HOUR && hour < CLOSE_HOUR;
+  return open;
+}
+
+/* ============================ ICONS ============================ */
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -48,33 +238,62 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-function formatTime(ts: number) {
-  try {
-    return new Date(ts).toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return "";
-  }
+function DoubleCheck({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="square"
+      strokeLinejoin="miter"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M1 13l4 4L13 6" />
+      <path d="M10 17l9-11" />
+    </svg>
+  );
 }
 
+/* ============================ COMPONENT ============================ */
 export function WhatsAppWidget() {
+  const messages = useSyncExternalStore(
+    subscribeChat,
+    getChatSnapshot,
+    getServerChat
+  );
+  const muted = useSyncExternalStore(
+    subscribeMute,
+    getMuteSnapshot,
+    getServerMute
+  );
+
   const [open, setOpen] = useState(false);
-  const [hasNew, setHasNew] = useState(true); // badge notif sebelum dibuka
+  const [hasNew, setHasNew] = useState(true);
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState("");
-  const idRef = useRef(2);
+  const [now, setNow] = useState(() => Date.now());
+
   const bodyRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const lastFocusRef = useRef<HTMLElement | null>(null);
 
-  const [messages, setMessages] = useState<Msg[]>([
-    // Welcome message: tanpa ts agar tidak menyebabkan hydration mismatch (rendered hanya server-side).
-    // Timestamp hanya diisi untuk pesan yang dibuat client-side (user / konfirmasi CS).
-    { id: 1, role: "cs", text: WELCOME_MESSAGE },
-  ]);
+  const isOnline = getOperatingStatus(now);
+  const userSent = messages.some((m) => m.role === "user");
+  const unreadCount = open
+    ? 0
+    : messages.filter((m) => m.role === "cs" && m.id > 1).length;
 
   /* ---------- effects ---------- */
+  // clock untuk update status online/offline tiap menit
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 60000);
+    return () => window.clearInterval(id);
+  }, []);
+
   // auto-scroll ke bawah saat pesan/typing berubah
   useEffect(() => {
     const el = bodyRef.current;
@@ -91,41 +310,127 @@ export function WhatsAppWidget() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // fokus input saat dibuka
+  // focus trap + restore
   useEffect(() => {
     if (open) {
-      const t = window.setTimeout(() => inputRef.current?.focus(), 220);
-      return () => window.clearTimeout(t);
+      lastFocusRef.current = document.activeElement as HTMLElement;
+      const t = window.setTimeout(() => inputRef.current?.focus(), 240);
+      const onTab = (e: KeyboardEvent) => {
+        if (e.key !== "Tab") return;
+        const dlg = dialogRef.current;
+        if (!dlg) return;
+        const focusables = dlg.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      };
+      window.addEventListener("keydown", onTab);
+      return () => {
+        window.clearTimeout(t);
+        window.removeEventListener("keydown", onTab);
+      };
     }
+    // restore focus ke trigger saat tutup
+    lastFocusRef.current?.focus?.();
   }, [open]);
 
-  /* ---------- logic ---------- */
-  const sendMessage = useCallback((text: string) => {
-    const t = text.trim();
-    if (!t) return;
-
-    const userMsg: Msg = { id: idRef.current++, role: "user", text: t, ts: Date.now() };
-    setMessages((m) => [...m, userMsg]);
-    setInput("");
-
-    // buka wa.me dengan teks ter-encode
-    const encoded = encodeURIComponent(t);
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
-
-    // CS konfirmasi (dengan jeda typing)
-    setTyping(true);
-    window.setTimeout(() => {
-      setTyping(false);
-      setMessages((m) => [
-        ...m,
-        { id: idRef.current++, role: "cs", text: REDIRECT_MSG, ts: Date.now() },
-      ]);
-    }, 950);
+  // auto-open setelah delay (throttle via sessionStorage, sekali per session)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem(AUTO_KEY)) return;
+    const id = window.setTimeout(() => {
+      sessionStorage.setItem(AUTO_KEY, "1");
+      setOpen(true);
+      setHasNew(false);
+    }, AUTO_OPEN_DELAY);
+    return () => window.clearTimeout(id);
   }, []);
+
+  /* ---------- logic ---------- */
+  const sendMessage = useCallback(
+    (text: string) => {
+      const t = text.trim();
+      if (!t) return;
+
+      const userMsg: Msg = {
+        id: nextId(),
+        role: "user",
+        text: t,
+        ts: Date.now(),
+        sent: false,
+      };
+      const withUser = [...messages, userMsg];
+      writeChat(withUser);
+      setInput("");
+
+      // buka wa.me dengan teks ter-encode
+      const encoded = encodeURIComponent(t);
+      window.open(
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      // tandai pesan user sebagai "sent" (read receipt) setelah jeda singkat
+      window.setTimeout(() => {
+        writeChat(
+          readChat().map((m) => (m.id === userMsg.id ? { ...m, sent: true } : m))
+        );
+      }, 500);
+
+      // CS konfirmasi (dengan jeda typing)
+      setTyping(true);
+      window.setTimeout(() => {
+        setTyping(false);
+        writeChat([
+          ...readChat(),
+          { id: nextId(), role: "cs", text: REDIRECT_MSG, ts: Date.now() },
+        ]);
+        if (!muted) playBlip("recv");
+      }, 950);
+
+      if (!muted) playBlip("send");
+    },
+    [messages, muted]
+  );
+
+  // quick reply khusus "Jam Operasional" → jawab langsung tanpa buka wa.me
+  const handleQuickReply = useCallback(
+    (q: { label: string; emoji: string }) => {
+      if (q.label === "Jam Operasional") {
+        const userMsg: Msg = {
+          id: nextId(),
+          role: "user",
+          text: q.label,
+          ts: Date.now(),
+          sent: true,
+        };
+        writeChat([...messages, userMsg]);
+        setTyping(true);
+        window.setTimeout(() => {
+          setTyping(false);
+          writeChat([
+            ...readChat(),
+            { id: nextId(), role: "cs", text: HOURS_REPLY, ts: Date.now() },
+          ]);
+          if (!muted) playBlip("recv");
+        }, 900);
+        if (!muted) playBlip("send");
+        return;
+      }
+      sendMessage(q.label);
+    },
+    [messages, muted, sendMessage]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +442,14 @@ export function WhatsAppWidget() {
     setHasNew(false);
   };
 
-  const userSent = messages.some((m) => m.role === "user");
+  const toggleMute = () => writeMute(!muted);
+  const handleClear = () => {
+    clearChat();
+    setTyping(false);
+  };
+
+  const charCount = input.length;
+  const nearLimit = charCount > 400;
 
   /* ============================ RENDER ============================ */
   return (
@@ -150,6 +462,7 @@ export function WhatsAppWidget() {
         {open && (
           <motion.div
             key="wa-chat"
+            ref={dialogRef}
             role="dialog"
             aria-label={`Live chat ${CS_NAME}`}
             aria-modal="false"
@@ -160,7 +473,7 @@ export function WhatsAppWidget() {
             className={cn(
               "relative mb-4 flex flex-col overflow-hidden",
               "w-[min(22rem,calc(100vw-2rem))]",
-              "h-[30rem] max-h-[calc(100vh-7rem)]",
+              "h-[32rem] max-h-[calc(100vh-7rem)]",
               "bg-[#121017] text-[#e5e5e5]",
               "border-2 border-[#25D366] pixel-corner scanlines",
               "shadow-[0_0_0_2px_#0a0a0a,0_0_0_4px_#25D366,0_0_28px_rgba(37,211,102,0.45),0_18px_40px_-12px_rgba(0,0,0,0.8)]"
@@ -168,23 +481,38 @@ export function WhatsAppWidget() {
           >
             {/* ===== Header ===== */}
             <div className="relative flex items-center gap-3 border-b-2 border-[#25D366]/40 bg-[#0a0a0a] px-3 py-3">
-              {/* halo neon di belakang avatar */}
               <div className="relative shrink-0">
-                <div className="absolute inset-0 rounded-full bg-[#25D366]/40 blur-md" />
                 <div
-                  className="relative flex h-11 w-11 items-center justify-center rounded-full bg-[#25D366] font-pixel text-[11px] text-[#0a0a0a]"
+                  className={cn(
+                    "absolute inset-0 rounded-full blur-md",
+                    isOnline ? "bg-[#25D366]/40" : "bg-[#9a93a8]/30"
+                  )}
+                />
+                <div
+                  className={cn(
+                    "relative flex h-11 w-11 items-center justify-center rounded-full font-pixel text-[11px] text-[#0a0a0a]",
+                    isOnline ? "bg-[#25D366]" : "bg-[#6b6478]"
+                  )}
                   style={{
-                    boxShadow:
-                      "0 0 0 2px #0a0a0a, 0 0 0 4px #25D366, 0 0 12px rgba(37,211,102,0.7)",
+                    boxShadow: isOnline
+                      ? "0 0 0 2px #0a0a0a, 0 0 0 4px #25D366, 0 0 12px rgba(37,211,102,0.7)"
+                      : "0 0 0 2px #0a0a0a, 0 0 0 4px #6b6478",
                   }}
                   aria-hidden="true"
                 >
                   AJ
                 </div>
-                {/* online dot */}
+                {/* status dot */}
                 <span
-                  className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#0a0a0a] bg-[#6ee7b7]"
-                  style={{ boxShadow: "0 0 8px rgba(110,231,183,0.9)" }}
+                  className={cn(
+                    "absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#0a0a0a]",
+                    isOnline ? "bg-[#6ee7b7]" : "bg-[#9a93a8]"
+                  )}
+                  style={{
+                    boxShadow: isOnline
+                      ? "0 0 8px rgba(110,231,183,0.9)"
+                      : "0 0 6px rgba(154,147,168,0.6)",
+                  }}
                   aria-hidden="true"
                 />
               </div>
@@ -199,18 +527,71 @@ export function WhatsAppWidget() {
                   </span>
                 </div>
                 <div className="mt-1 flex items-center gap-1.5">
-                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#6ee7b7]" />
-                  <p className="font-pixel text-[7px] uppercase tracking-wide text-[#6ee7b7]">
-                    Online · {SUBSTATUS}
-                  </p>
+                  {isOnline ? (
+                    <>
+                      <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#6ee7b7]" />
+                      <AnimatePresence mode="wait" initial={false}>
+                        {typing ? (
+                          <motion.p
+                            key="typing"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="font-pixel text-[7px] uppercase tracking-wide text-[#c44bff]"
+                          >
+                            Sedang mengetik...
+                          </motion.p>
+                        ) : (
+                          <motion.p
+                            key="online"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="font-pixel text-[7px] uppercase tracking-wide text-[#6ee7b7]"
+                          >
+                            Online · {SUBSTATUS_ONLINE}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ) : (
+                    <>
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#9a93a8]" />
+                      <p className="font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]">
+                        Offline · {SUBSTATUS_OFFLINE}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
 
+              {/* mute toggle */}
+              <button
+                type="button"
+                onClick={toggleMute}
+                aria-label={muted ? "Aktifkan suara notifikasi" : "Matikan suara notifikasi"}
+                aria-pressed={muted}
+                title={muted ? "Bunyikan suara" : "Bisukan suara"}
+                className="flex h-8 w-8 shrink-0 items-center justify-center border-2 border-[#2a2436] text-[#9a93a8] pixel-corner transition-colors hover:border-[#25D366] hover:text-[#25D366]"
+              >
+                {muted ? <BellOff className="size-4" /> : <Bell className="size-4" />}
+              </button>
+              {/* clear chat */}
+              <button
+                type="button"
+                onClick={handleClear}
+                aria-label="Hapus percakapan"
+                title="Hapus percakapan"
+                className="flex h-8 w-8 shrink-0 items-center justify-center border-2 border-[#2a2436] text-[#9a93a8] pixel-corner transition-colors hover:border-[#ff3b6b] hover:text-[#ff3b6b]"
+              >
+                <Trash2 className="size-4" />
+              </button>
+              {/* close */}
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Tutup chat"
-                className="flex h-8 w-8 shrink-0 items-center justify-center border-2 border-[#2a2436] text-[#9a93a8] pixel-corner transition-colors hover:border-[#ff3b6b] hover:text-[#ff3b6b]"
+                className="flex h-8 w-8 shrink-0 items-center justify-center border-2 border-[#2a2436] text-[#9a93a8] pixel-corner transition-colors hover:border-[#e5e5e5] hover:text-[#e5e5e5]"
               >
                 <X className="size-4" />
               </button>
@@ -219,22 +600,54 @@ export function WhatsAppWidget() {
             {/* ===== Body ===== */}
             <div
               ref={bodyRef}
+              role="log"
+              aria-label="Riwayat percakapan"
+              aria-live="polite"
               className="relative flex-1 space-y-3 overflow-y-auto bg-[#0a0a0a] px-3 py-4"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 50% 0%, rgba(37,211,102,0.06), transparent 60%)",
-              }}
             >
+              {/* animated grid bg */}
+              <div
+                className="pointer-events-none absolute inset-0 opacity-[0.35]"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgba(37,211,102,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(37,211,102,0.07) 1px, transparent 1px)",
+                  backgroundSize: "24px 24px",
+                  animation: "wa-grid-move 18s linear infinite",
+                }}
+                aria-hidden="true"
+              />
+
               {/* tanggal chip */}
-              <div className="flex justify-center">
+              <div className="relative flex justify-center">
                 <span className="rounded-sm border border-[#2a2436] bg-[#121017] px-2 py-1 font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]">
                   Hari ini
                 </span>
               </div>
 
-              {messages.map((m) => (
-                <Bubble key={m.id} msg={m} />
-              ))}
+              {messages.map((m, i) => {
+                const prev = messages[i - 1];
+                const showDateDivider =
+                  i > 0 &&
+                  m.ts &&
+                  prev?.ts &&
+                  new Date(m.ts).toDateString() !==
+                    new Date(prev.ts).toDateString();
+                return (
+                  <div key={m.id} className="relative">
+                    {showDateDivider && (
+                      <div className="my-2 flex justify-center">
+                        <span className="rounded-sm border border-[#2a2436] bg-[#121017] px-2 py-1 font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]">
+                          {new Date(m.ts!).toLocaleDateString("id-ID", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                        </span>
+                      </div>
+                    )}
+                    <Bubble msg={m} isOnline={isOnline} />
+                  </div>
+                );
+              })}
 
               {/* typing indicator */}
               <AnimatePresence>
@@ -243,9 +656,14 @@ export function WhatsAppWidget() {
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
-                    className="flex items-end gap-2"
+                    className="relative flex items-end gap-2"
                   >
-                    <AvatarMini />
+                    <motion.div
+                      animate={{ y: [0, -2, 0] }}
+                      transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <AvatarMini online={isOnline} />
+                    </motion.div>
                     <div className="flex items-center gap-1 rounded-md rounded-bl-none border-2 border-[#2a2436] bg-[#1a1722] px-3 py-2.5">
                       <Dot delay="0ms" />
                       <Dot delay="150ms" />
@@ -267,12 +685,13 @@ export function WhatsAppWidget() {
                 >
                   {QUICK_REPLIES.map((q) => (
                     <button
-                      key={q}
+                      key={q.label}
                       type="button"
-                      onClick={() => sendMessage(q)}
-                      className="btn-shine font-pixel text-[8px] uppercase tracking-wide text-[#25D366] border-2 border-[#25D366]/60 px-2.5 py-1.5 pixel-corner transition-all hover:bg-[#25D366] hover:text-[#0a0a0a] hover:shadow-[0_0_12px_rgba(37,211,102,0.6)] active:translate-y-[1px]"
+                      onClick={() => handleQuickReply(q)}
+                      className="btn-shine flex items-center gap-1 font-pixel text-[8px] uppercase tracking-wide text-[#25D366] border-2 border-[#25D366]/60 px-2.5 py-1.5 pixel-corner transition-all hover:bg-[#25D366] hover:text-[#0a0a0a] hover:shadow-[0_0_12px_rgba(37,211,102,0.6)] active:translate-y-[1px]"
                     >
-                      {q}
+                      <span aria-hidden="true">{q.emoji}</span>
+                      {q.label}
                     </button>
                   ))}
                 </motion.div>
@@ -282,25 +701,41 @@ export function WhatsAppWidget() {
             {/* ===== Input Area ===== */}
             <form
               onSubmit={handleSubmit}
-              className="flex items-center gap-2 border-t-2 border-[#25D366]/40 bg-[#121017] px-2.5 py-2.5"
+              className="relative border-t-2 border-[#25D366]/40 bg-[#121017] px-2.5 py-2.5"
             >
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ketik pesan..."
-                aria-label="Ketik pesan"
-                maxLength={500}
-                className="min-w-0 flex-1 bg-[#0a0a0a] px-3 py-2.5 font-sans text-sm text-[#e5e5e5] placeholder:text-[#9a93a8] border-2 border-[#2a2436] pixel-corner outline-none transition-colors focus:border-[#25D366] focus:shadow-[0_0_10px_rgba(37,211,102,0.4)]"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim()}
-                aria-label="Kirim pesan"
-                className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#25D366] text-[#0a0a0a] border-2 border-[#25D366] pixel-corner transition-all hover:bg-[#1ebe5d] hover:shadow-[0_0_14px_rgba(37,211,102,0.7)] active:translate-y-[1px] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
-              >
-                <Send className="size-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ketik pesan..."
+                  aria-label="Ketik pesan"
+                  maxLength={500}
+                  className="min-w-0 flex-1 bg-[#0a0a0a] px-3 py-2.5 font-sans text-sm text-[#e5e5e5] placeholder:text-[#9a93a8] border-2 border-[#2a2436] pixel-corner outline-none transition-colors focus:border-[#25D366] focus:shadow-[0_0_10px_rgba(37,211,102,0.4)]"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  aria-label="Kirim pesan"
+                  className="btn-shine flex h-11 w-11 shrink-0 items-center justify-center bg-[#25D366] text-[#0a0a0a] border-2 border-[#25D366] pixel-corner transition-all hover:bg-[#1ebe5d] hover:shadow-[0_0_14px_rgba(37,211,102,0.7)] active:translate-y-[1px] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                >
+                  <Send className="size-4" />
+                </button>
+              </div>
+              {/* char counter + footer notice */}
+              <div className="mt-1.5 flex items-center justify-between px-1">
+                <p className="font-pixel text-[6px] uppercase tracking-wide text-[#9a93a8]">
+                  Diteruskan ke WhatsApp
+                </p>
+                <p
+                  className={cn(
+                    "font-pixel text-[6px] uppercase tracking-wide transition-colors",
+                    nearLimit ? "text-[#ff3b6b]" : "text-[#9a93a8]/60"
+                  )}
+                >
+                  {charCount}/500
+                </p>
+              </div>
             </form>
           </motion.div>
         )}
@@ -309,6 +744,7 @@ export function WhatsAppWidget() {
       {/* ===== Floating Button ===== */}
       <div className="flex justify-end">
         <motion.button
+          ref={triggerRef}
           type="button"
           onClick={toggle}
           aria-label={open ? "Tutup live chat WhatsApp" : "Buka live chat WhatsApp"}
@@ -323,17 +759,38 @@ export function WhatsAppWidget() {
           whileTap={{ scale: 0.92 }}
           transition={{ type: "spring", stiffness: 400, damping: 18 }}
         >
-          {/* pulse ring (denut halus) */}
+          {/* pulse ring */}
           {!open && (
-            <span
-              className="pointer-events-none absolute inset-0 rounded-full border-2 border-[#25D366]"
-              style={{ animation: "wa-ping 2.2s cubic-bezier(0,0,0.2,1) infinite" }}
-              aria-hidden="true"
-            />
+            <>
+              <span
+                className="pointer-events-none absolute inset-0 rounded-full border-2 border-[#25D366]"
+                style={{ animation: "wa-ping 2.2s cubic-bezier(0,0,0.2,1) infinite" }}
+                aria-hidden="true"
+              />
+              <span
+                className="pointer-events-none absolute inset-0 rounded-full border-2 border-[#25D366]"
+                style={{ animation: "wa-ping 2.2s cubic-bezier(0,0,0.2,1) infinite 1.1s" }}
+                aria-hidden="true"
+              />
+            </>
           )}
 
-          {/* badge notif */}
-          {hasNew && !open && (
+          {/* badge notif unread */}
+          {!open && unreadCount > 0 && (
+            <motion.span
+              key={unreadCount}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18 }}
+              className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-[#ff3b6b] px-1 font-pixel text-[8px] text-white"
+              style={{ boxShadow: "0 0 10px rgba(255,59,107,0.9)" }}
+              aria-hidden="true"
+            >
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </motion.span>
+          )}
+          {/* initial badge (sebelum ada pesan CS baru) */}
+          {!open && unreadCount === 0 && hasNew && (
             <span
               className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-[#ff3b6b] px-1 font-pixel text-[8px] text-white"
               style={{ boxShadow: "0 0 10px rgba(255,59,107,0.9)" }}
@@ -369,7 +826,7 @@ export function WhatsAppWidget() {
         </motion.button>
       </div>
 
-      {/* keyframes injected locally (ping ring + typing dots) */}
+      {/* keyframes injected locally */}
       <style>{`
         @keyframes wa-ping {
           0%   { transform: scale(1);   opacity: 0.7; }
@@ -380,6 +837,10 @@ export function WhatsAppWidget() {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
           30%           { transform: translateY(-3px); opacity: 1; }
         }
+        @keyframes wa-grid-move {
+          from { background-position: 0 0, 0 0; }
+          to   { background-position: 24px 24px, 24px 24px; }
+        }
       `}</style>
     </div>
   );
@@ -387,45 +848,70 @@ export function WhatsAppWidget() {
 
 /* ============================ Sub-components ============================ */
 
-function Bubble({ msg }: { msg: Msg }) {
+function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
   const isUser = msg.role === "user";
+  const isRedirect = msg.role === "cs" && msg.text === REDIRECT_MSG;
+  const isHours = msg.role === "cs" && msg.text === HOURS_REPLY;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+      initial={{ opacity: 0, y: 8, scale: 0.92 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      transition={
+        isRedirect
+          ? { type: "spring", stiffness: 500, damping: 14, mass: 0.6 }
+          : { duration: 0.2, ease: "easeOut" }
+      }
       className={cn("flex items-end gap-2", isUser ? "justify-end" : "justify-start")}
     >
-      {!isUser && <AvatarMini />}
-      <div className={cn("max-w-[78%]", isUser && "order-1")}>
+      {!isUser && <AvatarMini online={isOnline} />}
+      <div className={cn("max-w-[80%]", isUser && "order-1")}>
         <div
           className={cn(
             "px-3 py-2 font-sans text-sm leading-relaxed",
             isUser
               ? "rounded-md rounded-br-none border-2 border-[#0a0a0a] bg-[#25D366] text-[#0a0a0a]"
-              : "rounded-md rounded-bl-none border-2 border-[#2a2436] bg-[#1a1722] text-[#e5e5e5]"
+              : isHours
+                ? "rounded-md rounded-bl-none border-2 border-[#a020f0]/60 bg-[#1a1722] text-[#e5e5e5]"
+                : "rounded-md rounded-bl-none border-2 border-[#2a2436] bg-[#1a1722] text-[#e5e5e5]"
           )}
         >
           {msg.text}
         </div>
-        <p
+        <div
           className={cn(
-            "mt-1 font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]",
-            isUser ? "text-right" : "text-left"
+            "mt-1 flex items-center gap-1.5",
+            isUser ? "justify-end" : "justify-start"
           )}
         >
-          {msg.ts ? formatTime(msg.ts) : ""}
-        </p>
+          <p
+            className={cn(
+              "font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]",
+              isUser ? "text-right" : "text-left"
+            )}
+          >
+            {msg.ts ? formatTime(msg.ts) : ""}
+          </p>
+          {isUser && msg.sent && (
+            <DoubleCheck className="size-3 text-[#25D366]" />
+          )}
+        </div>
       </div>
     </motion.div>
   );
 }
 
-function AvatarMini() {
+function AvatarMini({ online }: { online: boolean }) {
   return (
     <div
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#25D366] font-pixel text-[8px] text-[#0a0a0a]"
-      style={{ boxShadow: "0 0 0 1px #0a0a0a, 0 0 6px rgba(37,211,102,0.5)" }}
+      className={cn(
+        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-pixel text-[8px] text-[#0a0a0a]",
+        online ? "bg-[#25D366]" : "bg-[#6b6478]"
+      )}
+      style={{
+        boxShadow: online
+          ? "0 0 0 1px #0a0a0a, 0 0 6px rgba(37,211,102,0.5)"
+          : "0 0 0 1px #0a0a0a",
+      }}
       aria-hidden="true"
     >
       AJ
