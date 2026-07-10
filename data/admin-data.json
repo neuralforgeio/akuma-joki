@@ -179,6 +179,15 @@
           ]
         }
       ]
+    },
+    {
+      "slug": "test-game",
+      "name": "Test Game",
+      "tagline": "test",
+      "description": "test",
+      "emoji": "⚔️",
+      "accent": "#a020f0",
+      "categories": []
     }
   ],
   "announcement": null,
@@ -191,5 +200,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-10T19:32:29.128Z"
+  "updatedAt": "2026-07-10T19:42:23.756Z"
 }
