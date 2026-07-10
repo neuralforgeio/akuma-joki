@@ -3,6 +3,8 @@ import { Geist, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import WhatsAppWidget from "@/components/akuma/whatsapp-widget-loader";
+import { AnnouncementBanner } from "@/components/admin/announcement-banner";
+import { VisitorTracker } from "@/components/admin/visitor-tracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +51,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${pixelFont.variable} font-sans antialiased bg-background text-foreground`}
       >
+        <AnnouncementBanner />
+        <VisitorTracker />
         {children}
         <WhatsAppWidget />
         <Toaster />

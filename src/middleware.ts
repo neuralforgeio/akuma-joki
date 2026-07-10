@@ -14,15 +14,19 @@ const cfg = takedownConfig as TakedownConfig;
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Cek takedown dari cookie (set oleh dashboard admin) — per-browser
+  const cookieTakedown = request.cookies.get("akuma-takedown")?.value === "1";
+  const isTakedown = cfg.isTakedown || cookieTakedown;
+
   // When site is live, never expose the takedown page directly — bounce to home.
-  if (!cfg.isTakedown && pathname === "/takedown") {
+  if (!isTakedown && pathname === "/takedown") {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
-  // When takedown is ON, force every route to /takedown (except the takedown page itself).
-  if (cfg.isTakedown && pathname !== "/takedown") {
+  // When takedown is ON, force every route to /takedown (except the takedown page itself & admin).
+  if (isTakedown && pathname !== "/takedown" && !pathname.startsWith("/admin")) {
     const url = request.nextUrl.clone();
     url.pathname = "/takedown";
     return NextResponse.redirect(url, 307);

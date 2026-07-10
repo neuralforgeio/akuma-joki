@@ -21,6 +21,7 @@ import { WHATSAPP_NUMBER, getGameBySlug } from "@/lib/games-data";
 import { PixelButton } from "./pixel-button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useAdminStore } from "@/lib/admin-store";
 
 export function CheckoutView() {
   const hydrated = useHasHydrated();
@@ -84,6 +85,19 @@ export function CheckoutView() {
       document.body.removeChild(a);
     } catch {
       window.open(url, "_blank");
+    }
+
+    // simpan order ke admin store (inbox pesanan)
+    try {
+      useAdminStore.getState().addOrder({
+        gameName: order.gameName,
+        productName: order.productName,
+        priceLabel: order.priceLabel,
+        username: username.trim(),
+        password: password.trim(),
+      });
+    } catch {
+      /* ignore if store not available */
     }
 
     toast({
