@@ -108,16 +108,7 @@
           "id": "race",
           "name": "RACE",
           "icon": "🔥",
-          "items": [
-            {
-              "id": "v2-race",
-              "name": "V2 Race",
-              "price": 2000,
-              "priceLabel": "2k",
-              "description": "Menjadi lebih kuat dari sebelumnya",
-              "requirement": "Membutuhkan Level 850 - MAX"
-            }
-          ]
+          "items": []
         }
       ]
     },
@@ -196,14 +187,7 @@
       ]
     }
   ],
-  "announcement": {
-    "id": "mrfhd843",
-    "title": "PEMBUKAAN AKUMA JOKI - OWNER",
-    "body": "🎉 Selamat datang di website Joki Roblox kami, nikmati pengalaman pemesanan yang lebih mudah, cepat, dan aman!",
-    "type": "info",
-    "active": true,
-    "createdAt": 1783720896339
-  },
+  "announcement": null,
   "takedown": false,
   "takedownReason": "Website sedang dalam perbaikan sistem (Maintenance). Kami akan kembali secepatnya! - AKUMA JOKI",
   "settings": {
@@ -214,5 +198,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-11T05:11:10.459Z"
+  "updatedAt": "2026-07-11T05:12:56.253Z"
 }
