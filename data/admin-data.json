@@ -108,7 +108,16 @@
           "id": "race",
           "name": "RACE",
           "icon": "🔥",
-          "items": []
+          "items": [
+            {
+              "id": "v2-race",
+              "name": "V2 Race",
+              "price": 2000,
+              "priceLabel": "2k",
+              "description": "Menjadi lebih kuat dari sebelumnya",
+              "requirement": "Membutuhkan Level 850 - MAX"
+            }
+          ]
         }
       ]
     },
@@ -205,5 +214,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-11T01:25:48.902Z"
+  "updatedAt": "2026-07-11T05:11:10.459Z"
 }
