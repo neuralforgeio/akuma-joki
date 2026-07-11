@@ -103,6 +103,12 @@
               "description": "Senjata tier tinggi untuk PvP & grind."
             }
           ]
+        },
+        {
+          "id": "race",
+          "name": "RACE",
+          "icon": "🔥",
+          "items": []
         }
       ]
     },
@@ -199,5 +205,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-11T01:21:50.882Z"
+  "updatedAt": "2026-07-11T01:25:48.902Z"
 }
