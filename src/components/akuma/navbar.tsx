@@ -8,7 +8,6 @@ import { Menu, X, Search } from "lucide-react";
 import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
 import type { Game, ProductItem } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
-import { ThemeToggle } from "./theme-toggle";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -74,7 +73,6 @@ export function Navbar() {
 
         {/* Search + Checkout */}
         <div className="hidden md:flex items-center gap-2.5">
-          <ThemeToggle />
           <div ref={searchContainerRef} className="relative">
             <button type="button" onClick={() => setSearchOpen(v => !v)} aria-label="Cari game atau joki" aria-expanded={searchOpen}
               className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-zinc-400 hover:text-violet-400 hover:border-violet-500/30 transition-all">

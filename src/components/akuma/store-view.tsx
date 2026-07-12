@@ -10,6 +10,7 @@ import { GAMES } from "@/lib/games-data";
 import { useAkumaStore } from "@/lib/store";
 import { useReviews } from "@/lib/reviews";
 import { useCart } from "@/lib/cart";
+import { useToast } from "@/hooks/use-toast";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { SkeletonGrid } from "./skeleton";
@@ -22,7 +23,9 @@ export function StoreView({ game }: { game: Game }) {
   const order = useAkumaStore((s) => s.order);
   const selectProduct = useAkumaStore((s) => s.selectProduct);
   const cartAdd = useCart((s) => s.add);
+  const cartHas = useCart((s) => s.has);
   const cartCount = useCart((s) => s.items.length);
+  const { toast } = useToast();
   const [selectedItem, setSelectedItem] = useState<{ item: ProductItem; category: string } | null>(null);
 
   const handlePick = (
@@ -47,7 +50,8 @@ export function StoreView({ game }: { game: Game }) {
       category: selectedItem.category,
     });
     setSelectedItem(null);
-    router.push("/checkout");
+    // Toast notification, NOT redirect
+    toast({ title: "Ditambahkan ke keranjang! 🛒", description: `${selectedItem.item.name} (${selectedItem.item.priceLabel})` });
   };
 
   const handleBuyNow = () => {
@@ -192,6 +196,7 @@ export function StoreView({ game }: { game: Game }) {
                       item={item}
                       game={game}
                       selected={!!isSelected}
+                      inCart={cartHas(`${game.slug}-${item.id}`)}
                       onPick={() => handlePick(item, cat.name)}
                     />
                   </Reveal>
@@ -298,9 +303,19 @@ export function StoreView({ game }: { game: Game }) {
               <div className="flex gap-2">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm font-medium text-zinc-200 hover:bg-white/10 transition-all"
+                  disabled={selectedItem ? cartHas(`${game.slug}-${selectedItem.item.id}`) : false}
+                  className={cn(
+                    "flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all",
+                    selectedItem && cartHas(`${game.slug}-${selectedItem.item.id}`)
+                      ? "bg-green-500/15 border border-green-500/30 text-green-400 cursor-default"
+                      : "bg-white/5 border border-white/10 text-zinc-200 hover:bg-white/10"
+                  )}
                 >
-                  <Plus className="size-4" /> Keranjang
+                  {selectedItem && cartHas(`${game.slug}-${selectedItem.item.id}`) ? (
+                    <><Check className="size-4" /> Di Keranjang</>
+                  ) : (
+                    <><Plus className="size-4" /> Keranjang</>
+                  )}
                 </button>
                 <button
                   onClick={handleBuyNow}
@@ -332,6 +347,7 @@ function ProductCard({
   game,
   selected,
   onPick,
+  inCart,
 }: {
   item: {
     id: string;
@@ -344,6 +360,7 @@ function ProductCard({
   game: Game;
   selected: boolean;
   onPick: () => void;
+  inCart: boolean;
 }) {
   // Promo tags yang dapat badge khusus (glowing + animasi)
   const PROMO_TAGS = ["hot", "popular", "legendary", "starter", "max", "pro", "full climb", "completionist", "quick fix"];
@@ -434,21 +451,25 @@ function ProductCard({
 
       {/* action */}
       <div className="px-4 pb-4 flex items-center gap-2">
-        <PixelButton
-          variant={selected ? "silver" : "neon"}
-          className="flex-1"
+        <button
           onClick={onPick}
+          className={cn(
+            "flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-pixel uppercase tracking-wide transition-all active:scale-[0.97]",
+            inCart
+              ? "bg-green-500/15 border border-green-500/30 text-green-400"
+              : "bg-gradient-to-r from-violet-600 to-violet-500 text-white hover:from-violet-500 hover:to-violet-400"
+          )}
         >
-          {selected ? (
+          {inCart ? (
             <>
-              <Check className="size-3.5" /> Lanjut ke Checkout
+              <Check className="size-3.5" /> Di Keranjang
             </>
           ) : (
             <>
               <ShoppingCart className="size-3.5" /> Pilih Joki
             </>
           )}
-        </PixelButton>
+        </button>
         <WishlistButton
           gameSlug={game.slug}
           gameName={game.name}
