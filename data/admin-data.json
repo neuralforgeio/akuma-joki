@@ -198,7 +198,17 @@
           "id": "leveling",
           "name": "LEVELING",
           "icon": "📈",
-          "items": []
+          "items": [
+            {
+              "id": "testing-nama",
+              "name": "TESTING NAMA",
+              "price": 20,
+              "priceLabel": "20K",
+              "tag": "GOKIL TEST",
+              "description": "DESKRIPSI TEST",
+              "requirement": "AKUN NO CHEAT TEST"
+            }
+          ]
         }
       ]
     }
@@ -214,5 +224,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-12T11:53:28.602Z"
+  "updatedAt": "2026-07-12T11:54:02.073Z"
 }
