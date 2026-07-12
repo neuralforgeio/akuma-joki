@@ -185,6 +185,19 @@ type AdminState = {
   addReview: (r: Omit<Review, "id" | "createdAt">) => void;
   deleteReview: (id: string) => void;
 
+  /* sync from server (GitHub raw) */
+  syncFromServer: (data: Partial<{
+    games: Game[];
+    announcement: Announcement | null;
+    takedown: boolean;
+    takedownReason: string;
+    settings: AdminSettings;
+    faq: FAQItem[];
+    waReplies: WAReply[];
+    about: AboutContent;
+    reviews: Review[];
+  }>) => void;
+
   /* settings */
   updateSettings: (s: Partial<AdminSettings>) => void;
 
@@ -500,6 +513,23 @@ export const useAdminStore = create<AdminState>()(
         set((s) => ({ reviews: s.reviews.filter((r) => r.id !== id) }));
         get().logActivity("DELETE_REVIEW", `Hapus review ${id}`);
         get().triggerSync(`Delete review ${id}`);
+      },
+
+      /* ===== sync from server (GitHub raw) ===== */
+      // Dipanggil oleh useAutoSync hook setiap 60 detik.
+      // Update state dari server TANPA triggerSync (anti loop).
+      syncFromServer: (data) => {
+        set((s) => ({
+          games: data.games ?? s.games,
+          announcement: data.announcement !== undefined ? data.announcement : s.announcement,
+          takedown: data.takedown !== undefined ? data.takedown : s.takedown,
+          takedownReason: data.takedownReason ?? s.takedownReason,
+          settings: data.settings ? { ...s.settings, ...data.settings } : s.settings,
+          faq: data.faq ?? s.faq,
+          waReplies: data.waReplies ?? s.waReplies,
+          about: data.about ?? s.about,
+          reviews: data.reviews ?? s.reviews,
+        }));
       },
 
       /* ===== settings ===== */

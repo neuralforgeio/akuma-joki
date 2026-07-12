@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "@/components/akuma/navbar";
 import { Footer } from "@/components/akuma/footer";
 import { DeferredLoader } from "@/components/akuma/deferred-loader";
+import { useAutoSync } from "@/lib/use-auto-sync";
 
 // Lazy load non-critical floating components (reduce initial JS bundle)
 const BackToTop = dynamic(() => import("@/components/akuma/back-to-top").then(m => ({ default: m.BackToTop })), {
@@ -20,6 +21,9 @@ const BackToTop = dynamic(() => import("@/components/akuma/back-to-top").then(m 
  *
  * Performance: BackToTop & SocialProof lazy-loaded + deferred (render setelah
  * user interact atau 2s delay). Navbar & Footer render langsung (critical).
+ *
+ * useAutoSync: polling data dari GitHub raw setiap 60 detik untuk
+ * cross-device sync (games, reviews, about, dll).
  */
 export default function MainLayout({
   children,
@@ -27,6 +31,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  useAutoSync();
 
   return (
     <div className="relative flex min-h-screen flex-col bg-[#0a0a0a]">

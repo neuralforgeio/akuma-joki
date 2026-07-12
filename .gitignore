@@ -36,3 +36,4 @@ server.log
 worklog.md
 /upload/
 bun.lock
+keep-alive.log
