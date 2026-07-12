@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Gamepad2, Megaphone, Power, Activity, BarChart3,
   Package, FileImage, GitCommit, MessageSquare, HelpCircle, Settings,
   LogOut, ChevronLeft, ChevronRight, Menu as MenuIcon, X,
-  Code2, Terminal, Database, Webhook, ShieldAlert, Bug, Info, Inbox,
+  Code2, Terminal, Database, Webhook, ShieldAlert, Bug, Info, Inbox, Rocket,
 } from "lucide-react";
 
 type MenuItem = { href: string; label: string; icon: typeof LayoutDashboard; roles: ("developer" | "admin")[] };
@@ -31,6 +31,7 @@ const MENU: MenuItem[] = [
   // Developer-only features
   { href: "/admin/about", label: "About Page", icon: Info, roles: ["developer"] },
   { href: "/admin/reports", label: "Reports", icon: Inbox, roles: ["developer"] },
+  { href: "/admin/dev-vercel", label: "Vercel Control", icon: Rocket, roles: ["developer"] },
   { href: "/admin/dev-console", label: "Dev Console", icon: Terminal, roles: ["developer"] },
   { href: "/admin/dev-data", label: "Data Inspector", icon: Database, roles: ["developer"] },
   { href: "/admin/dev-webhooks", label: "Webhooks", icon: Webhook, roles: ["developer"] },

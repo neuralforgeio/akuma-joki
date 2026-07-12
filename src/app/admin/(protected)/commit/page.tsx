@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAdminStore } from "@/lib/admin-store";
 import { PixelButton } from "@/components/akuma/pixel-button";
 import { useToast } from "@/hooks/use-toast";
-import { GitCommit, Save, RotateCcw, History } from "lucide-react";
+import { GitCommit, Save, RotateCcw, History, Rocket, RefreshCw } from "lucide-react";
 
 export default function CommitPage() {
   const commits = useAdminStore((s) => s.commits);
@@ -12,6 +12,7 @@ export default function CommitPage() {
   const rollbackCommit = useAdminStore((s) => s.rollbackCommit);
   const { toast } = useToast();
   const [message, setMessage] = useState("");
+  const [deploying, setDeploying] = useState(false);
 
   const handleCommit = () => {
     if (!message.trim()) {
@@ -30,6 +31,28 @@ export default function CommitPage() {
     }
   };
 
+  const handleTriggerDeploy = async () => {
+    if (!confirm("Trigger deploy ke Vercel? Ini akan redeploy latest commit.")) return;
+    setDeploying(true);
+    try {
+      const res = await fetch("/api/vercel/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "redeploy" }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast({ title: `✅ ${data.message}`, description: data.url ? `URL: ${data.url}` : undefined });
+      } else {
+        toast({ title: data.error || "Deploy failed", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Deploy request failed", variant: "destructive" });
+    } finally {
+      setDeploying(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -37,8 +60,28 @@ export default function CommitPage() {
           COMMIT HISTORY
         </h1>
         <p className="mt-1 text-sm text-[#9a93a8]">
-          Snapshot perubahan data untuk backup & rollback.
+          Snapshot perubahan data untuk backup & rollback. Hubungkan ke Vercel untuk deploy.
         </p>
+      </div>
+
+      {/* Quick action: Trigger Vercel deploy */}
+      <div className="border-2 border-cyan-500/30 bg-[#121017] pixel-corner p-5 max-w-2xl">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-pixel text-[9px] uppercase text-[#22d3ee] flex items-center gap-2">
+            <Rocket className="size-3" /> Vercel Deploy
+          </h2>
+        </div>
+        <p className="text-xs text-[#9a93a8] mb-3">
+          Trigger deploy ke Vercel langsung dari sini. Pakai token <code className="text-cyan-400">akuma_joki_token</code>.
+        </p>
+        <button
+          onClick={handleTriggerDeploy}
+          disabled={deploying}
+          className="inline-flex items-center gap-2 rounded-xl bg-cyan-500/20 border border-cyan-500/30 px-4 py-2 text-sm text-cyan-400 hover:bg-cyan-500/30 transition-all disabled:opacity-50"
+        >
+          {deploying ? <RefreshCw className="size-4 animate-spin" /> : <Rocket className="size-4" />}
+          {deploying ? "Deploying..." : "Trigger Deploy"}
+        </button>
       </div>
 
       {/* create commit */}
@@ -77,7 +120,7 @@ export default function CommitPage() {
             Belum ada commit. Buat commit pertama untuk menyimpan snapshot data.
           </p>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-3 max-h-96 overflow-y-auto akuma-scroll">
             {commits.map((c) => (
               <div
                 key={c.id}
