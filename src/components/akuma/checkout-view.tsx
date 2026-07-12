@@ -4,17 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ArrowLeft,
-  ShoppingBag,
-  User,
-  Lock,
-  MessageCircle,
-  AlertTriangle,
-  Gamepad2,
-  Trash2,
-  ShieldCheck,
-  Eye,
-  EyeOff,
+  ArrowLeft, ShoppingBag, User, Lock, MessageCircle, AlertTriangle,
+  Gamepad2, Trash2, ShieldCheck, Eye, EyeOff, ShoppingCart,
 } from "lucide-react";
 import { useAkumaStore, useHasHydrated } from "@/lib/store";
 import { WHATSAPP_NUMBER, getGameBySlug } from "@/lib/games-data";
@@ -22,88 +13,70 @@ import { PixelButton } from "./pixel-button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useAdminStore } from "@/lib/admin-store";
+import { useCart } from "@/lib/cart";
 
 export function CheckoutView() {
   const hydrated = useHasHydrated();
   const order = useAkumaStore((s) => s.order);
   const clearOrder = useAkumaStore((s) => s.clearOrder);
+  const cartItems = useCart((s) => s.items);
+  const cartRemove = useCart((s) => s.remove);
+  const cartClear = useCart((s) => s.clear);
   const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
-  // Until the persisted store rehydrates on the client, render a neutral
-  // skeleton to avoid SSR/client hydration mismatch.
-  if (!hydrated) {
-    return <CheckoutSkeleton />;
-  }
+  if (!hydrated) { return <CheckoutSkeleton />; }
 
+  // Determine if we have cart items or single order
+  const hasCart = cartItems.length > 0;
   const hasOrder = !!order;
+  const hasAnything = hasCart || hasOrder;
   const game = getGameBySlug(order?.gameSlug ?? null);
-  const canSubmit = hasOrder && username.trim().length > 0 && password.trim().length > 0 && agreed;
+  const canSubmit = hasAnything && username.trim().length > 0 && password.trim().length > 0 && agreed;
 
   const handleOrder = () => {
-    if (!order) return;
-    if (!username.trim() || !password.trim()) {
-      toast({
-        title: "Data belum lengkap",
-        description: "Isi username & password Roblox dulu ya.",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (!agreed) {
-      toast({
-        title: "Konfirmasi dulu",
-        description: "Centang persetujuan untuk lanjut.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!hasAnything) return;
+    if (!username.trim() || !password.trim()) { toast({ title: "Data belum lengkap", description: "Isi username & password Roblox dulu ya.", variant: "destructive" }); return; }
+    if (!agreed) { toast({ title: "Konfirmasi dulu", description: "Centang persetujuan untuk lanjut.", variant: "destructive" }); return; }
 
-    const message =
-      `*AKUMA JOKI - NEW ORDER* 🔥\n\n` +
-      `*Game:* ${order.gameName}\n` +
-      `*Joki:* ${order.productName}\n` +
-      `*Harga:* ${order.priceLabel}\n\n` +
-      `*Data Akun Roblox:*\n` +
-      `*Username:* ${username.trim()}\n` +
-      `*Password:* ${password.trim()}\n\n` +
-      `Saya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
+    // Build message: multi-cart format if cart has items, single format otherwise
+    let message = "";
+    if (hasCart && cartItems.length > 1) {
+      // MULTI-JOKI FORMAT
+      message = `*AKUMA JOKI - MULTI ORDER* 🔥\n\n*Daftar Joki:*\n`;
+      cartItems.forEach((item, i) => {
+        message += `${i + 1}. ${item.gameEmoji} ${item.gameName} - ${item.productName} (${item.priceLabel})\n`;
+      });
+      message += `\n*Total Item:* ${cartItems.length}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan multiple joki, mau lanjut ke pembayaran. Terima kasih!`;
+    } else if (hasCart && cartItems.length === 1) {
+      // SINGLE ITEM FROM CART
+      const item = cartItems[0];
+      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Game:* ${item.gameName}\n*Joki:* ${item.productName}\n*Harga:* ${item.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
+    } else if (order) {
+      // SINGLE ITEM FROM DIRECT SELECT
+      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Game:* ${order.gameName}\n*Joki:* ${order.productName}\n*Harga:* ${order.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
+    }
 
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
-    // anchor click untuk hindari proxy corrupt emoji di URL
-    try {
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch {
-      window.open(url, "_blank");
-    }
+    try { const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; document.body.appendChild(a); a.click(); document.body.removeChild(a); } catch { window.open(url, "_blank"); }
 
-    // simpan order ke admin store (inbox pesanan)
+    // Save orders to admin store
     try {
-      useAdminStore.getState().addOrder({
-        gameName: order.gameName,
-        productName: order.productName,
-        priceLabel: order.priceLabel,
-        username: username.trim(),
-        password: password.trim(),
-      });
-    } catch {
-      /* ignore if store not available */
-    }
+      if (hasCart) {
+        cartItems.forEach((item) => {
+          useAdminStore.getState().addOrder({ gameName: item.gameName, productName: item.productName, priceLabel: item.priceLabel, username: username.trim(), password: password.trim() });
+        });
+        cartClear();
+      } else if (order) {
+        useAdminStore.getState().addOrder({ gameName: order.gameName, productName: order.productName, priceLabel: order.priceLabel, username: username.trim(), password: password.trim() });
+      }
+    } catch { /* ignore */ }
 
-    toast({
-      title: "Membuka WhatsApp…",
-      description: "Pesan order otomatis sudah disiapkan. Kirim ke admin ya!",
-    });
+    toast({ title: "Membuka WhatsApp…", description: "Pesan order otomatis sudah disiapkan. Kirim ke admin ya!" });
   };
 
   return (
@@ -135,7 +108,7 @@ export function CheckoutView() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16">
-        {!hasOrder ? (
+        {!hasAnything ? (
           <EmptyOrder />
         ) : (
           <div className="grid gap-8 lg:grid-cols-5">
@@ -220,61 +193,68 @@ export function CheckoutView() {
 
             {/* right: summary */}
             <div className="lg:col-span-2">
-              <div className="lg:sticky lg:top-24 border-2 border-[#a020f0]/50 bg-[#0a0a0a] pixel-corner overflow-hidden">
-                <div className="border-b-2 border-[#a020f0]/40 bg-[#a020f0]/10 px-5 py-4 flex items-center justify-between">
-                  <h3 className="font-pixel text-[10px] sm:text-xs uppercase text-[#e5e5e5]">
-                    Ringkasan Pesanan
+              <div className="lg:sticky lg:top-24 glass-strong rounded-2xl overflow-hidden">
+                <div className="border-b border-white/8 px-5 py-4 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
+                    <ShoppingCart className="size-4 text-violet-400" /> Ringkasan Pesanan
                   </h3>
                   <button
-                    onClick={() => {
-                      clearOrder();
-                      setUsername("");
-                      setPassword("");
-                      setShowPassword(false);
-                      setAgreed(false);
-                    }}
-                    className="text-[#9a93a8] hover:text-[#ff3b6b] transition-colors"
-                    aria-label="Hapus pesanan"
+                    onClick={() => { clearOrder(); cartClear(); setUsername(""); setPassword(""); setShowPassword(false); setAgreed(false); }}
+                    className="text-zinc-500 hover:text-red-400 transition-colors"
+                    aria-label="Hapus semua"
                   >
                     <Trash2 className="size-4" />
                   </button>
                 </div>
 
-                <div className="p-5 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-14 w-14 items-center justify-center border-2 pixel-corner text-3xl"
-                      style={{
-                        borderColor: game?.accent ?? "#a020f0",
-                        boxShadow: `0 0 16px ${game?.accent ?? "#a020f0"}55`,
-                      }}
-                    >
-                      {game?.emoji ?? "🎮"}
+                <div className="p-5 space-y-3">
+                  {/* Cart items */}
+                  {hasCart && cartItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3 rounded-xl bg-white/5 p-3">
+                      <span className="text-2xl shrink-0">{item.gameEmoji}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-zinc-200 truncate">{item.productName}</p>
+                        <p className="text-xs text-zinc-500">{item.gameName}</p>
+                      </div>
+                      <span className="text-sm font-bold text-violet-400 shrink-0">{item.priceLabel}</span>
+                      <button onClick={() => cartRemove(item.id)} className="text-zinc-600 hover:text-red-400 shrink-0">
+                        <Trash2 className="size-3.5" />
+                      </button>
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-pixel text-[9px] uppercase text-[#9a93a8]">Game</p>
-                      <p className="font-pixel text-[11px] text-[#e5e5e5] mt-1 truncate">
-                        {order!.gameName}
-                      </p>
-                    </div>
-                  </div>
+                  ))}
 
-                  <SummaryRow label="Jenis Joki" value={order!.productName} />
-                  {order!.category && <SummaryRow label="Kategori" value={order!.category} />}
+                  {/* Single order (if no cart) */}
+                  {!hasCart && order && (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 text-2xl" style={{ borderColor: game?.accent ?? "#8b5cf6" }}>
+                          {game?.emoji ?? "🎮"}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs text-zinc-500">Game</p>
+                          <p className="text-sm text-zinc-200 truncate">{order.gameName}</p>
+                        </div>
+                      </div>
+                      <SummaryRow label="Jenis Joki" value={order.productName} />
+                      {order.category && <SummaryRow label="Kategori" value={order.category} />}
+                    </>
+                  )}
 
-                  <div className="h-px w-full bg-[#2a2436]" />
+                  <div className="h-px w-full bg-white/8" />
 
                   <div className="flex items-end justify-between">
-                    <span className="font-pixel text-[10px] uppercase text-[#9a93a8]">
-                      Total Harga
+                    <span className="text-xs text-zinc-500">
+                      {hasCart ? `Total (${cartItems.length} item)` : "Total Harga"}
                     </span>
-                    <span className="font-pixel text-2xl sm:text-3xl text-[#c44bff] text-glow-neon">
-                      {order!.priceLabel}
+                    <span className="text-2xl font-bold text-gradient">
+                      {hasCart
+                        ? cartItems.map(i => i.price).reduce((a, b) => a + b, 0) + "K"
+                        : order?.priceLabel}
                     </span>
                   </div>
 
                   {/* steps */}
-                  <div className="mt-4 border-t-2 border-[#2a2436] pt-4 space-y-3">
+                  <div className="mt-4 border-t border-white/8 pt-4 space-y-3">
                     <Step n={1} text="Isi data akun Roblox" />
                     <Step n={2} text="Klik Order via WhatsApp" />
                     <Step n={3} text="Kirim pesan & lakukan pembayaran" />

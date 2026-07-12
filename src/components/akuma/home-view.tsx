@@ -8,6 +8,7 @@ import { ShieldCheck, Zap, Wallet, ChevronDown, Flame, Gamepad2, Trophy, Star, A
 import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
 import type { Game } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
+import { useReviews } from "@/lib/reviews";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { Starfield, MovingGrid } from "./backgrounds";
@@ -187,8 +188,12 @@ export function HomeView() {
         <div className="text-center mb-10">
           <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">TESTIMONI</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-gradient">KATA MEREKA YANG SUDAH JOKI</h2>
+          <p className="mt-2 text-xs text-zinc-600">Testimoni nyata dari pelanggan kami · Bukan data dummy</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Real reviews from store pages */}
+          <RealReviews />
+          {/* Default testimonials (always visible) */}
           {TESTIMONIALS.map((t, i) => (
             <Reveal key={t.name} delay={i * 80}>
               <div className="card-lux p-5">
@@ -222,3 +227,30 @@ export function HomeView() {
 }
 
 function GameCard({ game }: { game: Game }) { return null; }
+
+function RealReviews() {
+  const allReviews = useReviews((s) => s.reviews);
+  const hydrated = useReviews((s) => s._hasHydrated);
+  if (!hydrated || allReviews.length === 0) return null;
+  return (
+    <>
+      {allReviews.slice(0, 6).map((r, i) => (
+        <Reveal key={r.id} delay={i * 80}>
+          <div className="card-lux p-5 border-violet-500/10">
+            <div className="flex gap-0.5 mb-3">{Array.from({ length: r.rating }).map((_, s) => <Star key={s} className="size-3.5 fill-amber-400 text-amber-400" />)}</div>
+            <p className="text-sm text-zinc-400 leading-relaxed mb-4">&ldquo;{r.comment}&rdquo;</p>
+            <div className="flex items-center gap-3 border-t border-white/5 pt-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-500/20 text-xs font-bold text-violet-400">
+                {r.customerName.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-zinc-100">{r.customerName}</p>
+                <p className="text-[10px] text-zinc-500">{r.gameName} · Verified</p>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      ))}
+    </>
+  );
+}

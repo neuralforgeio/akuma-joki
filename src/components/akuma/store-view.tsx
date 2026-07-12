@@ -3,23 +3,69 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ShoppingCart, Tag, Check, AlertTriangle, Lock, Star } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Tag, Check, AlertTriangle, Lock, Star, X, Plus, Minus } from "lucide-react";
 import type { Game } from "@/lib/games-data";
+import type { ProductItem, ProductCategory } from "@/lib/games-data";
 import { GAMES } from "@/lib/games-data";
 import { useAkumaStore } from "@/lib/store";
 import { useReviews } from "@/lib/reviews";
+import { useCart } from "@/lib/cart";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { SkeletonGrid } from "./skeleton";
 import { WishlistButton } from "./wishlist-button";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function StoreView({ game }: { game: Game }) {
   const router = useRouter();
   const order = useAkumaStore((s) => s.order);
   const selectProduct = useAkumaStore((s) => s.selectProduct);
+  const cartAdd = useCart((s) => s.add);
+  const cartCount = useCart((s) => s.items.length);
+  const [selectedItem, setSelectedItem] = useState<{ item: ProductItem; category: string } | null>(null);
 
   const handlePick = (
+    item: (typeof game.categories)[number]["items"][number],
+    categoryName: string
+  ) => {
+    // Show item description modal instead of going directly to checkout
+    setSelectedItem({ item: item as ProductItem, category: categoryName });
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedItem) return;
+    cartAdd({
+      id: `${game.slug}-${selectedItem.item.id}`,
+      gameSlug: game.slug,
+      gameName: game.name,
+      gameEmoji: game.emoji,
+      productId: selectedItem.item.id,
+      productName: selectedItem.item.name,
+      priceLabel: selectedItem.item.priceLabel,
+      price: selectedItem.item.price,
+      category: selectedItem.category,
+    });
+    setSelectedItem(null);
+    router.push("/checkout");
+  };
+
+  const handleBuyNow = () => {
+    if (!selectedItem) return;
+    selectProduct({
+      gameSlug: game.slug,
+      gameName: game.name,
+      productId: selectedItem.item.id,
+      productName: selectedItem.item.name,
+      priceLabel: selectedItem.item.priceLabel,
+      price: selectedItem.item.price,
+      category: selectedItem.category,
+    });
+    setSelectedItem(null);
+    router.push("/checkout");
+  };
+
+  const _handlePick = (
     item: (typeof game.categories)[number]["items"][number],
     categoryName: string
   ) => {
@@ -187,6 +233,96 @@ export function StoreView({ game }: { game: Game }) {
           </div>
         </div>
       </section>
+
+      {/* Item Detail Modal */}
+      <AnimatePresence>
+        {selectedItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={() => setSelectedItem(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="glass-strong rounded-3xl p-6 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 text-2xl" style={{ borderColor: game.accent, background: `${game.accent}15` }}>
+                    {game.emoji}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-bold text-zinc-100">{selectedItem.item.name}</h3>
+                    <p className="text-xs text-zinc-500">{game.name} · {selectedItem.category}</p>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedItem(null)} className="text-zinc-500 hover:text-zinc-300">
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              {/* Description */}
+              {selectedItem.item.description && (
+                <p className="text-sm text-zinc-400 leading-relaxed mb-3">{selectedItem.item.description}</p>
+              )}
+
+              {/* Requirement */}
+              {selectedItem.item.requirement && (
+                <div className="flex items-center gap-2 mb-3 rounded-xl bg-amber-400/10 border border-amber-400/20 px-3 py-2">
+                  <Lock className="size-3.5 text-amber-400 shrink-0" />
+                  <span className="text-xs text-amber-400">{selectedItem.item.requirement}</span>
+                </div>
+              )}
+
+              {/* Tag */}
+              {selectedItem.item.tag && (
+                <span className="inline-block mb-3 rounded-lg px-2.5 py-1 text-xs font-medium" style={{ background: `${game.accent}20`, color: game.accent }}>
+                  {selectedItem.item.tag}
+                </span>
+              )}
+
+              {/* Price */}
+              <div className="flex items-end gap-1.5 mb-5">
+                <span className="text-3xl font-bold text-gradient">{selectedItem.item.priceLabel}</span>
+                <span className="text-xs text-zinc-500 mb-1">Robux</span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm font-medium text-zinc-200 hover:bg-white/10 transition-all"
+                >
+                  <Plus className="size-4" /> Keranjang
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-3 text-sm font-medium text-white hover:from-violet-500 hover:to-violet-400 transition-all"
+                >
+                  <ShoppingCart className="size-4" /> Beli Sekarang
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Cart Badge */}
+      {cartCount > 0 && (
+        <Link href="/checkout" className="fixed bottom-6 right-6 z-[9998] flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-violet-500 shadow-[0_8px_24px_-4px_rgba(139,92,246,0.5)] hover:scale-105 transition-transform">
+          <ShoppingCart className="size-6 text-white" />
+          <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold border-2 border-[#07090f]">
+            {cartCount}
+          </span>
+        </Link>
+      )}
     </div>
   );
 }
