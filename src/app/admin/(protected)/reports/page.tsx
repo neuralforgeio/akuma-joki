@@ -3,27 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isDeveloper } from "@/lib/auth";
+import { useAdminStore } from "@/lib/admin-store";
 import { useToast } from "@/hooks/use-toast";
 import { HelpBanner } from "@/components/admin/help-tooltip";
-import { Bug, Lightbulb, HelpCircle, AlertTriangle, Trash2, CheckCircle2, Eye, Download, Filter } from "lucide-react";
+import { Bug, Lightbulb, HelpCircle, AlertTriangle, Trash2, CheckCircle2, Eye, Download, Filter, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ReportType = "bug" | "suggestion" | "question" | "complaint";
 type ReportStatus = "new" | "read" | "resolved";
-
-type StoredReport = {
-  id: string;
-  name: string;
-  contact: string;
-  type: ReportType;
-  subject: string;
-  description: string;
-  page: string;
-  status: ReportStatus;
-  createdAt: number;
-};
-
-const REPORTS_KEY = "akuma-contact-reports";
 
 const TYPE_META: Record<ReportType, { label: string; icon: typeof Bug; color: string }> = {
   bug: { label: "Bug", icon: Bug, color: "#ef4444" },
@@ -46,10 +33,14 @@ function formatDate(ts: number) {
 export default function ReportsAdminPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const reports = useAdminStore((s) => s.reports);
+  const hydrated = useAdminStore((s) => s._hasHydrated);
+  const updateReportStatus = useAdminStore((s) => s.updateReportStatus);
+  const deleteReport = useAdminStore((s) => s.deleteReport);
+
   const [authorized, setAuthorized] = useState(false);
-  const [reports, setReports] = useState<StoredReport[]>([]);
   const [filter, setFilter] = useState<"all" | ReportType | ReportStatus>("all");
-  const [selected, setSelected] = useState<StoredReport | null>(null);
+  const [selected, setSelected] = useState<typeof reports[0] | null>(null);
 
   useEffect(() => {
     if (!isDeveloper()) {
@@ -59,40 +50,22 @@ export default function ReportsAdminPage() {
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAuthorized(true);
-    try {
-      const data: StoredReport[] = JSON.parse(localStorage.getItem(REPORTS_KEY) || "[]");
-      setReports(data);
-    } catch {
-      setReports([]);
-    }
   }, [router, toast]);
 
-  const persist = (next: StoredReport[]) => {
-    setReports(next);
-    localStorage.setItem(REPORTS_KEY, JSON.stringify(next.slice(0, 100)));
-  };
-
-  const updateStatus = (id: string, status: ReportStatus) => {
-    persist(reports.map((r) => (r.id === id ? { ...r, status } : r)));
+  const handleStatusChange = (id: string, status: ReportStatus) => {
+    updateReportStatus(id, status);
     if (selected?.id === id) setSelected({ ...selected, status });
     toast({ title: `Status → ${STATUS_META[status].label}` });
   };
 
-  const remove = (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Hapus laporan ini?")) return;
-    persist(reports.filter((r) => r.id !== id));
+    deleteReport(id);
     if (selected?.id === id) setSelected(null);
     toast({ title: "Laporan dihapus" });
   };
 
-  const clearAll = () => {
-    if (!confirm("Hapus SEMUA laporan? Tidak bisa diundo.")) return;
-    persist([]);
-    setSelected(null);
-    toast({ title: "Semua laporan dihapus" });
-  };
-
-  const exportJson = () => {
+  const handleExport = () => {
     const blob = new Blob([JSON.stringify(reports, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -128,37 +101,38 @@ export default function ReportsAdminPage() {
     <div className="space-y-5">
       <HelpBanner
         title="Reports"
-        description="Laporan bug, saran, pertanyaan, dan keluhan dari halaman /contact (disimpan lokal di browser user)."
+        description="Laporan bug, saran, pertanyaan, dan keluhan dari halaman /contact. Data sync via GitHub — muncul di semua admin device."
         tips={[
           "Laporan dikirim dari form /contact oleh pengunjung",
-          "Data tersimpan di localStorage browser user (akuma-contact-reports)",
+          "Data tersimpan di admin-data.json (GitHub-synced) → cross-device",
           "Admin bisa lihat, ubah status, hapus, dan export",
           "Status: Baru → Dibaca → Selesai",
-          "Note: data laporan TIDAK otomatis sync antar browser user",
+          "Auto-sync: laporan baru muncul dalam 60 detik di admin device lain",
         ]}
       />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gradient">Contact Reports</h1>
-          <p className="mt-1 text-sm text-zinc-500">{stats.total} laporan · {stats.new} baru · {stats.bug} bug · {stats.resolved} selesai</p>
+          <p className="mt-1 text-sm text-zinc-500">
+            {hydrated ? `${stats.total} laporan · ${stats.new} baru · ${stats.bug} bug · ${stats.resolved} selesai` : "Loading..."}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={exportJson}
+            onClick={handleExport}
             disabled={reports.length === 0}
             className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 transition-all disabled:opacity-50"
           >
             <Download className="size-4" /> Export
           </button>
-          <button
-            onClick={clearAll}
-            disabled={reports.length === 0}
-            className="inline-flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-50"
-          >
-            <Trash2 className="size-4" /> Clear All
-          </button>
         </div>
+      </div>
+
+      {/* Sync indicator */}
+      <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-2 text-xs text-zinc-400">
+        <RefreshCw className="size-3.5 text-green-400 animate-spin-slow" style={{ animationDuration: "3s" }} />
+        <span>Auto-sync aktif: laporan baru dari user akan muncul otomatis dalam ~60 detik</span>
       </div>
 
       {/* Filter chips */}
@@ -191,14 +165,18 @@ export default function ReportsAdminPage() {
       </div>
 
       {/* Reports list */}
-      {filtered.length === 0 ? (
+      {!hydrated ? (
+        <div className="glass rounded-2xl p-12 text-center">
+          <p className="text-sm text-zinc-500">Loading reports...</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="glass rounded-2xl p-12 text-center">
           <Bug className="mx-auto size-10 text-zinc-700 mb-3" />
           <p className="text-sm text-zinc-500">
             {reports.length === 0 ? "Belum ada laporan masuk." : "Tidak ada laporan untuk filter ini."}
           </p>
           <p className="text-[10px] text-zinc-600 mt-1">
-            Laporan akan muncul di sini ketika user submit form di /contact
+            Laporan akan muncul di sini ketika user submit form di /contact (auto-sync ~60 detik)
           </p>
         </div>
       ) : (
@@ -249,7 +227,7 @@ export default function ReportsAdminPage() {
                     <button
                       onClick={() => {
                         setSelected(r);
-                        if (r.status === "new") updateStatus(r.id, "read");
+                        if (r.status === "new") handleStatusChange(r.id, "read");
                       }}
                       className="rounded-lg p-1.5 text-zinc-400 hover:text-violet-400 hover:bg-white/5 transition-all"
                       aria-label="Lihat detail"
@@ -258,7 +236,7 @@ export default function ReportsAdminPage() {
                     </button>
                     {r.status !== "resolved" && (
                       <button
-                        onClick={() => updateStatus(r.id, "resolved")}
+                        onClick={() => handleStatusChange(r.id, "resolved")}
                         className="rounded-lg p-1.5 text-zinc-400 hover:text-green-400 hover:bg-white/5 transition-all"
                         aria-label="Tandai selesai"
                       >
@@ -266,7 +244,7 @@ export default function ReportsAdminPage() {
                       </button>
                     )}
                     <button
-                      onClick={() => remove(r.id)}
+                      onClick={() => handleDelete(r.id)}
                       className="rounded-lg p-1.5 text-zinc-400 hover:text-red-400 hover:bg-white/5 transition-all"
                       aria-label="Hapus"
                     >
@@ -287,7 +265,7 @@ export default function ReportsAdminPage() {
           onClick={() => setSelected(null)}
         >
           <div
-            className="glass-strong rounded-3xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto akuma-scroll"
+            className="glass-nav-strong rounded-3xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto akuma-scroll"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
@@ -338,7 +316,7 @@ export default function ReportsAdminPage() {
               <div className="flex gap-2 pt-2">
                 <select
                   value={selected.status}
-                  onChange={(e) => updateStatus(selected.id, e.target.value as ReportStatus)}
+                  onChange={(e) => handleStatusChange(selected.id, e.target.value as ReportStatus)}
                   className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40"
                 >
                   <option value="new" className="bg-[#0a0a0a]">Baru</option>
@@ -346,7 +324,7 @@ export default function ReportsAdminPage() {
                   <option value="resolved" className="bg-[#0a0a0a]">Selesai</option>
                 </select>
                 <button
-                  onClick={() => remove(selected.id)}
+                  onClick={() => handleDelete(selected.id)}
                   className="inline-flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500/20 transition-all"
                 >
                   <Trash2 className="size-4" /> Hapus

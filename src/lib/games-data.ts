@@ -202,6 +202,7 @@ export const DEFAULT_ABOUT: AboutContent = {
 
 /* ============================ Contact Report ============================ */
 // Type untuk laporan bug dari halaman /contact.
+// Disimpan di admin-data.json (GitHub sync) supaya cross-device.
 export type ContactReport = {
   id: string;
   name: string;
@@ -252,6 +253,7 @@ type AdminDataFile = {
   waReplies?: unknown[];
   about?: AboutContent;
   reviews?: Review[];
+  reports?: ContactReport[];
   version?: number;
   updatedAt?: string;
 };
@@ -275,6 +277,7 @@ export const SYNCED_SETTINGS = parsed.settings ?? {
 export const SYNCED_FAQ = parsed.faq ?? [];
 export const SYNCED_ABOUT: AboutContent = parsed.about ?? DEFAULT_ABOUT;
 export const SYNCED_REVIEWS: Review[] = parsed.reviews ?? [];
+export const SYNCED_REPORTS: ContactReport[] = parsed.reports ?? [];
 export const SYNCED_UPDATED_AT = parsed.updatedAt ?? null;
 
 export function getGameBySlug(slug: string | null): Game | undefined {

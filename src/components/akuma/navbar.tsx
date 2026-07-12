@@ -69,8 +69,19 @@ export function Navbar() {
   const isAnyStore = pathname.startsWith("/store/");
 
   return (
-    <header className={cn("sticky top-0 z-50 w-full transition-all duration-500", scrolled ? "py-2" : "py-3")}>
-      <nav className={cn("mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 sm:px-6 py-3 transition-all duration-500", scrolled ? "glass-nav-strong" : "glass-nav")}>
+    <header className="sticky top-0 z-50 w-full">
+      {/* Full-width blur layer — pakai Tailwind utility backdrop-blur (Tailwind v4 purge backdrop-filter dari custom CSS) */}
+      <div
+        className={cn(
+          "w-full transition-all duration-500 backdrop-saturate-150 -webkit-backdrop-blur",
+          scrolled ? "glass-nav-full-strong backdrop-blur-xl" : "glass-nav-full backdrop-blur-lg"
+        )}
+        style={{
+          backdropFilter: scrolled ? "blur(36px) saturate(200%)" : "blur(28px) saturate(180%)",
+          WebkitBackdropFilter: scrolled ? "blur(36px) saturate(200%)" : "blur(28px) saturate(180%)",
+        }}
+      >
+        <nav className={cn("mx-auto flex max-w-6xl items-center justify-between rounded-none px-4 sm:px-6 py-3 transition-all duration-500")}>
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2.5 shrink-0" aria-label="AKUMA JOKI home">
           <div className="relative h-9 w-18 sm:h-10 sm:w-20 shrink-0 rounded-lg overflow-hidden ring-2 ring-violet-500/30 group-hover:ring-violet-500/50 transition-all">
@@ -110,7 +121,10 @@ export function Navbar() {
                 onMouseLeave={() => setGamesOpen(false)}
                 className="absolute left-0 top-full pt-2 w-72 z-50"
               >
-                <div className="glass-nav-strong rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] overflow-hidden border border-white/10">
+                <div
+                  className="glass-nav-strong rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] overflow-hidden border border-white/10 backdrop-blur-xl"
+                  style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
+                >
                   <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                       {games.length} Game Tersedia
@@ -169,7 +183,10 @@ export function Navbar() {
               <Search className="size-4" />
             </button>
             {searchOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 glass-strong rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] z-50 overflow-hidden">
+              <div
+                className="absolute right-0 top-full mt-2 w-80 glass-nav-strong rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] z-50 overflow-hidden backdrop-blur-xl"
+                style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
+              >
                 <div className="border-b border-white/8 p-3">
                   <input ref={searchInputRef} type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cari game atau joki..." aria-label="Cari" className="w-full bg-transparent px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none" />
                 </div>
@@ -206,11 +223,15 @@ export function Navbar() {
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
-      </nav>
+        </nav>
+      </div>
 
       {/* Mobile menu */}
       <div className={cn("md:hidden overflow-hidden transition-all duration-300 mt-2 mx-auto max-w-6xl px-4", mobileOpen ? "max-h-[600px]" : "max-h-0")}>
-        <div className="glass-strong rounded-2xl p-4 space-y-2">
+        <div
+          className="glass-nav-strong rounded-2xl p-4 space-y-2 backdrop-blur-xl"
+          style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
+        >
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cari game atau joki..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none mb-2" />
           {searchQuery && searchResults.length > 0 && (
             <div className="space-y-1 mb-2">{searchResults.slice(0, 5).map((r, i) => (

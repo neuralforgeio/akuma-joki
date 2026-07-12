@@ -28,9 +28,10 @@ import {
   SYNCED_FAQ,
   SYNCED_ABOUT,
   SYNCED_REVIEWS,
+  SYNCED_REPORTS,
   DEFAULT_ABOUT,
 } from "./games-data";
-import type { Game, AboutContent, Review } from "./games-data";
+import type { Game, AboutContent, Review, ContactReport } from "./games-data";
 import { scheduleGitHubSync } from "./github-sync";
 
 /* ============================ Types ============================ */
@@ -126,6 +127,7 @@ type AdminState = {
   faq: FAQItem[];
   about: AboutContent;
   reviews: Review[];
+  reports: ContactReport[];
   settings: AdminSettings;
   _hasHydrated: boolean;
 
@@ -185,6 +187,11 @@ type AdminState = {
   addReview: (r: Omit<Review, "id" | "createdAt">) => void;
   deleteReview: (id: string) => void;
 
+  /* reports (contact reports) */
+  addReport: (r: Omit<ContactReport, "id" | "createdAt" | "status">) => void;
+  updateReportStatus: (id: string, status: ContactReport["status"]) => void;
+  deleteReport: (id: string) => void;
+
   /* sync from server (GitHub raw) */
   syncFromServer: (data: Partial<{
     games: Game[];
@@ -196,6 +203,7 @@ type AdminState = {
     waReplies: WAReply[];
     about: AboutContent;
     reviews: Review[];
+    reports: ContactReport[];
   }>) => void;
 
   /* settings */
@@ -229,6 +237,7 @@ export const useAdminStore = create<AdminState>()(
       faq: SYNCED_FAQ,
       about: SYNCED_ABOUT,
       reviews: SYNCED_REVIEWS,
+      reports: SYNCED_REPORTS,
       settings: SYNCED_SETTINGS,
       _hasHydrated: false,
 
@@ -435,6 +444,7 @@ export const useAdminStore = create<AdminState>()(
           waReplies: s.waReplies,
           about: s.about,
           reviews: s.reviews,
+          reports: s.reports,
           version: 1,
           updatedAt: new Date().toISOString(),
         };
@@ -515,6 +525,29 @@ export const useAdminStore = create<AdminState>()(
         get().triggerSync(`Delete review ${id}`);
       },
 
+      /* ===== reports (contact reports) ===== */
+      addReport: (r) => {
+        const report: ContactReport = {
+          ...r,
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          status: "new",
+          createdAt: Date.now(),
+        };
+        set((s) => ({ reports: [report, ...s.reports] }));
+        get().logActivity("ADD_REPORT", `${r.type.toUpperCase()}: ${r.subject}`);
+        get().triggerSync(`Add report: ${r.type} - ${r.subject}`);
+      },
+      updateReportStatus: (id, status) => {
+        set((s) => ({ reports: s.reports.map((r) => (r.id === id ? { ...r, status } : r)) }));
+        get().logActivity("UPDATE_REPORT", `Report ${id} → ${status}`);
+        get().triggerSync(`Update report ${id} → ${status}`);
+      },
+      deleteReport: (id) => {
+        set((s) => ({ reports: s.reports.filter((r) => r.id !== id) }));
+        get().logActivity("DELETE_REPORT", `Hapus report ${id}`);
+        get().triggerSync(`Delete report ${id}`);
+      },
+
       /* ===== sync from server (GitHub raw) ===== */
       // Dipanggil oleh useAutoSync hook setiap 60 detik.
       // Update state dari server TANPA triggerSync (anti loop).
@@ -529,6 +562,7 @@ export const useAdminStore = create<AdminState>()(
           waReplies: data.waReplies ?? s.waReplies,
           about: data.about ?? s.about,
           reviews: data.reviews ?? s.reviews,
+          reports: data.reports ?? s.reports,
         }));
       },
 
@@ -555,6 +589,7 @@ export const useAdminStore = create<AdminState>()(
           faq: SYNCED_FAQ,
           about: DEFAULT_ABOUT,
           reviews: SYNCED_REVIEWS,
+          reports: SYNCED_REPORTS,
           settings: SYNCED_SETTINGS,
         });
         try {

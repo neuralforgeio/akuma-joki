@@ -22,23 +22,10 @@ const REPORT_TYPES: { id: ReportType; label: string; icon: typeof Bug; color: st
   { id: "complaint", label: "Keluhan", icon: AlertTriangle, color: "#f97316", desc: "Komplain order / service" },
 ];
 
-const REPORTS_KEY = "akuma-contact-reports";
-
-type StoredReport = {
-  id: string;
-  name: string;
-  contact: string;
-  type: ReportType;
-  subject: string;
-  description: string;
-  page: string;
-  status: "new" | "read" | "resolved";
-  createdAt: number;
-};
-
 export function ContactView() {
   const settings = useAdminStore((s) => s.settings);
   const hydrated = useAdminStore((s) => s._hasHydrated);
+  const addReport = useAdminStore((s) => s.addReport);
   const waNumber = hydrated ? settings.whatsappNumber : WHATSAPP_NUMBER;
   const csName = hydrated ? settings.csName : "Akuma Joki";
   const { toast } = useToast();
@@ -59,23 +46,18 @@ export function ContactView() {
     }
     setSubmitting(true);
     try {
-      const report: StoredReport = {
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      // Push ke admin store → triggerSync → GitHub → cross-device
+      addReport({
         name: name.trim(),
         contact: contact.trim(),
         type,
         subject: subject.trim(),
         description: description.trim(),
         page: typeof window !== "undefined" ? window.location.href : "",
-        status: "new",
-        createdAt: Date.now(),
-      };
-      const existing: StoredReport[] = JSON.parse(localStorage.getItem(REPORTS_KEY) || "[]");
-      existing.unshift(report);
-      localStorage.setItem(REPORTS_KEY, JSON.stringify(existing.slice(0, 100)));
+      });
 
       setSubmitted(true);
-      toast({ title: "Laporan terkirim! Terima kasih 🙏" });
+      toast({ title: "Laporan terkirim! Admin akan terima via sync. 🙏" });
       setName(""); setContact(""); setSubject(""); setDescription("");
       setType("bug");
     } catch {
@@ -110,7 +92,7 @@ export function ContactView() {
       {/* Hero */}
       <section className="relative mx-auto max-w-4xl px-4 sm:px-6 pt-12 sm:pt-20 pb-8 text-center">
         <Reveal>
-          <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full glass-nav px-4 py-1.5 mb-5">
             <Bug className="size-3.5 text-violet-400" />
             <span className="text-[10px] sm:text-xs font-pixel uppercase tracking-widest text-violet-400">
               Contact & Report
@@ -133,7 +115,7 @@ export function ContactView() {
       <section className="relative mx-auto max-w-5xl px-4 sm:px-6 grid lg:grid-cols-5 gap-6">
         {/* Form */}
         <Reveal className="lg:col-span-3">
-          <div className="glass-strong rounded-3xl p-6 sm:p-8">
+          <div className="glass-nav-strong rounded-3xl p-6 sm:p-8">
             {submitted ? (
               <div className="py-10 text-center">
                 <motion.div
@@ -145,7 +127,7 @@ export function ContactView() {
                   <CheckCircle2 className="size-8 text-green-400" />
                 </motion.div>
                 <h3 className="text-lg font-semibold text-zinc-100 mb-1">Laporan Terkirim!</h3>
-                <p className="text-sm text-zinc-500 mb-5">Terima kasih sudah membantu AKUMA JOKI jadi lebih baik.</p>
+                <p className="text-sm text-zinc-500 mb-5">Terima kasih sudah membantu AKUMA JOKI jadi lebih baik. Admin akan terima laporan ini via sync.</p>
                 <button
                   onClick={() => setSubmitted(false)}
                   className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-5 py-2.5 text-sm text-zinc-300 hover:bg-white/10 transition-all"
@@ -255,7 +237,7 @@ export function ContactView() {
                   </button>
                 </div>
                 <p className="text-[10px] text-zinc-600 pt-1">
-                  Laporan disimpan lokal & dikirim ke admin. Untuk respon cepat, gunakan WhatsApp.
+                  ✅ Laporan tersimpan ke server &amp; sync ke semua admin. Untuk respon cepat, gunakan WhatsApp.
                 </p>
               </form>
             )}
@@ -265,7 +247,7 @@ export function ContactView() {
         {/* Contact info */}
         <Reveal delay={150} className="lg:col-span-2">
           <div className="space-y-4">
-            <div className="glass rounded-2xl p-5">
+            <div className="glass-nav rounded-2xl p-5">
               <h3 className="text-xs font-pixel uppercase tracking-widest text-violet-400 mb-3">Info Kontak</h3>
               <a
                 href={`https://wa.me/${waNumber}`}
@@ -283,7 +265,7 @@ export function ContactView() {
               </a>
             </div>
 
-            <div className="glass rounded-2xl p-5">
+            <div className="glass-nav rounded-2xl p-5">
               <h3 className="text-xs font-pixel uppercase tracking-widest text-violet-400 mb-3">Jam Operasional</h3>
               <div className="flex items-center gap-3 mb-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/15 border border-violet-500/20">
@@ -305,15 +287,16 @@ export function ContactView() {
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-5 border-violet-500/20">
+            <div className="glass-nav rounded-2xl p-5 border-violet-500/20">
               <div className="flex items-center gap-3 mb-2">
                 <ShieldCheck className="size-5 text-violet-400" />
                 <h3 className="text-sm font-semibold text-zinc-100">Privasi Laporan</h3>
               </div>
               <ul className="space-y-1.5 text-[11px] text-zinc-500">
-                <li>• Data laporan disimpan lokal di browser kamu</li>
+                <li>• Laporan tersimpan di server (GitHub-synced)</li>
                 <li>• Hanya admin AKUMA JOKI yang bisa lihat</li>
                 <li>• Tidak perlu login untuk kirim laporan</li>
+                <li>• Sync ke semua admin device secara real-time</li>
                 <li>• Untuk respon cepat, kirim via WhatsApp</li>
               </ul>
             </div>
