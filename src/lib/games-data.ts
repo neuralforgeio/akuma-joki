@@ -151,6 +151,69 @@ export const GAMES: Game[] = [
 
 export const WHATSAPP_NUMBER = "6282131561301";
 
+/* ============================ About Content ============================ */
+// Konten halaman /about — bisa di-edit developer dari dashboard.
+export type AboutFeature = {
+  id: string;
+  icon: string; // emoji
+  title: string;
+  desc: string;
+};
+
+export type AboutStat = {
+  id: string;
+  label: string;
+  value: string;
+};
+
+export type AboutContent = {
+  title: string;
+  tagline: string;
+  description: string;
+  mission: string;
+  features: AboutFeature[];
+  stats: AboutStat[];
+  updatedAt?: number;
+};
+
+export const DEFAULT_ABOUT: AboutContent = {
+  title: "Tentang AKUMA JOKI",
+  tagline: "Joki & Store Roblox premium yang aman, cepat, dan terpercaya.",
+  description:
+    "AKUMA JOKI adalah layanan joki & store Roblox yang lahir dari passion para gamer untuk gamer. " +
+    "Kami mengerti betapa berharganya akun, waktu, dan progress kamu — itulah kenapa setiap order ditangani " +
+    "oleh joki profesional dengan transparansi penuh, dari proses hingga selesai.",
+  mission:
+    "Misi kami sederhana: memberikan layanan joki terbaik dengan harga bersahabat, tanpa mengorbankan " +
+    "keamanan akun & kenyamanan customer. Setiap pelanggan adalah prioritas, setiap order adalah tanggung jawab.",
+  features: [
+    { id: "f1", icon: "🛡️", title: "Aman & Terpercaya", desc: "Akun kamu ditangani joki profesional. Tidak ada cheat, tidak ada resiko banned." },
+    { id: "f2", icon: "⚡", title: "Proses Cepat", desc: "Order diproses secepat mungkin dengan update progres real-time via WhatsApp." },
+    { id: "f3", icon: "💰", title: "Harga Bersahabat", desc: "Harga fair, transparan, tanpa biaya tersembunyi. Cocok untuk pelajar & mahasiswa." },
+    { id: "f4", icon: "🎧", title: "CS Responsif", desc: "Admin online 16 jam sehari. Jawaban cepat, ramah, dan selalu siap bantu." },
+  ],
+  stats: [
+    { id: "s1", label: "Order Selesai", value: "1.500+" },
+    { id: "s2", label: "Customer Puas", value: "99%" },
+    { id: "s3", label: "Game Aktif", value: "5+" },
+    { id: "s4", label: "Tahun Pengalaman", value: "3+" },
+  ],
+};
+
+/* ============================ Contact Report ============================ */
+// Type untuk laporan bug dari halaman /contact.
+export type ContactReport = {
+  id: string;
+  name: string;
+  contact: string;
+  type: "bug" | "suggestion" | "question" | "complaint";
+  subject: string;
+  description: string;
+  page?: string;
+  status: "new" | "read" | "resolved";
+  createdAt: number;
+};
+
 /* ============================ SYNCED DATA ============================ */
 // Saat admin update via dashboard, data di-push ke GitHub sebagai
 // data/admin-data.json. Vercel redeploys → file ini terbaca saat build.
@@ -173,6 +236,7 @@ type AdminDataFile = {
   settings?: { whatsappNumber: string; csName: string };
   faq?: { id: string; question: string; answer: string }[];
   waReplies?: unknown[];
+  about?: AboutContent;
   version?: number;
   updatedAt?: string;
 };
@@ -194,6 +258,7 @@ export const SYNCED_SETTINGS = parsed.settings ?? {
   csName: "Akuma Joki",
 };
 export const SYNCED_FAQ = parsed.faq ?? [];
+export const SYNCED_ABOUT: AboutContent = parsed.about ?? DEFAULT_ABOUT;
 export const SYNCED_UPDATED_AT = parsed.updatedAt ?? null;
 
 export function getGameBySlug(slug: string | null): Game | undefined {

@@ -26,8 +26,10 @@ import {
   SYNCED_TAKEDOWN_REASON,
   SYNCED_SETTINGS,
   SYNCED_FAQ,
+  SYNCED_ABOUT,
+  DEFAULT_ABOUT,
 } from "./games-data";
-import type { Game } from "./games-data";
+import type { Game, AboutContent } from "./games-data";
 import { scheduleGitHubSync } from "./github-sync";
 
 /* ============================ Types ============================ */
@@ -121,6 +123,7 @@ type AdminState = {
   artifacts: Artifact[];
   waReplies: WAReply[];
   faq: FAQItem[];
+  about: AboutContent;
   settings: AdminSettings;
   _hasHydrated: boolean;
 
@@ -173,6 +176,9 @@ type AdminState = {
   updateFAQ: (id: string, q: string, a: string) => void;
   deleteFAQ: (id: string) => void;
 
+  /* about */
+  setAbout: (a: AboutContent) => void;
+
   /* settings */
   updateSettings: (s: Partial<AdminSettings>) => void;
 
@@ -202,6 +208,7 @@ export const useAdminStore = create<AdminState>()(
       artifacts: [],
       waReplies: [],
       faq: SYNCED_FAQ,
+      about: SYNCED_ABOUT,
       settings: SYNCED_SETTINGS,
       _hasHydrated: false,
 
@@ -406,6 +413,7 @@ export const useAdminStore = create<AdminState>()(
           settings: s.settings,
           faq: s.faq,
           waReplies: s.waReplies,
+          about: s.about,
           version: 1,
           updatedAt: new Date().toISOString(),
         };
@@ -461,6 +469,14 @@ export const useAdminStore = create<AdminState>()(
         set((s) => ({ faq: s.faq.filter((f) => f.id !== id) }));
       },
 
+      /* ===== about ===== */
+      setAbout: (a) => {
+        const withTs = { ...a, updatedAt: Date.now() };
+        set({ about: withTs });
+        get().logActivity("UPDATE_ABOUT", `Update About: ${a.title}`);
+        get().triggerSync(`Update About page: ${a.title}`);
+      },
+
       /* ===== settings ===== */
       updateSettings: (s) => {
         set((st) => ({ settings: { ...st.settings, ...s } }));
@@ -482,6 +498,7 @@ export const useAdminStore = create<AdminState>()(
           artifacts: [],
           waReplies: [],
           faq: SYNCED_FAQ,
+          about: DEFAULT_ABOUT,
           settings: SYNCED_SETTINGS,
         });
         try {

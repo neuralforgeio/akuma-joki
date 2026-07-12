@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Gamepad2, Megaphone, Power, Activity, BarChart3,
   Package, FileImage, GitCommit, MessageSquare, HelpCircle, Settings,
   LogOut, ChevronLeft, ChevronRight, Menu as MenuIcon, X,
-  Code2, Terminal, Database, Webhook, ShieldAlert, Bug,
+  Code2, Terminal, Database, Webhook, ShieldAlert, Bug, Info, Inbox,
 } from "lucide-react";
 
 type MenuItem = { href: string; label: string; icon: typeof LayoutDashboard; roles: ("developer" | "admin")[] };
@@ -29,6 +29,8 @@ const MENU: MenuItem[] = [
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle, roles: ["developer", "admin"] },
   { href: "/admin/settings", label: "Settings", icon: Settings, roles: ["developer", "admin"] },
   // Developer-only features
+  { href: "/admin/about", label: "About Page", icon: Info, roles: ["developer"] },
+  { href: "/admin/reports", label: "Reports", icon: Inbox, roles: ["developer"] },
   { href: "/admin/dev-console", label: "Dev Console", icon: Terminal, roles: ["developer"] },
   { href: "/admin/dev-data", label: "Data Inspector", icon: Database, roles: ["developer"] },
   { href: "/admin/dev-webhooks", label: "Webhooks", icon: Webhook, roles: ["developer"] },
@@ -73,8 +75,11 @@ export function AdminSidebar() {
   });
 
   // Split: standard items vs developer items
-  const standardItems = visibleMenu.filter((m) => !m.href.startsWith("/admin/dev-"));
-  const devItems = visibleMenu.filter((m) => m.href.startsWith("/admin/dev-"));
+  // Dev items = routes starting with /admin/dev- + /admin/about + /admin/reports
+  const isDevItem = (href: string) =>
+    href.startsWith("/admin/dev-") || href === "/admin/about" || href === "/admin/reports";
+  const standardItems = visibleMenu.filter((m) => !isDevItem(m.href));
+  const devItems = visibleMenu.filter((m) => isDevItem(m.href));
 
   return (
     <>
