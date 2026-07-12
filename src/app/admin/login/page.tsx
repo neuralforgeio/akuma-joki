@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/lib/auth";
-import { PixelButton } from "@/components/akuma/pixel-button";
+import { login, isAuthenticated } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, User, Gamepad2, ShieldCheck, Zap, Star, ArrowRight } from "lucide-react";
+import { Lock, User, Eye, EyeOff, ShieldCheck, Zap, Star, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AdminLoginPage() {
@@ -13,6 +12,14 @@ export default function AdminLoginPage() {
   const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Auto-redirect ke dashboard jika sudah login
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.replace("/admin");
+    }
+  }, [router]);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,14 +144,27 @@ export default function AdminLoginPage() {
               <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Lock className="size-3 text-violet-400" /> Password
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="mt-2 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-violet-500/40 transition-all"
-              />
+              <div className="relative mt-2">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-violet-500/40 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-violet-400 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+              {showPassword && password && (
+                <p className="mt-1.5 text-[10px] text-zinc-600">👁 Pastikan password sudah benar sebelum submit</p>
+              )}
             </div>
 
             <button

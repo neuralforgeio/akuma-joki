@@ -27,8 +27,11 @@ export default function DevWebhooksPage() {
         <div className="flex items-center gap-2 mb-2"><Webhook className="size-4 text-cyan-400" /><span className="text-sm text-zinc-300">Add Webhook</span></div>
         <div className="flex flex-col sm:flex-row gap-2">
           <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-cyan-500/40" />
-          <select value={event} onChange={e => setEvent(e.target.value)} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none">
-            <option value="order.new">order.new</option><option value="order.status">order.status</option><option value="game.add">game.add</option><option value="announcement.set">announcement.set</option>
+          <select value={event} onChange={e => setEvent(e.target.value)} className="bg-[#0a0a0a] border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-200 outline-none focus:border-cyan-500/40">
+            <option value="order.new" className="bg-[#0a0a0a] text-zinc-200">order.new</option>
+            <option value="order.status" className="bg-[#0a0a0a] text-zinc-200">order.status</option>
+            <option value="game.add" className="bg-[#0a0a0a] text-zinc-200">game.add</option>
+            <option value="announcement.set" className="bg-[#0a0a0a] text-zinc-200">announcement.set</option>
           </select>
           <button onClick={add} className="inline-flex items-center gap-1 rounded-xl bg-cyan-500/20 border border-cyan-500/30 px-4 py-2 text-sm text-cyan-400 hover:bg-cyan-500/30"><Plus className="size-4" /> Add</button>
         </div>

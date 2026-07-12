@@ -63,7 +63,19 @@ type QuickReply = {
     | "pembayaran"
     | "garansi"
     | "estimasi"
-    | "custom";
+    | "custom"
+    | "promo"
+    | "refund"
+    | "login-aman"
+    | "update-progres"
+    | " kontak"
+    | " testimoni"
+    | " tips-joki"
+    | " keamanan"
+    | " rate-card"
+    | " bundle"
+    | " cq-afk"
+    | " private-server";
 };
 
 /** Menu default (di halaman non-store). */
@@ -76,6 +88,18 @@ const QUICK_REPLIES_DEFAULT: QuickReply[] = [
   { label: "Garansi Joki", emoji: "🛡️", kind: "auto", autoKey: "garansi" },
   { label: "Estimasi Waktu", emoji: "⏱️", kind: "auto", autoKey: "estimasi" },
   { label: "Jam Operasional", emoji: "🕐", kind: "auto", autoKey: "hours" },
+  { label: "Promo & Diskon", emoji: "🎉", kind: "auto", autoKey: "promo" },
+  { label: "Kebijakan Refund", emoji: "↩️", kind: "auto", autoKey: "refund" },
+  { label: "Tips Login Aman", emoji: "🔐", kind: "auto", autoKey: "login-aman" },
+  { label: "Update Progres", emoji: "📊", kind: "auto", autoKey: "update-progres" },
+  { label: "Kontak & Sosmed", emoji: "📱", kind: "auto", autoKey: "kontak" },
+  { label: "Testimoni", emoji: "⭐", kind: "auto", autoKey: "testimoni" },
+  { label: "Tips Joki Roblox", emoji: "💡", kind: "auto", autoKey: "tips-joki" },
+  { label: "Keamanan Akun", emoji: "🔒", kind: "auto", autoKey: "keamanan" },
+  { label: "Rate Card Lengkap", emoji: "📋", kind: "auto", autoKey: "rate-card" },
+  { label: "Paket Bundle Hemat", emoji: "📦", kind: "auto", autoKey: "bundle" },
+  { label: "Cek Queue/AFK", emoji: "⏳", kind: "auto", autoKey: "cq-afk" },
+  { label: "Private Server", emoji: "🎮", kind: "auto", autoKey: "private-server" },
   { label: "Chat Admin", emoji: "👤", kind: "redirect" },
 ];
 
@@ -105,6 +129,32 @@ const STATUS_REPLY =
 /** Pesan auto-reply untuk "Chat Admin" — tetap di chat box (instruksi), redirect terpisah. */
 const CHAT_ADMIN_REPLY =
   "👤 Baik! Kami arahkan kamu ke WhatsApp admin kami untuk dibantu lebih lanjut. 👇";
+
+/** 15 New auto-reply templates */
+const PROMO_REPLY =
+  "🎉 PROMO & DISKON AKUMA JOKI:\n\n- Bundle 2 joki: diskon 10%\n- Bundle 3 joki: diskon 15%\n- Member return (order ke-3+): diskon 5%\n- Promo weekend: diskon 8% (Sabtu-Minggu)\n\nPromo berlaku kelipatan. Gabung sekarang! 💰";
+const REFUND_REPLY =
+  "↩️ KEBIJAKAN REFUND:\n\n- Refund 100% jika joki belum dimulai\n- Refund 50% jika joki sudah berjalan < 30%\n- Tidak ada refund jika joki sudah > 50% selesai\n- Refund diproses 1x24 jam via metode pembayaran awal\n\nHubungi admin untuk klaim refund.";
+const LOGIN_AMAN_REPLY =
+  "🔐 TIPS LOGIN AMAN:\n\n1. Ubah password sebelum & sesudah joki\n2. Aktifkan 2-Step Verification Roblox\n3. Jangan share link login ke siapapun\n4. Logout dari device lain sebelum joki\n5. Cek riwayat login setelah joki selesai\n\nKeamanan akunmu prioritas kami! 🛡️";
+const UPDATE_PROGRES_REPLY =
+  "📊 UPDATE PROGRES JOKI:\n\nKami update progres via WhatsApp setiap 25% penyelesaian:\n- 25%: Notif 'Joki dimulai'\n- 50%: Screenshot progres\n- 75%: Notif 'Hampir selesai'\n- 100%: Screenshot hasil + selesai\n\nKamu juga bisa tanya progres kapan saja via 'Chat Admin'!";
+const KONTAK_REPLY =
+  "📱 KONTAK & SOSMED AKUMA JOKI:\n\n- WhatsApp: +62 821-3156-1301\n- Jam operasional: 13.00-21.00 WIB\n- Website: akuma-joki.vercel.app\n\nIkuti sosmed kami untuk update promo & game baru! 🚀";
+const TESTIMONI_REPLY =
+  "⭐ TESTIMONI PELANGGAN:\n\n'RizkyGaming' - 'Pelayanan cepat, 200 level selesai 1 hari!'\n'FrozenMaster' - 'Harga bersahabat, akun aman!' (5/5)\n'TycoonKing' - 'Profit maksimal, joki pro!' (5/5)\n\nRating rata-rata: 4.9/5 dari 200+ review. Gabung sekarang! 🏆";
+const TIPS_JOKI_REPLY =
+  "💡 TIPS JOKI ROBLOX:\n\n1. Pastikan akun level cukup sebelum order senjata\n2. Backup inventory penting sebelum joki\n3. Pilih joki yang sesuai kebutuhan (jangan over-order)\n4. Hubungi admin untuk konsultasi gratis\n5. Manfaatkan promo bundle untuk hemat!\n\nSemoga membantu! 🎮";
+const KEAMANAN_REPLY =
+  "🔒 KEAMANAN AKUN ROBLOX:\n\n- Joki AKUMA tidak pakai cheat/exploit (anti-ban)\n- Akun dijaga dari hackback & trade scam\n- Joki logout dari semua device setelah selesai\n- Garansi: jika ban saat joki (bukan kesalahan user) → refund 100%\n- Privacy: data akun TIDAK disimpan setelah joki selesai\n\nAman 100% dengan AKUMA! 🛡️";
+const RATE_CARD_REPLY =
+  "📋 RATE CARD LENGKAP AKUMA JOKI:\n\nBlox Fruits:\n- 100 Level: 2K | 200 Level: 4K | 300 Level: 6K\n- Raid 1-10: 10K | Raid Full Skill: 10K\n- CDK: 20K | SG: 10K | SH: 10K | GH: 15K\n\nExpedition Antarctica:\n- Muncak 1-10: 15K | Muncak 1-25: 30K | NPC All: 25K\n\nRetail Tycoon 2:\n- Benerin Toko: 2K | Main Pro: 5K\n\nHarga dalam Robux (K = ribu). Hubungi admin untuk negosiasi!";
+const BUNDLE_REPLY =
+  "📦 PAKET BUNDLE HEMAT:\n\nBundle Blox Fruits:\n- 200 Level + Raid Full Skill = 12K (hemat 2K!)\n- 300 Level + CDK = 23K (hemat 3K!)\n- Full Package (300 Level + CDK + SG + Raid) = 40K (hemat 6K!)\n\nBundle Expedition:\n- Muncak 1-25 + NPC All = 45K (hemat 10K!)\n\nBundle Retail Tycoon:\n- Benerin Toko + Main Pro = 6K (hemat 1K!)\n\nPesan bundle sekarang! 🎉";
+const CQ_AFK_REPLY =
+  "⏳ CEK QUEUE & AFK:\n\nStatus queue saat ini:\n- Pagi (09-12): Queue rendah, proses cepat\n- Siang (12-15): Queue sedang\n- Sore (15-18): Queue tinggi, mungkin agak lama\n- Malam (18-21): Queue sedang\n\nTips: Order di jam sepi (pagi) untuk proses tercepat!\n\nKami TIDAK AFK saat jam operasional (13-21 WIB). Di luar jam, pesan dibalas saat online kembali.";
+const PRIVATE_SERVER_REPLY =
+  "🎮 PRIVATE SERVER AKUMA:\n\nKami punya private server untuk:\n- Blox Fruits (grinding cepat, no interrupt)\n- Expedition Antarctica (exclusive run)\n- Retail Tycoon 2 (testing & optimasi)\n\nKeuntungan private server:\n- No lag, no toxic player\n- Proses joki 2x lebih cepat\n- Aman dari griefing\n\nPrivate server included GRATIS untuk order > 10K! 🎁";
 
 /** Pesan auto-reply untuk "Cara Order" — panduan step-by-step. */
 const CARA_ORDER_REPLY =
@@ -717,6 +767,42 @@ export function WhatsAppWidget() {
             break;
           case "estimasi":
             csMsg = { id: 0, role: "cs", text: ESTIMASI_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "promo":
+            csMsg = { id: 0, role: "cs", text: PROMO_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "refund":
+            csMsg = { id: 0, role: "cs", text: REFUND_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "login-aman":
+            csMsg = { id: 0, role: "cs", text: LOGIN_AMAN_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "update-progres":
+            csMsg = { id: 0, role: "cs", text: UPDATE_PROGRES_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "kontak":
+            csMsg = { id: 0, role: "cs", text: KONTAK_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "testimoni":
+            csMsg = { id: 0, role: "cs", text: TESTIMONI_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "tips-joki":
+            csMsg = { id: 0, role: "cs", text: TIPS_JOKI_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "keamanan":
+            csMsg = { id: 0, role: "cs", text: KEAMANAN_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "rate-card":
+            csMsg = { id: 0, role: "cs", text: RATE_CARD_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "bundle":
+            csMsg = { id: 0, role: "cs", text: BUNDLE_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "cq-afk":
+            csMsg = { id: 0, role: "cs", text: CQ_AFK_REPLY, ts: 0, badge: "AUTO" };
+            break;
+          case "private-server":
+            csMsg = { id: 0, role: "cs", text: PRIVATE_SERVER_REPLY, ts: 0, badge: "AUTO" };
             break;
           case "custom":
             // Template custom dari admin dashboard — reply diambil dari waReplies store

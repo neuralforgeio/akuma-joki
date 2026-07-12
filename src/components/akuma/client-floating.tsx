@@ -1,10 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { DeferredLoader } from "@/components/akuma/deferred-loader";
 
-// Lazy load heavy floating components (reduce initial JS bundle)
-// ssr: false karena tidak perlu SSR (floating UI, muncul setelah interact)
 const WhatsAppWidget = dynamic(
   () => import("@/components/akuma/whatsapp-widget-loader"),
   { ssr: false, loading: () => null }
@@ -15,13 +14,20 @@ const CookieConsent = dynamic(
 );
 
 /**
- * ClientWrapper — wrapper untuk floating components yang butuh lazy load.
- * Dipakai di root layout (server component) agar dynamic import ssr:false works.
+ * ClientFloatingComponents — floating components yang hanya muncul di halaman tertentu.
+ * - WhatsApp Widget: HANYA di halaman public (/, /store/*, /checkout)
+ *   TIDAK muncul di /admin/*, /takedown, /login
+ * - Cookie Consent: semua halaman public
  */
 export function ClientFloatingComponents() {
+  const pathname = usePathname();
+
+  // WA widget hanya di halaman public (tidak di admin/login/takedown)
+  const showWhatsApp = pathname === "/" || pathname.startsWith("/store/") || pathname === "/checkout";
+
   return (
     <DeferredLoader delay={3000}>
-      <WhatsAppWidget />
+      {showWhatsApp && <WhatsAppWidget />}
       <CookieConsent />
     </DeferredLoader>
   );

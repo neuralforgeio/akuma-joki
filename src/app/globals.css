@@ -115,6 +115,15 @@
   --sidebar-ring: #7c3aed;
 }
 
+/* Light mode overrides for glass/components */
+.light .glass { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.08); }
+.light .glass-strong { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.1); }
+.light .card-lux { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.06); }
+.light .card-lux:hover { background: rgba(255,255,255,0.7); border-color: rgba(124,58,237,0.2); }
+.light .bg-grid { background-image: linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px); }
+.light .scanlines::after { display: none; }
+.light .akuma-glass { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.08); }
+
 @layer base {
   * { border-color: var(--border); }
   html { scroll-behavior: smooth; }
