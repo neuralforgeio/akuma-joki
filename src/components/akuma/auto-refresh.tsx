@@ -16,7 +16,7 @@ import { useEffect } from "react";
  * Versi di-increment setiap kali ada breaking change di data structure.
  */
 
-const APP_VERSION = "v2.0.5"; // increment saat ada breaking change
+const APP_VERSION = "v2.1.0"; // increment saat ada breaking change
 const VERSION_KEY = "akuma-app-version";
 const RELOAD_KEY = "akuma-app-reloaded";
 
