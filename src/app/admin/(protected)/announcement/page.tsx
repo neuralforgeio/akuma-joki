@@ -1,4 +1,5 @@
 "use client";
+import { HelpBanner } from "@/components/admin/help-tooltip";
 
 import { useState } from "react";
 import { useAdminStore } from "@/lib/admin-store";
@@ -46,6 +47,7 @@ export default function AnnouncementPage() {
 
   return (
     <div className="space-y-6">
+      <HelpBanner title="Announcement" description="Banner global yang muncul di semua halaman public. User bisa dismiss per session." tips={["Pilih tipe: info (biru), warning (merah), success (hijau)", "Centang 'Aktif' untuk menampilkan banner", "Announcement otomatis sync ke GitHub & Vercel redeploys"]} />
       <div>
         <h1 className="font-pixel text-base sm:text-lg text-[#e5e5e5] text-glow-neon">
           ANNOUNCEMENT

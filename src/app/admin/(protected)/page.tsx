@@ -1,4 +1,5 @@
 "use client";
+import { HelpBanner } from "@/components/admin/help-tooltip";
 
 import Link from "next/link";
 import { useAdminStore, useTotalItems } from "@/lib/admin-store";
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      <HelpBanner title="Dashboard" description="Ringkasan statistik dan aktivitas website AKUMA JOKI." tips={["Lihat total games, items, pesanan, visitors", "Quick actions untuk akses cepat ke fitur utama", "Activity log menampilkan semua aksi admin", "Visitor chart 7 hari terakhir"]} />
       {/* header */}
       <div>
         <h1 className="font-pixel text-base sm:text-lg text-[#e5e5e5] text-glow-neon">
@@ -210,7 +212,7 @@ export default function AdminDashboard() {
               Commit Terbaru
             </h3>
           </div>
-          <div className="space-y-2">
+    <div className="space-y-2">
             {commits.slice(0, 3).map((c) => (
               <div key={c.id} className="flex items-center gap-3 border-l-2 border-[#ffd166]/40 pl-3">
                 <GitCommit className="size-3 text-[#ffd166]" />

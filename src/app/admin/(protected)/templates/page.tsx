@@ -1,4 +1,5 @@
 "use client";
+import { HelpBanner } from "@/components/admin/help-tooltip";
 
 import { useState } from "react";
 import { useAdminStore } from "@/lib/admin-store";
@@ -29,6 +30,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="space-y-5">
+      <HelpBanner title="WhatsApp Templates" description="Edit template quick-reply di widget WhatsApp. User ketik / untuk melihat template." tips={["Klik 'Tambah' untuk membuat template baru", "Pilih 'Auto-reply' untuk jawaban otomatis di widget", "Pilih 'Redirect WA' untuk langsung ke admin", "Template tersimpan otomatis ke GitHub"]} />
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -41,7 +43,7 @@ export default function TemplatesPage() {
       </div>
 
       {/* Template cards */}
-      <div className="space-y-3">
+    <div className="space-y-3">
         {replies.map((r, i) => (
           <div key={i} className="glass rounded-2xl p-4 space-y-3">
             {/* Row 1: emoji + label (mobile: stacked, desktop: inline) */}

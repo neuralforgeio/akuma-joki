@@ -1,4 +1,5 @@
 "use client";
+import { HelpBanner } from "@/components/admin/help-tooltip";
 
 import { useState } from "react";
 import { useAdminStore } from "@/lib/admin-store";
@@ -32,6 +33,7 @@ export default function TakedownPage() {
 
   return (
     <div className="space-y-6">
+      <HelpBanner title="Takedown Control" description="Aktifkan mode maintenance untuk menonaktifkan website sementara." tips={["Klik 'Aktifkan Takedown' untuk maintenance mode", "Edit alasan maintenance jika perlu", "Takedown berlaku per-browser (cookie)", "Untuk global semua visitor, ubah config.json di repo"]} />
       <div>
         <h1 className="font-pixel text-base sm:text-lg text-[#e5e5e5] text-glow-neon">
           TAKEDOWN CONTROL

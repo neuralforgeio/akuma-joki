@@ -1,4 +1,5 @@
 "use client";
+import { HelpBanner } from "@/components/admin/help-tooltip";
 
 import { useState } from "react";
 import { useAdminStore } from "@/lib/admin-store";
@@ -57,6 +58,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-5">
+      <HelpBanner title="Settings" description="Konfigurasi global website — nomor WA, nama CS, foto profile, backup/restore data." tips={["Ubah nomor WhatsApp & nama CS di sini", "Upload foto profile CS dengan crop circular", "Export JSON untuk backup, Import untuk restore", "Reset semua data jika ada masalah"]} />
       <div>
         <h1 className="text-xl font-bold text-gradient">Settings</h1>
         <p className="mt-1 text-sm text-zinc-500">Konfigurasi global website.</p>

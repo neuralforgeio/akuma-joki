@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAdminStore } from "@/lib/admin-store";
 import { PixelButton } from "@/components/akuma/pixel-button";
+import { HelpBanner } from "@/components/admin/help-tooltip";
 import { Gamepad2, Plus, Edit3, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,6 +21,16 @@ export default function AdminGamesPage() {
 
   return (
     <div className="space-y-6">
+      <HelpBanner
+        title="Kelola Game"
+        description="Tambah, edit, atau hapus game yang tersedia di store. Setiap perubahan otomatis tersimpan ke GitHub dan website terupdate."
+        tips={[
+          "Klik 'Tambah Game' untuk membuat game baru",
+          "Klik 'Edit' untuk mengubah game atau menambah item joki",
+          "Klik ikon merah untuk menghapus game (dengan konfirmasi)",
+          "Game baru akan otomatis muncul di navbar, homepage, dan widget WhatsApp",
+        ]}
+      />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-pixel text-base sm:text-lg text-[#e5e5e5] text-glow-neon">
