@@ -32,9 +32,26 @@ export const useReviews = create<ReviewsState>()(
       reviews: [],
       _hasHydrated: false,
       setHasHydrated: (v) => set({ _hasHydrated: v }),
-      addReview: (r) => set((s) => ({
-        reviews: [{ ...r, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), createdAt: Date.now() }, ...s.reviews],
-      })),
+      addReview: (r) => {
+        const review: Review = { ...r, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), createdAt: Date.now() };
+        set((s) => ({ reviews: [review, ...s.reviews] }));
+        // Sync reviews to GitHub via admin store triggerSync
+        try {
+          import("./admin-store").then(({ useAdminStore }) => {
+            const allReviews = useReviews.getState().reviews;
+            useAdminStore.getState().triggerSync(`Add review: ${r.customerName} → ${r.gameName}`);
+            // Also push reviews separately to data/admin-data.json
+            fetch("/api/sync-github", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                data: { ...useAdminStore.getState(), reviews: allReviews },
+                commitMessage: `Add review: ${r.customerName} → ${r.gameName}`,
+              }),
+            }).catch(() => {});
+          });
+        } catch { /* ignore */ }
+      },
       deleteReview: (id) => set((s) => ({ reviews: s.reviews.filter((r) => r.id !== id) })),
       getReviewsByGame: (gameSlug) => get().reviews.filter((r) => r.gameSlug === gameSlug),
       getAverageRating: (gameSlug) => {
