@@ -329,9 +329,10 @@ function ProductCard({
 
 /* ============================ Store Reviews ============================ */
 function StoreReviews({ game }: { game: Game }) {
-  const reviews = useReviews((s) => s.reviews.filter((r) => r.gameSlug === game.slug));
+  const allReviews = useReviews((s) => s.reviews);
   const addReview = useReviews((s) => s.addReview);
   const hydrated = useReviews((s) => s._hasHydrated);
+  const reviews = allReviews.filter((r) => r.gameSlug === game.slug);
   const [name, setName] = useState("");
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
