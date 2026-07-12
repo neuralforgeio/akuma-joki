@@ -56,6 +56,9 @@ export function Footer() {
               <a href={waLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-2.5 text-sm text-green-400 hover:bg-green-500/20 transition-all">
                 <MessageCircle className="size-4" /> WhatsApp Admin
               </a>
+              <Link href="/track-order" className="mt-2 block text-sm text-zinc-400 hover:text-violet-400 transition-colors">
+                📦 Lacak Order
+              </Link>
             </div>
           </div>
 

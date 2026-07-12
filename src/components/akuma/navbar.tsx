@@ -4,16 +4,20 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, Search, ChevronDown, Gamepad2, Info, Bug } from "lucide-react";
+import { Menu, X, Search, ChevronDown, Gamepad2, Info, Bug, Heart } from "lucide-react";
 import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
 import type { Game, ProductItem } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
+import { useWishlist } from "@/lib/wishlist";
+import { LanguageToggle } from "./language-toggle";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const adminGames = useAdminStore((s) => s.games);
   const hydrated = useAdminStore((s) => s._hasHydrated);
   const games = hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
+  const wishlistCount = useWishlist((s) => s.items.length);
+  const wishlistHydrated = useWishlist((s) => s._hasHydrated);
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -66,7 +70,7 @@ export function Navbar() {
 
   return (
     <header className={cn("sticky top-0 z-50 w-full transition-all duration-500", scrolled ? "py-2" : "py-3")}>
-      <nav className={cn("mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 sm:px-6 py-3 transition-all duration-500", scrolled ? "glass-strong shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6)]" : "glass")}>
+      <nav className={cn("mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 sm:px-6 py-3 transition-all duration-500", scrolled ? "glass-nav-strong" : "glass-nav")}>
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2.5 shrink-0" aria-label="AKUMA JOKI home">
           <div className="relative h-9 w-18 sm:h-10 sm:w-20 shrink-0 rounded-lg overflow-hidden ring-2 ring-violet-500/30 group-hover:ring-violet-500/50 transition-all">
@@ -106,7 +110,7 @@ export function Navbar() {
                 onMouseLeave={() => setGamesOpen(false)}
                 className="absolute left-0 top-full pt-2 w-72 z-50"
               >
-                <div className="glass-strong rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] overflow-hidden border border-white/10">
+                <div className="glass-nav-strong rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] overflow-hidden border border-white/10">
                   <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                       {games.length} Game Tersedia
@@ -157,7 +161,7 @@ export function Navbar() {
           </NavLink>
         </div>
 
-        {/* Search + Checkout */}
+        {/* Search + Wishlist + Checkout */}
         <div className="flex items-center gap-2.5">
           <div ref={searchContainerRef} className="relative">
             <button type="button" onClick={() => setSearchOpen(v => !v)} aria-label="Cari game atau joki" aria-expanded={searchOpen}
@@ -184,6 +188,15 @@ export function Navbar() {
               </div>
             )}
           </div>
+          <LanguageToggle />
+          <Link href="/wishlist" aria-label="Wishlist" className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-zinc-400 hover:text-pink-400 hover:border-pink-500/30 transition-all">
+            <Heart className="size-4" />
+            {wishlistHydrated && wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-pink-500 px-1 text-[9px] font-bold text-white">
+                {wishlistCount > 9 ? "9+" : wishlistCount}
+              </span>
+            )}
+          </Link>
           <Link href="/checkout" className={cn("hidden sm:inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-pixel uppercase tracking-wide transition-all duration-300", isCheckout ? "bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-[0_4px_20px_-4px_rgba(139,92,246,0.5)]" : "bg-white/5 text-zinc-300 border border-white/10 hover:bg-white/10 backdrop-blur-sm")}>
             🛒 Checkout
           </Link>
@@ -238,6 +251,7 @@ export function Navbar() {
           )}
 
           <MobileLink active={isContact} href="/contact" onClick={() => setMobileOpen(false)}>🐛 Contact</MobileLink>
+          <MobileLink active={pathname === "/wishlist"} href="/wishlist" onClick={() => setMobileOpen(false)}>❤️ Wishlist {wishlistHydrated && wishlistCount > 0 && `(${wishlistCount})`}</MobileLink>
           <MobileLink active={isCheckout} href="/checkout" onClick={() => setMobileOpen(false)}>🛒 Checkout</MobileLink>
         </div>
       </div>

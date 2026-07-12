@@ -13,6 +13,7 @@ import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { Starfield, MovingGrid } from "./backgrounds";
 import { SkeletonGameCard } from "./skeleton";
+import { RecentlyViewed } from "./recently-viewed";
 
 const HEADING_TEXTS = [
   { main: "AKUMA", accent: "JOKI", subtitle: "Joki & Store Roblox" },
@@ -154,6 +155,9 @@ export function HomeView() {
           }
         </div>
       </section>
+
+      {/* Recently viewed (only if user has viewed items) */}
+      <RecentlyViewed />
 
       {/* WHY CHOOSE */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 border-t border-white/5">

@@ -13,6 +13,18 @@ const BackToTop = dynamic(() => import("@/components/akuma/back-to-top").then(m 
   ssr: false,
   loading: () => null,
 });
+const KeyboardShortcutsHint = dynamic(() => import("@/components/akuma/keyboard-shortcuts").then(m => ({ default: m.KeyboardShortcutsHint })), {
+  ssr: false,
+  loading: () => null,
+});
+const PushNotificationOptIn = dynamic(() => import("@/components/akuma/push-notif-opt-in").then(m => ({ default: m.PushNotificationOptIn })), {
+  ssr: false,
+  loading: () => null,
+});
+const PWAInstaller = dynamic(() => import("@/components/akuma/pwa-installer").then(m => ({ default: m.PWAInstaller })), {
+  ssr: false,
+  loading: () => null,
+});
 
 /**
  * Wraps all "normal" routes (/, /store/*, /checkout) with the Navbar + Footer
@@ -53,6 +65,9 @@ export default function MainLayout({
       {/* Non-critical floating components: deferred load (2s atau user interact) */}
       <DeferredLoader delay={2000}>
         <BackToTop />
+        <KeyboardShortcutsHint />
+        <PushNotificationOptIn />
+        <PWAInstaller />
       </DeferredLoader>
     </div>
   );

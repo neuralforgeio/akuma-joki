@@ -138,18 +138,32 @@
 
 /* Glassmorphism */
 .glass {
-  background: rgba(255,255,255,0.03);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(15,18,28,0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 1rem;
 }
 .glass-strong {
-  background: rgba(15,18,28,0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(10,12,20,0.85);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 1rem;
+}
+/* Navbar-specific glass: stronger blur supaya teks tetap readable saat scroll */
+.glass-nav {
+  background: rgba(10,10,15,0.72);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.glass-nav-strong {
+  background: rgba(10,10,15,0.88);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px -8px rgba(0,0,0,0.6);
 }
 
 /* Gradient text */

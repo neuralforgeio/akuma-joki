@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ShoppingCart, Tag, Check, AlertTriangle, Lock, Star, X, Plus, Minus } from "lucide-react";
@@ -9,6 +9,7 @@ import type { ProductItem, ProductCategory } from "@/lib/games-data";
 import { GAMES } from "@/lib/games-data";
 import { useAkumaStore } from "@/lib/store";
 import { useReviews } from "@/lib/reviews";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 import { useCart } from "@/lib/cart";
 import { useToast } from "@/hooks/use-toast";
 import { PixelButton } from "./pixel-button";
@@ -25,15 +26,74 @@ export function StoreView({ game }: { game: Game }) {
   const cartAdd = useCart((s) => s.add);
   const cartHas = useCart((s) => s.has);
   const cartCount = useCart((s) => s.items.length);
+  const addViewed = useRecentlyViewed((s) => s.addViewed);
   const { toast } = useToast();
   const [selectedItem, setSelectedItem] = useState<{ item: ProductItem; category: string } | null>(null);
+
+  /* ===== Advanced Filter State ===== */
+  const [filterQuery, setFilterQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterTag, setFilterTag] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "name">("default");
+
+  // Collect all unique tags from items
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    game.categories.forEach((c) => c.items.forEach((i) => { if (i.tag) tags.add(i.tag); }));
+    return Array.from(tags);
+  }, [game]);
+
+  // Filter + sort items
+  const filteredCategories = useMemo(() => {
+    const q = filterQuery.trim().toLowerCase();
+    let result = game.categories.map((cat) => ({
+      ...cat,
+      items: cat.items.filter((item) => {
+        if (filterCategory !== "all" && cat.id !== filterCategory) return false;
+        if (filterTag !== "all" && item.tag !== filterTag) return false;
+        if (q && !item.name.toLowerCase().includes(q) && !(item.description || "").toLowerCase().includes(q)) return false;
+        return true;
+      }),
+    }));
+    // Filter out empty categories when search/filter active
+    if (q || filterTag !== "all") {
+      result = result.filter((c) => c.items.length > 0);
+    }
+    // Sort items within each category
+    if (sortBy !== "default") {
+      result = result.map((c) => ({
+        ...c,
+        items: [...c.items].sort((a, b) => {
+          if (sortBy === "price-asc") return a.price - b.price;
+          if (sortBy === "price-desc") return b.price - a.price;
+          if (sortBy === "name") return a.name.localeCompare(b.name);
+          return 0;
+        }),
+      }));
+    }
+    // Hide categories not matching filterCategory
+    if (filterCategory !== "all") {
+      result = result.filter((c) => c.id === filterCategory);
+    }
+    return result;
+  }, [game, filterQuery, filterCategory, filterTag, sortBy]);
 
   const handlePick = (
     item: (typeof game.categories)[number]["items"][number],
     categoryName: string
   ) => {
-    // Show item description modal instead of going directly to checkout
-    setSelectedItem({ item: item as ProductItem, category: categoryName });
+    const pItem = item as ProductItem;
+    // Track ke recently viewed
+    addViewed({
+      id: `${game.slug}-${pItem.id}`,
+      gameSlug: game.slug,
+      gameName: game.name,
+      gameEmoji: game.emoji,
+      gameAccent: game.accent,
+      productName: pItem.name,
+      priceLabel: pItem.priceLabel,
+    });
+    setSelectedItem({ item: pItem, category: categoryName });
   };
 
   const handleAddToCart = () => {
@@ -171,9 +231,75 @@ export function StoreView({ game }: { game: Game }) {
         </div>
       )}
 
-      {/* category sections */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16 space-y-12">
-        {game.categories.map((cat) => (
+      {/* Advanced Filter Bar */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+        <div className="glass-nav rounded-2xl p-4 sticky top-20 z-30">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={filterQuery}
+              onChange={(e) => setFilterQuery(e.target.value)}
+              placeholder="Cari item... (mis. level, raid, senjata)"
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-violet-500/40"
+            />
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="bg-[#0a0a0a] border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-200 outline-none focus:border-violet-500/40"
+            >
+              <option value="all" className="bg-[#0a0a0a]">Semua Kategori</option>
+              {game.categories.map((c) => (
+                <option key={c.id} value={c.id} className="bg-[#0a0a0a]">{c.icon} {c.name}</option>
+              ))}
+            </select>
+            {allTags.length > 0 && (
+              <select
+                value={filterTag}
+                onChange={(e) => setFilterTag(e.target.value)}
+                className="bg-[#0a0a0a] border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-200 outline-none focus:border-violet-500/40"
+              >
+                <option value="all" className="bg-[#0a0a0a]">Semua Tag</option>
+                {allTags.map((t) => (
+                  <option key={t} value={t} className="bg-[#0a0a0a]">{t}</option>
+                ))}
+              </select>
+            )}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-[#0a0a0a] border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-200 outline-none focus:border-violet-500/40"
+            >
+              <option value="default" className="bg-[#0a0a0a]">Urutkan: Default</option>
+              <option value="price-asc" className="bg-[#0a0a0a]">Harga: Rendah → Tinggi</option>
+              <option value="price-desc" className="bg-[#0a0a0a]">Harga: Tinggi → Rendah</option>
+              <option value="name" className="bg-[#0a0a0a]">Nama (A-Z)</option>
+            </select>
+            {(filterQuery || filterCategory !== "all" || filterTag !== "all" || sortBy !== "default") && (
+              <button
+                onClick={() => { setFilterQuery(""); setFilterCategory("all"); setFilterTag("all"); setSortBy("default"); }}
+                className="inline-flex items-center justify-center gap-1 rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-xs text-zinc-400 hover:text-red-400 hover:border-red-500/30 transition-all"
+              >
+                <X className="size-3.5" /> Reset
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* category sections (filtered) */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12 space-y-12">
+        {filteredCategories.length === 0 ? (
+          <div className="glass rounded-2xl p-12 text-center">
+            <p className="text-sm text-zinc-500">Tidak ada item yang cocok dengan filter.</p>
+            <button
+              onClick={() => { setFilterQuery(""); setFilterCategory("all"); setFilterTag("all"); setSortBy("default"); }}
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-violet-500/10 border border-violet-500/20 px-4 py-2 text-sm text-violet-400 hover:bg-violet-500/20 transition-all"
+            >
+              Reset Filter
+            </button>
+          </div>
+        ) : (
+          filteredCategories.map((cat) => (
           <div key={cat.id}>
             <div className="flex items-center gap-3 mb-6">
               <span className="text-2xl">{cat.icon}</span>
@@ -204,7 +330,8 @@ export function StoreView({ game }: { game: Game }) {
               })}
             </div>
           </div>
-        ))}
+          ))
+        )}
       </section>
 
       {/* Reviews section */}
