@@ -27,9 +27,10 @@ import {
   SYNCED_SETTINGS,
   SYNCED_FAQ,
   SYNCED_ABOUT,
+  SYNCED_REVIEWS,
   DEFAULT_ABOUT,
 } from "./games-data";
-import type { Game, AboutContent } from "./games-data";
+import type { Game, AboutContent, Review } from "./games-data";
 import { scheduleGitHubSync } from "./github-sync";
 
 /* ============================ Types ============================ */
@@ -124,6 +125,7 @@ type AdminState = {
   waReplies: WAReply[];
   faq: FAQItem[];
   about: AboutContent;
+  reviews: Review[];
   settings: AdminSettings;
   _hasHydrated: boolean;
 
@@ -179,6 +181,10 @@ type AdminState = {
   /* about */
   setAbout: (a: AboutContent) => void;
 
+  /* reviews */
+  addReview: (r: Omit<Review, "id" | "createdAt">) => void;
+  deleteReview: (id: string) => void;
+
   /* settings */
   updateSettings: (s: Partial<AdminSettings>) => void;
 
@@ -209,6 +215,7 @@ export const useAdminStore = create<AdminState>()(
       waReplies: [],
       faq: SYNCED_FAQ,
       about: SYNCED_ABOUT,
+      reviews: SYNCED_REVIEWS,
       settings: SYNCED_SETTINGS,
       _hasHydrated: false,
 
@@ -414,6 +421,7 @@ export const useAdminStore = create<AdminState>()(
           faq: s.faq,
           waReplies: s.waReplies,
           about: s.about,
+          reviews: s.reviews,
           version: 1,
           updatedAt: new Date().toISOString(),
         };
@@ -477,6 +485,23 @@ export const useAdminStore = create<AdminState>()(
         get().triggerSync(`Update About page: ${a.title}`);
       },
 
+      /* ===== reviews ===== */
+      addReview: (r) => {
+        const review: Review = {
+          ...r,
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          createdAt: Date.now(),
+        };
+        set((s) => ({ reviews: [review, ...s.reviews] }));
+        get().logActivity("ADD_REVIEW", `${r.customerName} → ${r.gameName} (${r.rating}★)`);
+        get().triggerSync(`Add review: ${r.customerName} → ${r.gameName}`);
+      },
+      deleteReview: (id) => {
+        set((s) => ({ reviews: s.reviews.filter((r) => r.id !== id) }));
+        get().logActivity("DELETE_REVIEW", `Hapus review ${id}`);
+        get().triggerSync(`Delete review ${id}`);
+      },
+
       /* ===== settings ===== */
       updateSettings: (s) => {
         set((st) => ({ settings: { ...st.settings, ...s } }));
@@ -499,6 +524,7 @@ export const useAdminStore = create<AdminState>()(
           waReplies: [],
           faq: SYNCED_FAQ,
           about: DEFAULT_ABOUT,
+          reviews: SYNCED_REVIEWS,
           settings: SYNCED_SETTINGS,
         });
         try {
@@ -510,6 +536,18 @@ export const useAdminStore = create<AdminState>()(
     }),
     {
       name: "akuma-admin-store",
+      // Exclude fields yang sudah di-sync via GitHub (admin-data.json).
+      // Field-field ini harus selalu dari server (build-time), BUKAN localStorage,
+      // supaya cross-device consistent.
+      // Field yang tetap di-persist: orders, commits, activityLog, visitors,
+      // artifacts (data lokal admin dashboard).
+      partialize: (state) => ({
+        orders: state.orders,
+        commits: state.commits,
+        activityLog: state.activityLog,
+        visitors: state.visitors,
+        artifacts: state.artifacts,
+      }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

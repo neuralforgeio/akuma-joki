@@ -214,6 +214,20 @@ export type ContactReport = {
   createdAt: number;
 };
 
+/* ============================ Review ============================ */
+// Review/rating dari customer — disimpan di admin-data.json (GitHub sync)
+// supaya cross-device. Bukan localStorage.
+export type Review = {
+  id: string;
+  gameSlug: string;
+  gameName: string;
+  productName: string;
+  customerName: string;
+  rating: number; // 1-5
+  comment: string;
+  createdAt: number;
+};
+
 /* ============================ SYNCED DATA ============================ */
 // Saat admin update via dashboard, data di-push ke GitHub sebagai
 // data/admin-data.json. Vercel redeploys → file ini terbaca saat build.
@@ -237,6 +251,7 @@ type AdminDataFile = {
   faq?: { id: string; question: string; answer: string }[];
   waReplies?: unknown[];
   about?: AboutContent;
+  reviews?: Review[];
   version?: number;
   updatedAt?: string;
 };
@@ -259,6 +274,7 @@ export const SYNCED_SETTINGS = parsed.settings ?? {
 };
 export const SYNCED_FAQ = parsed.faq ?? [];
 export const SYNCED_ABOUT: AboutContent = parsed.about ?? DEFAULT_ABOUT;
+export const SYNCED_REVIEWS: Review[] = parsed.reviews ?? [];
 export const SYNCED_UPDATED_AT = parsed.updatedAt ?? null;
 
 export function getGameBySlug(slug: string | null): Game | undefined {
