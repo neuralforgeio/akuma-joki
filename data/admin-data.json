@@ -185,6 +185,15 @@
           ]
         }
       ]
+    },
+    {
+      "slug": "test-new-game",
+      "name": "Test New Game",
+      "tagline": "testing",
+      "description": "Hai, ini adalah testing penambahan game",
+      "emoji": "💀",
+      "accent": "#6ee7b7",
+      "categories": []
     }
   ],
   "announcement": null,
@@ -198,5 +207,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-12T10:42:33.060Z"
+  "updatedAt": "2026-07-12T11:36:12.226Z"
 }
