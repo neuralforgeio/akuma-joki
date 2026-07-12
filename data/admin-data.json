@@ -193,7 +193,14 @@
       "description": "Hai, ini adalah testing penambahan game",
       "emoji": "💀",
       "accent": "#6ee7b7",
-      "categories": []
+      "categories": [
+        {
+          "id": "leveling",
+          "name": "LEVELING",
+          "icon": "📈",
+          "items": []
+        }
+      ]
     }
   ],
   "announcement": null,
@@ -207,5 +214,5 @@
   "faq": [],
   "waReplies": [],
   "version": 1,
-  "updatedAt": "2026-07-12T11:36:12.226Z"
+  "updatedAt": "2026-07-12T11:53:28.602Z"
 }
