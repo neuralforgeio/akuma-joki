@@ -4,12 +4,16 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Clock, X } from "lucide-react";
 import { useRecentlyViewed } from "@/lib/recently-viewed";
+import { useI18n } from "@/lib/i18n";
 import { Reveal } from "./reveal";
 
 export function RecentlyViewed() {
   const items = useRecentlyViewed((s) => s.items);
   const hydrated = useRecentlyViewed((s) => s._hasHydrated);
   const clearAll = useRecentlyViewed((s) => s.clearAll);
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
 
   if (!hydrated || items.length === 0) return null;
 
@@ -20,14 +24,14 @@ export function RecentlyViewed() {
           <div className="flex items-center gap-2">
             <Clock className="size-4 text-violet-400" />
             <h2 className="text-sm font-pixel uppercase tracking-widest text-zinc-400">
-              Baru Saja Dilihat
+              {t("section.recentlyViewed")}
             </h2>
           </div>
           <button
             onClick={clearAll}
             className="inline-flex items-center gap-1 text-[10px] text-zinc-600 hover:text-red-400 transition-colors"
           >
-            <X className="size-3" /> Bersihkan
+            <X className="size-3" /> {t("common.clear")}
           </button>
         </div>
       </Reveal>

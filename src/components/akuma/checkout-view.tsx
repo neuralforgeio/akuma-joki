@@ -34,7 +34,7 @@ export function CheckoutView() {
 
   const MAX_ORDERS = 5;
   const orderCount = cartItems.length || (order ? 1 : 0);
-  const maxReached = orderCount >= MAX_ORDERS;
+  const maxReached = orderCount > MAX_ORDERS; // only block if MORE than 5 (shouldn't happen due to cart limit)
 
   if (!hydrated) { return <CheckoutSkeleton />; }
 
@@ -203,9 +203,7 @@ export function CheckoutView() {
                   </PixelButton>
 
                   <p className="text-center text-[10px] text-[#9a93a8]">
-                    {maxReached
-                      ? "Limit 5 joki tercapai. Hapus item untuk lanjut."
-                      : `Maksimal 5 joki per order · ${orderCount}/${MAX_ORDERS} terpakai`}
+                    Maksimal 5 joki per order · {orderCount}/{MAX_ORDERS} terpakai
                   </p>
                 </div>
               </div>

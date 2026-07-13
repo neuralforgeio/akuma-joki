@@ -3,6 +3,8 @@ import { HelpBanner } from "@/components/admin/help-tooltip";
 
 import Link from "next/link";
 import { useAdminStore, useTotalItems } from "@/lib/admin-store";
+import { useReviews } from "@/lib/reviews";
+import { useI18n } from "@/lib/i18n";
 import { PixelButton } from "@/components/akuma/pixel-button";
 import {
   Gamepad2,
@@ -25,15 +27,23 @@ export default function AdminDashboard() {
   const commits = useAdminStore((s) => s.commits);
   const activityLog = useAdminStore((s) => s.activityLog);
   const totalItems = useTotalItems();
+  const totalReviews = useReviews((s) => s.reviews.length);
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  // (the t function reference is stable and won't trigger re-render by itself)
+  useI18n((s) => s.lang);
 
   const totalVisitors = visitors.reduce((a, v) => a + v.count, 0);
   const newOrders = orders.filter((o) => o.status === "new").length;
+  // Suppress unused warnings — these are still useful for future enhancements
+  void totalItems;
+  void newOrders;
 
   const stats = [
-    { label: "Total Games", value: games.length, icon: Gamepad2, color: "#a020f0" },
-    { label: "Total Items", value: totalItems, icon: Package, color: "#25D366" },
-    { label: "Pesanan Baru", value: newOrders, icon: Package, color: "#ffd166" },
-    { label: "Visitors", value: totalVisitors, icon: Users, color: "#7fd4ff" },
+    { label: t("dash.totalGames"), value: games.length, icon: Gamepad2, color: "#a020f0" },
+    { label: t("dash.totalOrders"), value: orders.length, icon: Package, color: "#25D366" },
+    { label: t("dash.totalReviews"), value: totalReviews, icon: Package, color: "#ffd166" },
+    { label: t("dash.totalVisitors"), value: totalVisitors, icon: Users, color: "#7fd4ff" },
   ];
 
   return (
@@ -42,10 +52,10 @@ export default function AdminDashboard() {
       {/* header */}
       <div>
         <h1 className="font-pixel text-base sm:text-lg text-[#e5e5e5] text-glow-neon">
-          DASHBOARD
+          {t("dash.title").toUpperCase()}
         </h1>
         <p className="mt-1 text-sm text-[#9a93a8]">
-          Selamat datang kembali, admin AKUMA JOKI.
+          {t("dash.welcome")}, admin AKUMA JOKI.
         </p>
       </div>
 
@@ -106,12 +116,12 @@ export default function AdminDashboard() {
       {/* quick actions */}
       <div>
         <h2 className="mb-3 font-pixel text-[10px] uppercase tracking-wide text-[#c44bff]">
-          Quick Actions
+          {t("dash.quickActions")}
         </h2>
         <div className="flex flex-wrap gap-3">
           <PixelButton size="sm" asChild>
             <Link href="/admin/games">
-              <Gamepad2 className="size-3.5" /> Kelola Games
+              <Gamepad2 className="size-3.5" /> {t("dash.manageGames")}
             </Link>
           </PixelButton>
           <PixelButton size="sm" variant="silver" asChild>
@@ -138,13 +148,13 @@ export default function AdminDashboard() {
           <div className="mb-3 flex items-center gap-2">
             <Activity className="size-4 text-[#c44bff]" />
             <h3 className="font-pixel text-[9px] uppercase tracking-wide text-[#e5e5e5]">
-              Activity Log
+              {t("dash.recentActivity")}
             </h3>
           </div>
           <div className="max-h-64 space-y-2 overflow-y-auto">
             {activityLog.length === 0 ? (
               <p className="font-pixel text-[7px] uppercase text-[#5a5266] text-center py-4">
-                Belum ada aktivitas
+                {t("dash.noActivity")}
               </p>
             ) : (
               activityLog.slice(0, 10).map((a) => (

@@ -9,6 +9,7 @@ import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
 import type { Game } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
 import { useReviews } from "@/lib/reviews";
+import { useI18n } from "@/lib/i18n";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
 import { Starfield, MovingGrid } from "./backgrounds";
@@ -57,6 +58,10 @@ export function HomeView() {
   const adminGames = useAdminStore((s) => s.games);
   const hydrated = useAdminStore((s) => s._hasHydrated);
   const games: Game[] = hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  // (the t function reference is stable and won't trigger re-render by itself)
+  useI18n((s) => s.lang);
   const scrollToGames = () => gamesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
@@ -80,25 +85,25 @@ export function HomeView() {
             <AnimatedHeading />
 
             <p className="mt-6 max-w-xl text-base sm:text-lg text-zinc-400 leading-relaxed">
-              Joki & Store Roblox premium. Naik level, taklukkan raid, dan koleksi senjata langka bareng joki profesional kami. Aman, cepat, harga bersahabat.
+              {t("home.heroSubtitle")}
             </p>
 
             {/* CTAs */}
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
               <PixelButton size="lg" onClick={scrollToGames} className="w-full sm:w-auto">
-                <Gamepad2 className="size-4" /> Pilih Joki
+                <Gamepad2 className="size-4" /> {t("home.chooseJoki")}
               </PixelButton>
               <PixelButton size="lg" variant="silver" asChild className="w-full sm:w-auto">
-                <Link href="/store/blox-fruits">Lihat Store <ArrowRight className="size-4" /></Link>
+                <Link href="/store/blox-fruits">{t("home.viewStore")} <ArrowRight className="size-4" /></Link>
               </PixelButton>
             </div>
 
             {/* Stats */}
             <div className="mt-10 flex flex-wrap gap-6 sm:gap-10">
               {[
-                { value: "1.2K+", label: "Order Selesai" },
-                { value: "24/7", label: "Support" },
-                { value: "100%", label: "Aman" },
+                { value: "1.2K+", label: t("home.statsOrders") },
+                { value: "24/7", label: t("home.statsSupport") },
+                { value: "100%", label: t("home.statsSafe") },
               ].map((s) => (
                 <div key={s.label}>
                   <p className="text-2xl sm:text-3xl font-bold text-gradient">{s.value}</p>
@@ -123,7 +128,7 @@ export function HomeView() {
       <section ref={gamesRef} className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24">
         <div className="text-center mb-10">
           <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">PILIH GAME</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gradient">STORE GAME</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gradient">{t("home.storeGame")}</h2>
           <p className="mt-2 text-sm text-zinc-500">Pilih game favoritmu, lalu lihat daftar joki yang tersedia.</p>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
@@ -163,15 +168,15 @@ export function HomeView() {
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 border-t border-white/5">
         <div className="text-center mb-10">
           <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">KEUNGGULAN</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gradient">KENAPA PILIH AKUMA JOKI?</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gradient">{t("home.whyChoose")}</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { icon: ShieldCheck, title: "Aman & Terpercaya", desc: "Akunmu ditangani joki pro tanpa cheat. Garansi refund jika ada masalah.", color: "#8b5cf6" },
-            { icon: Zap, title: "Proses Cepat", desc: "Mulai dalam 5 menit setelah order. Update progres real-time via WhatsApp.", color: "#22d3ee" },
-            { icon: Wallet, title: "Harga Bersahabat", desc: "Mulai dari 2K. DP 50% di awal, pelunasan setelah joki selesai.", color: "#fbbf24" },
-            { icon: Flame, title: "Joki Berpengalaman", desc: "Tim joki dengan ribuan order selesai. Ahli di setiap game Roblox.", color: "#f472b6" },
-            { icon: Headphones, title: "Support 24/7", desc: "Admin selalu online untuk bantu kamu. Chat langsung via WhatsApp.", color: "#34d399" },
+            { icon: ShieldCheck, title: t("home.feature1Title"), desc: t("home.feature1Desc"), color: "#8b5cf6" },
+            { icon: Zap, title: t("home.feature2Title"), desc: t("home.feature2Desc"), color: "#22d3ee" },
+            { icon: Wallet, title: t("home.feature3Title"), desc: t("home.feature3Desc"), color: "#fbbf24" },
+            { icon: Flame, title: t("home.feature4Title"), desc: t("home.feature4Desc"), color: "#f472b6" },
+            { icon: Headphones, title: t("home.feature5Title"), desc: t("home.feature5Desc"), color: "#34d399" },
             { icon: Trophy, title: "Garansi Hasil", desc: "Jika item/level hilang dalam 24 jam, dikerjakan ulang gratis.", color: "#a78bfa" },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 60}>
@@ -191,8 +196,8 @@ export function HomeView() {
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 border-t border-white/5">
         <div className="text-center mb-10">
           <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">TESTIMONI</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gradient">KATA MEREKA YANG SUDAH JOKI</h2>
-          <p className="mt-2 text-xs text-zinc-600">Testimoni nyata dari pelanggan kami · Bukan data dummy</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gradient">{t("home.testimonials")}</h2>
+          <p className="mt-2 text-xs text-zinc-600">{t("home.testimonialsSub")}</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {/* Real reviews from store pages */}
@@ -218,10 +223,13 @@ export function HomeView() {
         <div className="relative overflow-hidden glass-strong rounded-3xl p-8 sm:p-12 text-center">
           <MovingGrid />
           <div className="relative">
-            <h3 className="text-xl sm:text-2xl font-bold text-gradient">SIAP JADI TOP PLAYER?</h3>
-            <p className="mt-3 text-sm text-zinc-400 max-w-lg mx-auto">Gas mulai sekarang. Pilih game, pilih joki, order via WhatsApp. Selesai!</p>
-            <div className="mt-6 flex justify-center">
-              <PixelButton size="lg" onClick={scrollToGames}><Gamepad2 className="size-4" /> Mulai Order</PixelButton>
+            <h3 className="text-xl sm:text-2xl font-bold text-gradient">{t("home.ctaTitle")}</h3>
+            <p className="mt-3 text-sm text-zinc-400 max-w-lg mx-auto">{t("home.ctaDesc")}</p>
+            <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+              <PixelButton size="lg" onClick={scrollToGames}><Gamepad2 className="size-4" /> {t("home.ctaButton1")}</PixelButton>
+              <PixelButton size="lg" variant="silver" asChild>
+                <Link href="/contact"><ArrowRight className="size-4" /> {t("home.ctaButton2")}</Link>
+              </PixelButton>
             </div>
           </div>
         </div>

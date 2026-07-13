@@ -9,6 +9,7 @@ import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
 import type { Game, ProductItem } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
 import { useWishlist } from "@/lib/wishlist";
+import { useI18n } from "@/lib/i18n";
 import { LanguageToggle } from "./language-toggle";
 import { NotificationBell } from "./notification-bell";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,10 @@ export function Navbar() {
   const games = hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
   const wishlistCount = useWishlist((s) => s.items.length);
   const wishlistHydrated = useWishlist((s) => s._hasHydrated);
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  // (the t function reference is stable and won't trigger re-render by itself)
+  useI18n((s) => s.lang);
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -132,9 +137,9 @@ export function Navbar() {
 
         {/* Desktop nav: Home → About → Games (dropdown) → Contact */}
         <div className="hidden md:flex items-center gap-1">
-          <NavLink active={isHome} href="/">Home</NavLink>
+          <NavLink active={isHome} href="/">{t("nav.home")}</NavLink>
           <NavLink active={isAbout} href="/about">
-            <span className="mr-1 inline-flex items-center"><Info className="size-3.5" /></span>About
+            <span className="mr-1 inline-flex items-center"><Info className="size-3.5" /></span>{t("nav.about")}
           </NavLink>
 
           {/* Games dropdown */}
@@ -143,7 +148,7 @@ export function Navbar() {
               type="button"
               onClick={() => setGamesOpen(v => !v)}
               onMouseEnter={() => setGamesOpen(true)}
-              aria-label="Daftar games"
+              aria-label={t("nav.games")}
               aria-expanded={gamesOpen}
               className={cn(
                 "relative inline-flex items-center gap-1 px-3.5 py-2 text-sm font-medium rounded-xl transition-all duration-300",
@@ -151,7 +156,7 @@ export function Navbar() {
               )}
             >
               <Gamepad2 className="size-3.5 mr-1" />
-              Games
+              {t("nav.games")}
               <ChevronDown className={cn("size-3.5 ml-0.5 transition-transform duration-300", gamesOpen && "rotate-180")} />
               {(isAnyStore || gamesOpen) && <span className="absolute -bottom-0.5 left-3 right-3 h-0.5 bg-gradient-to-r from-violet-500 to-violet-400 rounded-full" />}
             </button>
@@ -212,7 +217,7 @@ export function Navbar() {
           </div>
 
           <NavLink active={isContact} href="/contact">
-            <span className="mr-1 inline-flex items-center"><Bug className="size-3.5" /></span>Contact
+            <span className="mr-1 inline-flex items-center"><Bug className="size-3.5" /></span>{t("nav.contact")}
           </NavLink>
         </div>
 
@@ -229,7 +234,7 @@ export function Navbar() {
                 style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
               >
                 <div className="border-b border-white/8 p-3">
-                  <input ref={searchInputRef} type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cari game atau joki..." aria-label="Cari" className="w-full bg-transparent px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none" />
+                  <input ref={searchInputRef} type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("nav.searchPlaceholder")} aria-label="Cari" className="w-full bg-transparent px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none" />
                 </div>
                 <div className="max-h-72 overflow-y-auto">
                   {aiSearching && (
@@ -280,7 +285,7 @@ export function Navbar() {
             )}
           </Link>
           <Link href="/checkout" className={cn("hidden sm:inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-pixel uppercase tracking-wide transition-all duration-300", isCheckout ? "bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-[0_4px_20px_-4px_rgba(139,92,246,0.5)]" : "bg-white/5 text-zinc-300 border border-white/10 hover:bg-white/10 backdrop-blur-sm")}>
-            🛒 Checkout
+            🛒 {t("nav.checkout")}
           </Link>
 
           {/* Mobile toggle */}
@@ -297,7 +302,7 @@ export function Navbar() {
           className="glass-nav-strong rounded-2xl p-4 space-y-2 backdrop-blur-xl"
           style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
         >
-          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cari game atau joki..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none mb-2" />
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("nav.searchPlaceholder")} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none mb-2" />
           {searchQuery && searchResults.length > 0 && (
             <div className="space-y-1 mb-2">{searchResults.slice(0, 5).map((r, i) => (
               <Link key={`m-${i}`} href={r.href} onClick={() => { setMobileOpen(false); setSearchQuery(""); }} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
@@ -306,15 +311,15 @@ export function Navbar() {
               </Link>
             ))}</div>
           )}
-          <MobileLink active={isHome} href="/" onClick={() => setMobileOpen(false)}>🏠 Home</MobileLink>
-          <MobileLink active={isAbout} href="/about" onClick={() => setMobileOpen(false)}>ℹ️ About</MobileLink>
+          <MobileLink active={isHome} href="/" onClick={() => setMobileOpen(false)}>🏠 {t("nav.home")}</MobileLink>
+          <MobileLink active={isAbout} href="/about" onClick={() => setMobileOpen(false)}>ℹ️ {t("nav.about")}</MobileLink>
 
           {/* Games collapsible in mobile */}
           <button
             onClick={() => setMobileGamesOpen(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-zinc-300 hover:bg-white/5 border border-transparent"
           >
-            <span className="flex items-center gap-2"><Gamepad2 className="size-4" /> Games</span>
+            <span className="flex items-center gap-2"><Gamepad2 className="size-4" /> {t("nav.games")}</span>
             <ChevronDown className={cn("size-4 transition-transform", mobileGamesOpen && "rotate-180")} />
           </button>
           {mobileGamesOpen && (
@@ -336,9 +341,9 @@ export function Navbar() {
             </div>
           )}
 
-          <MobileLink active={isContact} href="/contact" onClick={() => setMobileOpen(false)}>🐛 Contact</MobileLink>
-          <MobileLink active={pathname === "/wishlist"} href="/wishlist" onClick={() => setMobileOpen(false)}>❤️ Wishlist {wishlistHydrated && wishlistCount > 0 && `(${wishlistCount})`}</MobileLink>
-          <MobileLink active={isCheckout} href="/checkout" onClick={() => setMobileOpen(false)}>🛒 Checkout</MobileLink>
+          <MobileLink active={isContact} href="/contact" onClick={() => setMobileOpen(false)}>🐛 {t("nav.contact")}</MobileLink>
+          <MobileLink active={pathname === "/wishlist"} href="/wishlist" onClick={() => setMobileOpen(false)}>❤️ {t("nav.wishlist")} {wishlistHydrated && wishlistCount > 0 && `(${wishlistCount})`}</MobileLink>
+          <MobileLink active={isCheckout} href="/checkout" onClick={() => setMobileOpen(false)}>🛒 {t("nav.checkout")}</MobileLink>
         </div>
       </div>
     </header>

@@ -118,18 +118,18 @@ export function StoreView({ game }: { game: Game }) {
       category: selectedItem.category,
     });
     if (!success) {
-      // Cart full (5 items) or duplicate
       const isDuplicate = cartHas(`${game.slug}-${selectedItem.item.id}`);
+      // Close item modal FIRST, then show limit/duplicate message
+      setSelectedItem(null);
       if (isDuplicate) {
         toast({ title: "Item sudah ada di keranjang", variant: "destructive" });
       } else {
-        // Show limit modal
-        setCartLimitModal(true);
+        // Show limit modal after item modal closes
+        setTimeout(() => setCartLimitModal(true), 100);
       }
       return;
     }
     setSelectedItem(null);
-    // Toast notification, NOT redirect
     toast({ title: "Ditambahkan ke keranjang! 🛒", description: `${selectedItem.item.name} (${selectedItem.item.priceLabel})` });
   };
 
