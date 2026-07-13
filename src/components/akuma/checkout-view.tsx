@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  ArrowLeft, ShoppingBag, User, Lock, MessageCircle, AlertTriangle,
+  ArrowLeft, ShoppingBag, User, Lock, MessageCircle,
   Gamepad2, Trash2, ShieldCheck, Eye, EyeOff, ShoppingCart,
 } from "lucide-react";
 import { useAkumaStore, useHasHydrated } from "@/lib/store";
@@ -369,38 +369,63 @@ function TrustBadge({ icon, text }: { icon: React.ReactNode; text: string }) {
 
 function EmptyOrder() {
   return (
-    <div className="mx-auto max-w-2xl text-center">
-      <div className="relative inline-block">
-        <div className="relative h-24 w-48 sm:h-28 sm:w-56 logo-glow rounded-md mx-auto float-slow overflow-hidden">
-          <Image
-            src="/akuma-logo.png"
-            alt="AKUMA JOKI"
-            fill
-            sizes="(min-width: 640px) 224px, 192px"
-            className="object-contain"
-          />
+    <div className="max-w-2xl mx-auto">
+      {/* Hero card — centered, e-commerce style empty state */}
+      <div className="glass-nav-strong rounded-3xl p-8 sm:p-12 text-center" style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}>
+        {/* Illustration */}
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-violet-500/5 border border-violet-500/30">
+          <ShoppingBag className="size-10 text-violet-400" />
+        </div>
+
+        {/* Title */}
+        <h2 className="text-xl sm:text-2xl font-bold text-zinc-100">
+          Keranjang Anda Kosong
+        </h2>
+        <p className="mt-2 text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
+          Belum ada joki yang dipilih. Jelajahi store dan pilih joki favorit kamu untuk mulai order.
+        </p>
+
+        {/* Quick stats / suggestions */}
+        <div className="mt-6 grid grid-cols-3 gap-3 max-w-md mx-auto">
+          <div className="glass rounded-xl p-3">
+            <ShieldCheck className="mx-auto size-5 text-violet-400 mb-1" />
+            <p className="text-[10px] text-zinc-500">Aman</p>
+          </div>
+          <div className="glass rounded-xl p-3">
+            <Gamepad2 className="mx-auto size-5 text-cyan-400 mb-1" />
+            <p className="text-[10px] text-zinc-500">Pro Cepat</p>
+          </div>
+          <div className="glass rounded-xl p-3">
+            <MessageCircle className="mx-auto size-5 text-green-400 mb-1" />
+            <p className="text-[10px] text-zinc-500">24/7</p>
+          </div>
+        </div>
+
+        {/* CTAs */}
+        <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <PixelButton size="lg" asChild>
+            <Link href="/store/blox-fruits">
+              <Gamepad2 className="size-4" />
+              Pilih Joki Sekarang
+            </Link>
+          </PixelButton>
+          <PixelButton size="lg" variant="silver" asChild>
+            <Link href="/">Kembali ke Beranda</Link>
+          </PixelButton>
         </div>
       </div>
-      <div className="mt-8 inline-flex items-center gap-2 border-2 border-[#ff3b6b]/60 bg-[#ff3b6b]/10 px-4 py-2 pixel-corner">
-        <AlertTriangle className="size-4 text-[#ff3b6b]" />
-        <span className="font-pixel text-[9px] uppercase text-[#ff8aa3]">Belum ada order</span>
-      </div>
-      <h2 className="mt-6 font-pixel text-base sm:text-xl text-[#e5e5e5] text-glow-neon leading-relaxed">
-        ANDA BELUM MEMILIH JOKI APAPUN!
-      </h2>
-      <p className="mt-4 text-sm text-[#bcb4c9] max-w-md mx-auto">
-        Silakan pilih joki terlebih dahulu dari store game untuk melanjutkan ke proses checkout.
-      </p>
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-        <PixelButton size="lg" asChild>
-          <Link href="/store/blox-fruits">
-            <Gamepad2 className="size-4" />
-            Pilih Joki Sekarang
-          </Link>
-        </PixelButton>
-        <PixelButton size="lg" variant="silver" asChild>
-          <Link href="/">Kembali ke Beranda</Link>
-        </PixelButton>
+
+      {/* Trust badges */}
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[10px] text-zinc-600">
+        <span className="inline-flex items-center gap-1.5">
+          <ShieldCheck className="size-3.5 text-violet-400" /> Garansi Aman
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <MessageCircle className="size-3.5 text-green-400" /> CS Responsif
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Gamepad2 className="size-3.5 text-cyan-400" /> Joki Pro
+        </span>
       </div>
     </div>
   );

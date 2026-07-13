@@ -8,6 +8,7 @@ import { HelpBanner } from "@/components/admin/help-tooltip";
 import {
   Rocket, RefreshCw, FileText, Settings, Trash2, Plus,
   CheckCircle2, XCircle, Clock, ExternalLink, GitBranch, AlertCircle, Activity,
+  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,11 +18,18 @@ type Deployment = {
   state: string;
   created: number;
   ready: number | null;
+  building: number | null;
   source: string;
   commit: string | null;
-  branch: string | null;
+  commitSha: string | null;
+  commitRef: string | null;
   author: string | null;
+  authorAvatar: string | null;
   target: string | null;
+  alias: string[];
+  inspectorUrl: string | null;
+  memoryUsage: number | null;
+  duration: number | null;
 };
 
 type EnvVar = {
@@ -33,13 +41,7 @@ type EnvVar = {
   updatedBy?: string;
 };
 
-type Status = {
-  ok: boolean;
-  username?: string;
-  project?: any;
-  deployments?: Deployment[];
-  error?: string;
-};
+type LogEntry = { type: string; text: string; ts: number };
 
 const STATE_META: Record<string, { color: string; bg: string; label: string; icon: typeof CheckCircle2 }> = {
   READY: { color: "#10b981", bg: "rgba(16,185,129,0.1)", label: "Ready", icon: CheckCircle2 },
@@ -47,6 +49,7 @@ const STATE_META: Record<string, { color: string; bg: string; label: string; ico
   ERROR: { color: "#ef4444", bg: "rgba(239,68,68,0.1)", label: "Error", icon: XCircle },
   QUEUED: { color: "#22d3ee", bg: "rgba(34,211,238,0.1)", label: "Queued", icon: Clock },
   CANCELED: { color: "#71717a", bg: "rgba(113,113,122,0.1)", label: "Canceled", icon: XCircle },
+  INITIALIZING: { color: "#a78bfa", bg: "rgba(167,139,250,0.1)", label: "Initializing", icon: Clock },
 };
 
 function formatTime(ts: number) {
@@ -61,20 +64,31 @@ function formatRelative(ts: number) {
   return `${Math.floor(diff / 86400000)}d ago`;
 }
 
+function formatDuration(ms: number | null) {
+  if (!ms) return "-";
+  if (ms < 1000) return `${ms}ms`;
+  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+  return `${Math.floor(ms / 60000)}m ${Math.floor((ms % 60000) / 1000)}s`;
+}
+
+const PROJECT_URL = "https://akuma-joki.vercel.app/";
+
 export default function DevVercelPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [authorized, setAuthorized] = useState(false);
-  const [status, setStatus] = useState<Status | null>(null);
+  const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [loading, setLoading] = useState(false);
   const [deploying, setDeploying] = useState(false);
-  const [logs, setLogs] = useState<{ deploymentId: string; logs: any[] } | null>(null);
+  const [selectedDep, setSelectedDep] = useState<Deployment | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [envs, setEnvs] = useState<EnvVar[]>([]);
   const [envLoading, setEnvLoading] = useState(false);
   const [newEnvKey, setNewEnvKey] = useState("");
   const [newEnvValue, setNewEnvValue] = useState("");
   const [addingEnv, setAddingEnv] = useState(false);
+  const [activeView, setActiveView] = useState<"deployments" | "env" | "project">("deployments");
 
   useEffect(() => {
     if (!isDeveloper()) {
@@ -83,22 +97,23 @@ export default function DevVercelPage() {
       return;
     }
     setAuthorized(true);
-    fetchStatus();
+    fetchDeployments();
     fetchEnvs();
   }, [router, toast]);
 
-  const fetchStatus = useCallback(async () => {
+  const fetchDeployments = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/vercel/status", { cache: "no-store" });
+      const res = await fetch("/api/vercel/deployments?limit=30", { cache: "no-store" });
       const data = await res.json();
-      setStatus(data);
+      if (data.ok) setDeployments(data.deployments);
+      else toast({ title: data.error || "Failed to fetch deployments", variant: "destructive" });
     } catch {
-      setStatus({ ok: false, error: "Failed to fetch status" });
+      toast({ title: "Failed to fetch deployments", variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   const fetchEnvs = useCallback(async () => {
     setEnvLoading(true);
@@ -110,17 +125,14 @@ export default function DevVercelPage() {
     finally { setEnvLoading(false); }
   }, []);
 
-  const fetchLogs = useCallback(async (deploymentId?: string) => {
+  const fetchLogs = useCallback(async (deploymentId: string) => {
     setLogsLoading(true);
+    setLogs([]);
     try {
-      const url = deploymentId ? `/api/vercel/logs?deploymentId=${deploymentId}` : "/api/vercel/logs";
-      const res = await fetch(url, { cache: "no-store" });
+      const res = await fetch(`/api/vercel/logs?deploymentId=${deploymentId}&limit=100`, { cache: "no-store" });
       const data = await res.json();
-      if (data.ok) {
-        setLogs({ deploymentId: data.deploymentId, logs: data.logs });
-      } else {
-        toast({ title: data.error || "Failed to fetch logs", variant: "destructive" });
-      }
+      if (data.ok) setLogs(data.logs);
+      else toast({ title: data.error || "Failed to fetch logs", variant: "destructive" });
     } catch {
       toast({ title: "Failed to fetch logs", variant: "destructive" });
     } finally {
@@ -139,7 +151,7 @@ export default function DevVercelPage() {
       const data = await res.json();
       if (data.ok) {
         toast({ title: `✅ ${data.message}`, description: data.url ? `URL: ${data.url}` : undefined });
-        setTimeout(() => fetchStatus(), 2000);
+        setTimeout(() => fetchDeployments(), 3000);
       } else {
         toast({ title: data.error || "Deploy failed", variant: "destructive" });
       }
@@ -194,6 +206,11 @@ export default function DevVercelPage() {
     }
   };
 
+  const handleSelectDeployment = (dep: Deployment) => {
+    setSelectedDep(dep);
+    fetchLogs(dep.uid);
+  };
+
   if (!authorized) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -202,42 +219,67 @@ export default function DevVercelPage() {
     );
   }
 
+  // Stats
+  const stats = {
+    total: deployments.length,
+    ready: deployments.filter(d => d.state === "READY").length,
+    building: deployments.filter(d => d.state === "BUILDING" || d.state === "INITIALIZING" || d.state === "QUEUED").length,
+    errors: deployments.filter(d => d.state === "ERROR").length,
+  };
+
   return (
     <div className="space-y-5">
       <HelpBanner
         title="Vercel Control"
-        description="Kelola deployment, logs, dan env vars Vercel project AKUMA JOKI langsung dari dashboard. Pakai Vercel API."
+        description="Kelola deployment AKUMA JOKI (akuma-joki.vercel.app). Full control untuk developer."
         tips={[
-          "Token: akuma_joki_token (di-set di Vercel project env vars)",
-          "Status: lihat deployment terbaru & build state",
-          "Deploy: trigger redeploy atau deploy dari git ref",
-          "Logs: lihat build logs (stdout/stderr)",
-          "Env: tambah/hapus env vars (production/preview/dev)",
+          "Deployments: klik deployment mana pun untuk lihat detail & logs",
+          "Trigger deploy: redeploy latest atau deploy dari git ref",
+          "Env vars: tambah/hapus env vars (production/preview/dev)",
+          "Project info: URL, framework, target deployments",
+          "Token: akuma_joki_token (di Vercel project env vars)",
         ]}
       />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gradient">Vercel Control</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            {status?.ok && status.username ? `Connected as @${status.username}` : "Not connected"}
-            {status?.project?.name ? ` · Project: ${status.project.name}` : ""}
+          <p className="mt-1 text-sm text-zinc-500 flex items-center gap-2 flex-wrap">
+            <a href={PROJECT_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-cyan-400 hover:underline">
+              <Globe className="size-3.5" /> akuma-joki.vercel.app
+            </a>
+            <span className="text-zinc-700">·</span>
+            <span>{stats.total} deployments</span>
+            <span className="text-zinc-700">·</span>
+            <span className="text-green-400">{stats.ready} ready</span>
+            {stats.building > 0 && <><span className="text-zinc-700">·</span><span className="text-yellow-400">{stats.building} building</span></>}
+            {stats.errors > 0 && <><span className="text-zinc-700">·</span><span className="text-red-400">{stats.errors} errors</span></>}
           </p>
         </div>
-        <button
-          onClick={fetchStatus}
-          disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 transition-all disabled:opacity-50"
-        >
-          <RefreshCw className={cn("size-4", loading && "animate-spin")} /> Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <a
+            href={PROJECT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-3 py-2 text-sm text-green-400 hover:bg-green-500/20 transition-all"
+          >
+            <ExternalLink className="size-4" /> Live
+          </a>
+          <button
+            onClick={fetchDeployments}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-zinc-300 hover:bg-white/10 transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={cn("size-4", loading && "animate-spin")} /> Refresh
+          </button>
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid sm:grid-cols-3 gap-3">
         <button
           onClick={() => handleDeploy("redeploy")}
-          disabled={deploying || loading}
+          disabled={deploying}
           className="glass rounded-2xl p-4 text-left hover:border-violet-500/30 transition-all disabled:opacity-50"
         >
           <div className="flex items-center gap-3">
@@ -250,10 +292,9 @@ export default function DevVercelPage() {
             </div>
           </div>
         </button>
-
         <button
           onClick={() => handleDeploy("deploy-git", "main")}
-          disabled={deploying || loading}
+          disabled={deploying}
           className="glass rounded-2xl p-4 text-left hover:border-cyan-500/30 transition-all disabled:opacity-50"
         >
           <div className="flex items-center gap-3">
@@ -266,9 +307,8 @@ export default function DevVercelPage() {
             </div>
           </div>
         </button>
-
         <a
-          href={`https://vercel.com/dashboard`}
+          href="https://vercel.com/dashboard"
           target="_blank"
           rel="noopener noreferrer"
           className="glass rounded-2xl p-4 hover:border-white/20 transition-all"
@@ -285,184 +325,345 @@ export default function DevVercelPage() {
         </a>
       </div>
 
-      {/* Deployments */}
-      <div className="glass rounded-2xl p-5">
-        <div className="mb-4 flex items-center gap-2">
-          <Activity className="size-4 text-violet-400" />
-          <h2 className="text-sm font-semibold text-zinc-100">Recent Deployments</h2>
-        </div>
-        {!status || loading ? (
-          <p className="text-sm text-zinc-500 py-6 text-center">Loading deployments...</p>
-        ) : !status.ok ? (
-          <div className="glass rounded-xl p-4 border-red-500/20">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="size-4 text-red-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm text-red-400">Failed to load status</p>
-                <p className="text-[10px] text-zinc-500 mt-1">{status.error}</p>
-              </div>
-            </div>
-          </div>
-        ) : !status.deployments || status.deployments.length === 0 ? (
-          <p className="text-sm text-zinc-500 py-6 text-center">No deployments found</p>
-        ) : (
-          <div className="space-y-2 max-h-80 overflow-y-auto akuma-scroll">
-            {status.deployments.map((d) => {
-              const meta = STATE_META[d.state] || STATE_META.READY;
-              const StateIcon = meta.icon;
-              return (
-                <div key={d.uid} className="glass rounded-xl p-3 flex items-center gap-3">
-                  <div
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: meta.bg, color: meta.color }}
-                  >
-                    <StateIcon className="size-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-zinc-100 truncate">
-                      {d.commit || `${d.source} · ${formatTime(d.created)}`}
-                    </p>
-                    <p className="text-[10px] text-zinc-500">
-                      {d.branch && <span>{d.branch} · </span>}
-                      {d.author && <span>@{d.author} · </span>}
-                      {formatRelative(d.created)}
-                      {d.target === "production" && <span className="text-violet-400"> · PROD</span>}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <a
-                      href={`https://${d.url}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-lg p-1.5 text-zinc-500 hover:text-violet-400 hover:bg-white/5 transition-all"
-                      aria-label="Open deployment"
-                    >
-                      <ExternalLink className="size-3.5" />
-                    </a>
-                    <button
-                      onClick={() => fetchLogs(d.uid)}
-                      className="rounded-lg p-1.5 text-zinc-500 hover:text-cyan-400 hover:bg-white/5 transition-all"
-                      aria-label="View logs"
-                    >
-                      <FileText className="size-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+      {/* View tabs */}
+      <div className="flex gap-1.5 border-b border-white/8 pb-1">
+        {[
+          { id: "deployments" as const, label: "Deployments", icon: Activity },
+          { id: "env" as const, label: "Env Vars", icon: Settings },
+          { id: "project" as const, label: "Project Info", icon: Globe },
+        ].map(t => {
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveView(t.id)}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-4 py-2 rounded-t-lg text-sm font-medium transition-all",
+                activeView === t.id ? "bg-violet-500/10 text-violet-400 border-b-2 border-violet-500" : "text-zinc-500 hover:text-zinc-300"
+              )}
+            >
+              <Icon className="size-4" /> {t.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Logs */}
-      {logs && (
-        <div className="glass rounded-2xl p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="size-4 text-cyan-400" />
-              <h2 className="text-sm font-semibold text-zinc-100">Build Logs</h2>
-              <span className="text-[10px] text-zinc-500 font-mono">{logs.deploymentId.slice(0, 12)}</span>
+      {/* DEPLOYMENTS VIEW */}
+      {activeView === "deployments" && (
+        <div className="grid lg:grid-cols-5 gap-4">
+          {/* Deployments list (left) */}
+          <div className={cn("glass rounded-2xl p-4", selectedDep ? "lg:col-span-2" : "lg:col-span-5")}>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="size-4 text-violet-400" />
+                <h2 className="text-sm font-semibold text-zinc-100">All Deployments</h2>
+                <span className="text-[10px] text-zinc-500">({deployments.length})</span>
+              </div>
             </div>
-            <button onClick={() => setLogs(null)} className="text-zinc-500 hover:text-zinc-300 text-xl leading-none">×</button>
+            {loading ? (
+              <p className="text-sm text-zinc-500 py-8 text-center">Loading...</p>
+            ) : deployments.length === 0 ? (
+              <p className="text-sm text-zinc-500 py-8 text-center">No deployments found</p>
+            ) : (
+              <div className="space-y-1.5 max-h-[600px] overflow-y-auto akuma-scroll">
+                {deployments.map(d => {
+                  const meta = STATE_META[d.state] || STATE_META.READY;
+                  const StateIcon = meta.icon;
+                  const isSelected = selectedDep?.uid === d.uid;
+                  return (
+                    <button
+                      key={d.uid}
+                      onClick={() => handleSelectDeployment(d)}
+                      className={cn(
+                        "w-full text-left rounded-xl p-3 transition-all border",
+                        isSelected ? "bg-violet-500/10 border-violet-500/40" : "bg-white/3 border-transparent hover:bg-white/5 hover:border-white/10"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                          style={{ backgroundColor: meta.bg, color: meta.color }}
+                        >
+                          <StateIcon className="size-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-zinc-100 truncate">
+                            {d.commit || `${d.source} · ${formatTime(d.created)}`}
+                          </p>
+                          <p className="text-[10px] text-zinc-500 flex items-center gap-1.5 flex-wrap">
+                            {d.commitRef && <span className="inline-flex items-center gap-0.5"><GitBranch className="size-2.5" />{d.commitRef}</span>}
+                            <span>·</span>
+                            <span>{formatRelative(d.created)}</span>
+                            {d.target === "production" && <span className="text-violet-400 font-semibold">· PROD</span>}
+                          </p>
+                        </div>
+                        <ChevronRight className="size-4 text-zinc-600 shrink-0" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-          {logsLoading ? (
-            <p className="text-sm text-zinc-500 py-6 text-center">Loading logs...</p>
-          ) : (
-            <div className="bg-black/40 rounded-xl p-3 h-64 overflow-y-auto akuma-scroll font-mono text-[11px] space-y-0.5">
-              {logs.logs.length === 0 ? (
-                <p className="text-zinc-600 text-center py-4">No logs available</p>
-              ) : (
-                logs.logs.map((log, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "whitespace-pre-wrap break-all",
-                      log.type === "stderr" ? "text-red-400" : log.type === "exit" ? "text-yellow-400" : "text-green-400"
-                    )}
-                  >
-                    {log.text}
+
+          {/* Detail view (right) */}
+          {selectedDep && (
+            <div className="lg:col-span-3 space-y-4">
+              {/* Back button (mobile) */}
+              <button
+                onClick={() => { setSelectedDep(null); setLogs([]); }}
+                className="lg:hidden inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200"
+              >
+                <ArrowLeft className="size-3.5" /> Back to list
+              </button>
+
+              {/* Deployment info */}
+              <div className="glass rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const meta = STATE_META[selectedDep.state] || STATE_META.READY;
+                      const StateIcon = meta.icon;
+                      return (
+                        <>
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: meta.bg, color: meta.color }}>
+                            <StateIcon className="size-4" />
+                          </div>
+                          <span className="text-sm font-semibold text-zinc-100">{meta.label}</span>
+                        </>
+                      );
+                    })()}
                   </div>
-                ))
-              )}
+                  <div className="flex items-center gap-1">
+                    <a
+                      href={`https://${selectedDep.url}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded-lg bg-green-500/10 border border-green-500/30 px-2.5 py-1.5 text-[11px] text-green-400 hover:bg-green-500/20 transition-all"
+                    >
+                      <ExternalLink className="size-3" /> Visit
+                    </a>
+                    {selectedDep.inspectorUrl && (
+                      <a
+                        href={selectedDep.inspectorUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 px-2.5 py-1.5 text-[11px] text-cyan-400 hover:bg-cyan-500/20 transition-all"
+                      >
+                        <Code className="size-3" /> Inspector
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {selectedDep.commit && (
+                    <InfoRow icon={GitBranch} label="Commit" value={selectedDep.commit} />
+                  )}
+                  {selectedDep.commitSha && (
+                    <InfoRow icon={Code} label="SHA" value={selectedDep.commitSha.slice(0, 12)} mono />
+                  )}
+                  {selectedDep.author && (
+                    <InfoRow icon={User} label="Author" value={selectedDep.author} avatar={selectedDep.authorAvatar} />
+                  )}
+                  <InfoRow icon={Clock} label="Created" value={formatTime(selectedDep.created)} />
+                  {selectedDep.ready && (
+                    <InfoRow icon={CheckCircle2} label="Ready" value={formatTime(selectedDep.ready)} />
+                  )}
+                  {selectedDep.duration && (
+                    <InfoRow icon={Timer} label="Duration" value={formatDuration(selectedDep.duration)} />
+                  )}
+                  {selectedDep.memoryUsage && (
+                    <InfoRow icon={MemoryStick} label="Memory" value={`${(selectedDep.memoryUsage / 1024 / 1024).toFixed(1)} MB`} />
+                  )}
+                  {selectedDep.target && (
+                    <InfoRow icon={Rocket} label="Target" value={selectedDep.target} badge />
+                  )}
+                  {selectedDep.alias.length > 0 && (
+                    <InfoRow icon={Globe} label="Alias" value={selectedDep.alias.join(", ")} />
+                  )}
+                </div>
+              </div>
+
+              {/* Logs */}
+              <div className="glass rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <FileText className="size-4 text-cyan-400" />
+                    <h2 className="text-sm font-semibold text-zinc-100">Build Logs</h2>
+                    <span className="text-[10px] text-zinc-500 font-mono">({logs.length})</span>
+                  </div>
+                  <button
+                    onClick={() => fetchLogs(selectedDep.uid)}
+                    disabled={logsLoading}
+                    className="text-[10px] text-zinc-500 hover:text-zinc-300"
+                  >
+                    {logsLoading ? "Loading..." : "Refresh"}
+                  </button>
+                </div>
+                {logsLoading ? (
+                  <p className="text-sm text-zinc-500 py-8 text-center">Loading logs...</p>
+                ) : logs.length === 0 ? (
+                  <p className="text-sm text-zinc-500 py-8 text-center">No logs available</p>
+                ) : (
+                  <div className="bg-black/40 rounded-xl p-3 h-80 overflow-y-auto akuma-scroll font-mono text-[11px] space-y-0.5">
+                    {logs.map((log, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "whitespace-pre-wrap break-all",
+                          log.type === "stderr" ? "text-red-400" : log.type === "exit" ? "text-yellow-400" : log.type === "command" ? "text-cyan-400" : "text-green-400"
+                        )}
+                      >
+                        {log.text}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Env Vars */}
-      <div className="glass rounded-2xl p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Settings className="size-4 text-amber-400" />
-            <h2 className="text-sm font-semibold text-zinc-100">Environment Variables</h2>
-            <span className="text-[10px] text-zinc-500">({envs.length})</span>
-          </div>
-          <button
-            onClick={fetchEnvs}
-            disabled={envLoading}
-            className="text-[10px] text-zinc-500 hover:text-zinc-300"
-          >
-            {envLoading ? "Loading..." : "Refresh"}
-          </button>
-        </div>
-
-        {/* Add new env */}
-        <div className="glass rounded-xl p-3 mb-3 space-y-2">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newEnvKey}
-              onChange={(e) => setNewEnvKey(e.target.value)}
-              placeholder="KEY (mis. DATABASE_URL)"
-              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 font-mono outline-none focus:border-violet-500/40"
-            />
-            <input
-              type="password"
-              value={newEnvValue}
-              onChange={(e) => setNewEnvValue(e.target.value)}
-              placeholder="value"
-              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40"
-            />
+      {/* ENV VARS VIEW */}
+      {activeView === "env" && (
+        <div className="glass rounded-2xl p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Settings className="size-4 text-amber-400" />
+              <h2 className="text-sm font-semibold text-zinc-100">Environment Variables</h2>
+              <span className="text-[10px] text-zinc-500">({envs.length})</span>
+            </div>
             <button
-              onClick={handleAddEnv}
-              disabled={addingEnv}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-violet-500/20 border border-violet-500/30 px-3 py-2 text-sm text-violet-400 hover:bg-violet-500/30 transition-all disabled:opacity-50"
+              onClick={fetchEnvs}
+              disabled={envLoading}
+              className="text-[10px] text-zinc-500 hover:text-zinc-300"
             >
-              <Plus className="size-3.5" /> Add
+              {envLoading ? "Loading..." : "Refresh"}
             </button>
           </div>
-          <p className="text-[10px] text-zinc-600">
-            Value di-encrypt oleh Vercel. Tidak bisa dilihat setelah disimpan (security).
-          </p>
-        </div>
 
-        {/* Env list */}
-        {envs.length === 0 ? (
-          <p className="text-sm text-zinc-500 py-4 text-center">
-            {envLoading ? "Loading..." : "No env vars found"}
-          </p>
-        ) : (
-          <div className="space-y-1.5 max-h-60 overflow-y-auto akuma-scroll">
-            {envs.map((e) => (
-              <div key={e.id} className="glass rounded-lg px-3 py-2 flex items-center gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-zinc-100 font-mono truncate">{e.key}</p>
-                  <p className="text-[10px] text-zinc-600">
-                    {e.type} · {e.target.join(", ")} · {formatTime(new Date(e.createdAt).getTime())}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleDeleteEnv(e.id, e.key)}
-                  className="rounded-lg p-1.5 text-zinc-500 hover:text-red-400 hover:bg-white/5 transition-all shrink-0"
-                  aria-label="Hapus"
-                >
-                  <Trash2 className="size-3.5" />
-                </button>
-              </div>
-            ))}
+          <div className="glass rounded-xl p-3 mb-3 space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newEnvKey}
+                onChange={(e) => setNewEnvKey(e.target.value)}
+                placeholder="KEY (mis. DATABASE_URL)"
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 font-mono outline-none focus:border-violet-500/40"
+              />
+              <input
+                type="password"
+                value={newEnvValue}
+                onChange={(e) => setNewEnvValue(e.target.value)}
+                placeholder="value"
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40"
+              />
+              <button
+                onClick={handleAddEnv}
+                disabled={addingEnv}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-violet-500/20 border border-violet-500/30 px-3 py-2 text-sm text-violet-400 hover:bg-violet-500/30 transition-all disabled:opacity-50"
+              >
+                <Plus className="size-3.5" /> Add
+              </button>
+            </div>
+            <p className="text-[10px] text-zinc-600">
+              Value di-encrypt oleh Vercel. Tidak bisa dilihat setelah disimpan (security).
+            </p>
           </div>
-        )}
+
+          {envs.length === 0 ? (
+            <p className="text-sm text-zinc-500 py-4 text-center">
+              {envLoading ? "Loading..." : "No env vars found"}
+            </p>
+          ) : (
+            <div className="space-y-1.5">
+              {envs.map(e => (
+                <div key={e.id} className="glass rounded-lg px-3 py-2 flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-zinc-100 font-mono truncate">{e.key}</p>
+                    <p className="text-[10px] text-zinc-600">
+                      {e.type} · {e.target.join(", ")} · {formatTime(new Date(e.createdAt).getTime())}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteEnv(e.id, e.key)}
+                    className="rounded-lg p-1.5 text-zinc-500 hover:text-red-400 hover:bg-white/5 transition-all shrink-0"
+                    aria-label="Hapus"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PROJECT INFO VIEW */}
+      {activeView === "project" && (
+        <div className="glass rounded-2xl p-5 space-y-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Globe className="size-4 text-cyan-400" />
+            <h2 className="text-sm font-semibold text-zinc-100">Project Info</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <InfoCard label="Production URL" value={PROJECT_URL} link />
+            <InfoCard label="Project Name" value="akuma-joki" />
+            <InfoCard label="Framework" value="Next.js" />
+            <InfoCard label="Repository" value="luminarydearx/akuma-joki" link="https://github.com/luminarydearx/akuma-joki" />
+            <InfoCard label="Branch" value="main" />
+            <InfoCard label="Token Env" value="akuma_joki_token" mono />
+          </div>
+          <div className="glass rounded-xl p-3 mt-3">
+            <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Quick Links</p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <a href={PROJECT_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-green-500/10 border border-green-500/30 px-3 py-1.5 text-xs text-green-400 hover:bg-green-500/20 transition-all">
+                <ExternalLink className="size-3" /> Live Site
+              </a>
+              <a href="https://github.com/luminarydearx/akuma-joki" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 transition-all">
+                <GitBranch className="size-3" /> GitHub
+              </a>
+              <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 transition-all">
+                <ExternalLink className="size-3" /> Vercel Dashboard
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InfoRow({ icon: Icon, label, value, mono, badge, avatar }: { icon: typeof Code; label: string; value: string; mono?: boolean; badge?: boolean; avatar?: string | null }) {
+  return (
+    <div className="flex items-center gap-3 py-1.5 border-b border-white/5 last:border-0">
+      <Icon className="size-3.5 text-zinc-500 shrink-0" />
+      <span className="text-[11px] text-zinc-500 uppercase tracking-wider w-20 shrink-0">{label}</span>
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        {avatar && <img src={avatar} alt="" className="size-4 rounded-full" />}
+        <span className={cn("text-sm text-zinc-100 truncate", mono && "font-mono text-cyan-400")}>
+          {badge ? <span className="px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400 text-[10px] uppercase">{value}</span> : value}
+        </span>
       </div>
+    </div>
+  );
+}
+
+function InfoCard({ label, value, link, mono }: { label: string; value: string; link?: boolean | string; mono?: boolean }) {
+  const isLink = link === true || typeof link === "string";
+  const href = typeof link === "string" ? link : value;
+  return (
+    <div className="glass rounded-xl p-3">
+      <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">{label}</p>
+      {isLink ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" className={cn("text-sm text-cyan-400 hover:underline truncate block", mono && "font-mono")}>
+          {value}
+        </a>
+      ) : (
+        <p className={cn("text-sm text-zinc-100 truncate", mono && "font-mono")}>{value}</p>
+      )}
     </div>
   );
 }
