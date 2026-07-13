@@ -1,5 +1,5 @@
 {
-  "cacheBust": 1783863794921,
-  "reason": "Test from automated",
-  "clearedAt": "2026-07-12T13:43:14.921Z"
+  "refreshSignal": 1783921968252,
+  "reason": "Test refresh signal",
+  "refreshedAt": "2026-07-13T05:52:48.252Z"
 }
