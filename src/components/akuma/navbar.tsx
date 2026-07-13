@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, Search, ChevronDown, Gamepad2, Info, Bug, Heart } from "lucide-react";
+import { Menu, X, Search, ChevronDown, Gamepad2, Info, Bug, Heart, Package } from "lucide-react";
 import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
 import type { Game, ProductItem } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
@@ -219,6 +219,9 @@ export function Navbar() {
           <NavLink active={isContact} href="/contact">
             <span className="mr-1 inline-flex items-center"><Bug className="size-3.5" /></span>{t("nav.contact")}
           </NavLink>
+          <NavLink active={pathname === "/track-order"} href="/track-order">
+            <span className="mr-1 inline-flex items-center"><Package className="size-3.5" /></span>{t("nav.trackOrder")}
+          </NavLink>
         </div>
 
         {/* Search + Wishlist + Checkout */}
@@ -342,6 +345,7 @@ export function Navbar() {
           )}
 
           <MobileLink active={isContact} href="/contact" onClick={() => setMobileOpen(false)}>🐛 {t("nav.contact")}</MobileLink>
+          <MobileLink active={pathname === "/track-order"} href="/track-order" onClick={() => setMobileOpen(false)}>📦 {t("nav.trackOrder")}</MobileLink>
           <MobileLink active={pathname === "/wishlist"} href="/wishlist" onClick={() => setMobileOpen(false)}>❤️ {t("nav.wishlist")} {wishlistHydrated && wishlistCount > 0 && `(${wishlistCount})`}</MobileLink>
           <MobileLink active={isCheckout} href="/checkout" onClick={() => setMobileOpen(false)}>🛒 {t("nav.checkout")}</MobileLink>
         </div>

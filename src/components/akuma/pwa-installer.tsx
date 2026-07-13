@@ -34,10 +34,9 @@ export function PWAInstaller() {
       return;
     }
 
-    // Check dismissed
-    try {
-      if (localStorage.getItem(DISMISSED_KEY) === "1") return;
-    } catch { /* ignore */ }
+    // Check dismissed (cookie, bukan localStorage — persist selamanya)
+    const dismissedCookie = document.cookie.match(new RegExp(`(?:^|; )${DISMISSED_KEY}=([^;]*)`));
+    if (dismissedCookie) return;
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -57,6 +56,16 @@ export function PWAInstaller() {
     };
   }, []);
 
+  const handleDismiss = () => {
+    setShowBanner(false);
+    // Pakai cookie (bukan localStorage) supaya tidak ke-reset saat clear cache
+    try {
+      const expires = new Date(Date.now() + 365 * 864e5).toUTCString();
+      document.cookie = `${DISMISSED_KEY}=1; expires=${expires}; path=/; SameSite=Lax`;
+    } catch { /* ignore */ }
+    setDeferredPrompt(null);
+  };
+
   const handleInstall = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
@@ -65,12 +74,12 @@ export function PWAInstaller() {
       setInstalled(true);
     }
     setShowBanner(false);
+    // Juga set cookie supaya tidak muncul lagi setelah install
+    try {
+      const expires = new Date(Date.now() + 365 * 864e5).toUTCString();
+      document.cookie = `${DISMISSED_KEY}=1; expires=${expires}; path=/; SameSite=Lax`;
+    } catch { /* ignore */ }
     setDeferredPrompt(null);
-  };
-
-  const handleDismiss = () => {
-    setShowBanner(false);
-    try { localStorage.setItem(DISMISSED_KEY, "1"); } catch { /* ignore */ }
   };
 
   if (installed) return null;

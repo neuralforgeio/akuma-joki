@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowLeft, ShoppingBag, User, Lock, MessageCircle,
-  Gamepad2, Trash2, ShieldCheck, Eye, EyeOff, ShoppingCart, CheckCircle2,
+  Gamepad2, Trash2, ShieldCheck, Eye, EyeOff, ShoppingCart, CheckCircle2, Package,
 } from "lucide-react";
 import { useAkumaStore, useHasHydrated } from "@/lib/store";
 import { WHATSAPP_NUMBER, getGameBySlug } from "@/lib/games-data";
@@ -31,6 +31,25 @@ export function CheckoutView() {
   const [agreed, setAgreed] = useState(false);
   const [successModal, setSuccessModal] = useState<{ orderIds: string[] } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [orderHistory, setOrderHistory] = useState<{ orderId: string; items: number; createdAt: number }[]>([]);
+
+  // Load order history on mount
+  useEffect(() => {
+    try {
+      const history = JSON.parse(localStorage.getItem("akuma-order-history") || "[]");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOrderHistory(history);
+    } catch { /* ignore */ }
+  }, []);
+
+  const removeHistoryItem = (orderId: string) => {
+    try {
+      const history = JSON.parse(localStorage.getItem("akuma-order-history") || "[]");
+      const filtered = history.filter((h: any) => h.orderId !== orderId);
+      localStorage.setItem("akuma-order-history", JSON.stringify(filtered));
+      setOrderHistory(filtered);
+    } catch { /* ignore */ }
+  };
 
   const MAX_ORDERS = 5;
   const orderCount = cartItems.length || (order ? 1 : 0);
@@ -51,45 +70,50 @@ export function CheckoutView() {
     if (!username.trim() || !password.trim()) { toast({ title: "Data belum lengkap", description: "Isi username & password Roblox dulu ya.", variant: "destructive" }); return; }
     if (!agreed) { toast({ title: "Konfirmasi dulu", description: "Centang persetujuan untuk lanjut.", variant: "destructive" }); return; }
 
-    // Generate 8-digit uppercase order IDs
-    const orderIds: string[] = [];
-    const numOrders = hasCart ? cartItems.length : 1;
-    for (let i = 0; i < numOrders; i++) orderIds.push(generateOrderId());
+    // Generate SINGLE Order ID for ALL items in this order
+    const orderId = generateOrderId();
 
-    // Build message with order IDs
+    // Build message with single Order ID
     let message = "";
     if (hasCart && cartItems.length > 1) {
-      message = `*AKUMA JOKI - MULTI ORDER* 🔥\n\n*Daftar Joki:*\n`;
+      message = `*AKUMA JOKI - MULTI ORDER* 🔥\n\n*Order ID: ${orderId}*\n\n*Daftar Joki:*\n`;
       cartItems.forEach((item, i) => {
-        message += `${i + 1}. [${orderIds[i]}] ${item.gameEmoji} ${item.gameName} - ${item.productName} (${item.priceLabel})\n`;
+        message += `${i + 1}. ${item.gameEmoji} ${item.gameName} - ${item.productName} (${item.priceLabel})\n`;
       });
       message += `\n*Total Item:* ${cartItems.length}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan multiple joki, mau lanjut ke pembayaran. Terima kasih!`;
     } else if (hasCart && cartItems.length === 1) {
       const item = cartItems[0];
-      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Order ID: ${orderIds[0]}*\n\n*Game:* ${item.gameName}\n*Joki:* ${item.productName}\n*Harga:* ${item.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
+      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Order ID: ${orderId}*\n\n*Game:* ${item.gameName}\n*Joki:* ${item.productName}\n*Harga:* ${item.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
     } else if (order) {
-      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Order ID: ${orderIds[0]}*\n\n*Game:* ${order.gameName}\n*Joki:* ${order.productName}\n*Harga:* ${order.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
+      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Order ID: ${orderId}*\n\n*Game:* ${order.gameName}\n*Joki:* ${order.productName}\n*Harga:* ${order.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
     }
 
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
     try { const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; document.body.appendChild(a); a.click(); document.body.removeChild(a); } catch { window.open(url, "_blank"); }
 
-    // Save orders to admin store with order IDs (auto-push to GitHub)
+    // Save orders to admin store — ALL items share the same Order ID
     try {
       if (hasCart) {
-        cartItems.forEach((item, i) => {
-          useAdminStore.getState().addOrder({ orderId: orderIds[i], gameName: item.gameName, productName: item.productName, priceLabel: item.priceLabel, username: username.trim(), password: password.trim() });
+        cartItems.forEach((item) => {
+          useAdminStore.getState().addOrder({ orderId, gameName: item.gameName, productName: item.productName, priceLabel: item.priceLabel, username: username.trim(), password: password.trim() });
         });
         cartClear();
       } else if (order) {
-        useAdminStore.getState().addOrder({ orderId: orderIds[0], gameName: order.gameName, productName: order.productName, priceLabel: order.priceLabel, username: username.trim(), password: password.trim() });
+        useAdminStore.getState().addOrder({ orderId, gameName: order.gameName, productName: order.productName, priceLabel: order.priceLabel, username: username.trim(), password: password.trim() });
       }
       clearOrder();
     } catch { /* ignore */ }
 
-    // Show success modal with order IDs
-    setSuccessModal({ orderIds });
+    // Save Order ID to history (for recovery)
+    try {
+      const history = JSON.parse(localStorage.getItem("akuma-order-history") || "[]");
+      history.unshift({ orderId, items: hasCart ? cartItems.length : 1, createdAt: Date.now() });
+      localStorage.setItem("akuma-order-history", JSON.stringify(history.slice(0, 10)));
+    } catch { /* ignore */ }
+
+    // Show success modal with single Order ID
+    setSuccessModal({ orderIds: [orderId] });
     toast({ title: "Membuka WhatsApp…", description: "Pesan order otomatis sudah disiapkan. Kirim ke admin ya!" });
   };
 
@@ -127,7 +151,7 @@ export function CheckoutView() {
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16">
         {!hasAnything ? (
-          <EmptyOrder />
+          <EmptyOrder orderHistory={orderHistory} removeHistoryItem={removeHistoryItem} />
         ) : (
           <div className="grid gap-8 lg:grid-cols-5">
             {/* left: form */}
@@ -465,7 +489,7 @@ function TrustBadge({ icon, text }: { icon: React.ReactNode; text: string }) {
   );
 }
 
-function EmptyOrder() {
+function EmptyOrder({ orderHistory, removeHistoryItem }: { orderHistory: { orderId: string; items: number; createdAt: number }[]; removeHistoryItem: (id: string) => void }) {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Hero card — centered, e-commerce style empty state */}
@@ -525,6 +549,45 @@ function EmptyOrder() {
           <Gamepad2 className="size-3.5 text-cyan-400" /> Joki Pro
         </span>
       </div>
+
+      {/* Order History — recover Order IDs */}
+      {orderHistory.length > 0 && (
+        <div className="mt-6 glass-nav rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Package className="size-4 text-violet-400" />
+            <h3 className="text-sm font-semibold text-zinc-100">Order History</h3>
+            <span className="text-[10px] text-zinc-500">({orderHistory.length})</span>
+          </div>
+          <p className="text-[11px] text-zinc-500 mb-3">Order ID yang pernah kamu buat. Klik untuk lacak, atau hapus jika tidak diperlukan.</p>
+          <div className="space-y-2 max-h-48 overflow-y-auto akuma-scroll">
+            {orderHistory.map((h) => (
+              <div key={h.orderId} className="glass rounded-xl p-2.5 flex items-center gap-3">
+                <Link
+                  href={`/track-order`}
+                  onClick={() => { try { navigator.clipboard.writeText(h.orderId); } catch {} }}
+                  className="flex-1 min-w-0 flex items-center gap-2 group"
+                >
+                  <span className="font-mono text-sm font-bold text-violet-400 tracking-wider group-hover:underline">{h.orderId}</span>
+                  <span className="text-[10px] text-zinc-600">· {h.items} item · {new Date(h.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}</span>
+                </Link>
+                <button
+                  onClick={() => { try { navigator.clipboard.writeText(h.orderId); } catch {} }}
+                  className="text-[10px] text-zinc-500 hover:text-cyan-400 px-2 py-1 rounded"
+                >
+                  Copy
+                </button>
+                <button
+                  onClick={() => removeHistoryItem(h.orderId)}
+                  className="text-zinc-500 hover:text-red-400 p-1"
+                  aria-label="Hapus"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
