@@ -262,30 +262,7 @@
     "updatedAt": 1783931460868
   },
   "reviews": [],
-  "reports": [
-    {
-      "name": "Dearly",
-      "contact": "",
-      "type": "bug",
-      "subject": "hsdia",
-      "description": "test",
-      "page": "https://akuma-joki.vercel.app/contact",
-      "id": "mriz07ssizqp",
-      "status": "new",
-      "createdAt": 1783931921020
-    },
-    {
-      "name": "test nama",
-      "contact": "",
-      "type": "bug",
-      "subject": "test",
-      "description": "test",
-      "page": "https://akuma-joki.vercel.app/contact",
-      "id": "mriyyblvdsu9",
-      "status": "read",
-      "createdAt": 1783931832643
-    }
-  ],
+  "reports": [],
   "notifications": [],
   "orders": [
     {
@@ -322,5 +299,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-13T08:40:00.006Z"
+  "updatedAt": "2026-07-13T08:40:16.530Z"
 }
