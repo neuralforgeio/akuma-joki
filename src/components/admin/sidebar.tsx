@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { logout, getSession, isDeveloper } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/akuma/notification-bell";
 import {
   LayoutDashboard, Gamepad2, Megaphone, Power, Activity, BarChart3,
   Package, FileImage, GitCommit, MessageSquare, HelpCircle, Settings,
@@ -170,11 +171,19 @@ export function AdminSidebar() {
 
         <div className="border-t-2 border-[#a020f0]/40 px-3 py-3">
           {(!collapsed || mobileOpen) && (
-            <div className="mb-2">
-              <p className="font-pixel text-[7px] uppercase text-[#9a93a8]">Login as</p>
-              <p className="font-pixel text-[8px] truncate" style={{ color: dev ? "#22d3ee" : "#6ee7b7" }}>
-                {session?.user ?? "admin"} ({dev ? "DEV" : "ADMIN"})
-              </p>
+            <div className="mb-2 flex items-center justify-between">
+              <div>
+                <p className="font-pixel text-[7px] uppercase text-[#9a93a8]">Login as</p>
+                <p className="font-pixel text-[8px] truncate" style={{ color: dev ? "#22d3ee" : "#6ee7b7" }}>
+                  {session?.user ?? "admin"} ({dev ? "DEV" : "ADMIN"})
+                </p>
+              </div>
+              <NotificationBell isAdmin />
+            </div>
+          )}
+          {collapsed && !mobileOpen && (
+            <div className="flex justify-center mb-2">
+              <NotificationBell isAdmin />
             </div>
           )}
           <button onClick={handleLogout} title={collapsed && !mobileOpen ? "Logout" : undefined}

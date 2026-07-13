@@ -104,6 +104,18 @@ export type FAQItem = {
   answer: string;
 };
 
+export type Notification = {
+  id: string;
+  type: "order_new" | "order_status" | "review_new" | "report_new" | "system";
+  title: string;
+  message: string;
+  targetRole: "admin" | "developer" | "all";
+  targetUser?: string; // username for user-specific notif
+  link?: string;
+  read: boolean;
+  createdAt: number;
+};
+
 export type AdminSettings = {
   whatsappNumber: string;
   csName: string;
@@ -128,6 +140,7 @@ type AdminState = {
   about: AboutContent;
   reviews: Review[];
   reports: ContactReport[];
+  notifications: Notification[];
   settings: AdminSettings;
   _hasHydrated: boolean;
 
@@ -192,6 +205,12 @@ type AdminState = {
   updateReportStatus: (id: string, status: ContactReport["status"]) => void;
   deleteReport: (id: string) => void;
 
+  /* notifications */
+  addNotification: (n: Omit<Notification, "id" | "createdAt" | "read">) => void;
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  deleteNotification: (id: string) => void;
+
   /* sync from server (GitHub raw) */
   syncFromServer: (data: Partial<{
     games: Game[];
@@ -204,6 +223,7 @@ type AdminState = {
     about: AboutContent;
     reviews: Review[];
     reports: ContactReport[];
+    notifications: Notification[];
   }>) => void;
 
   /* settings */
@@ -238,6 +258,7 @@ export const useAdminStore = create<AdminState>()(
       about: SYNCED_ABOUT,
       reviews: SYNCED_REVIEWS,
       reports: SYNCED_REPORTS,
+      notifications: [],
       settings: SYNCED_SETTINGS,
       _hasHydrated: false,
 
@@ -375,12 +396,32 @@ export const useAdminStore = create<AdminState>()(
           status: "new",
         };
         set((s) => ({ orders: [order, ...s.orders] }));
+        // Auto-create notification for admin
+        get().addNotification({
+          type: "order_new",
+          title: "Order Baru Masuk!",
+          message: `${order.productName} (${order.gameName}) - ${order.priceLabel} oleh ${order.username}`,
+          targetRole: "all",
+          link: "/admin/pesanan",
+        });
       },
       updateOrderStatus: (id, status) => {
+        const order = get().orders.find(o => o.id === id);
         set((s) => ({
           orders: s.orders.map((o) => (o.id === id ? { ...o, status } : o)),
         }));
         get().logActivity("ORDER_STATUS", `Order ${id} → ${status}`);
+        // Auto-create notification for user if order exists
+        if (order) {
+          get().addNotification({
+            type: "order_status",
+            title: "Status Order Diperbarui",
+            message: `Order ${order.productName} sekarang: ${status.toUpperCase()}`,
+            targetRole: "all",
+            targetUser: order.username,
+            link: `/track-order`,
+          });
+        }
       },
       deleteOrder: (id) => {
         set((s) => ({ orders: s.orders.filter((o) => o.id !== id) }));
@@ -445,6 +486,7 @@ export const useAdminStore = create<AdminState>()(
           about: s.about,
           reviews: s.reviews,
           reports: s.reports,
+          notifications: s.notifications,
           version: 1,
           updatedAt: new Date().toISOString(),
         };
@@ -517,6 +559,14 @@ export const useAdminStore = create<AdminState>()(
         };
         set((s) => ({ reviews: [review, ...s.reviews] }));
         get().logActivity("ADD_REVIEW", `${r.customerName} → ${r.gameName} (${r.rating}★)`);
+        // Auto-create notification
+        get().addNotification({
+          type: "review_new",
+          title: "Review Baru!",
+          message: `${r.customerName} memberi ${r.rating}★ untuk ${r.gameName}`,
+          targetRole: "all",
+          link: `/store/${r.gameSlug}`,
+        });
         get().triggerSync(`Add review: ${r.customerName} → ${r.gameName}`);
       },
       deleteReview: (id) => {
@@ -535,6 +585,14 @@ export const useAdminStore = create<AdminState>()(
         };
         set((s) => ({ reports: [report, ...s.reports] }));
         get().logActivity("ADD_REPORT", `${r.type.toUpperCase()}: ${r.subject}`);
+        // Auto-create notification for admin/dev
+        get().addNotification({
+          type: "report_new",
+          title: `Laporan ${r.type}: ${r.subject}`,
+          message: `Dari ${r.name}: ${r.description.slice(0, 80)}${r.description.length > 80 ? "..." : ""}`,
+          targetRole: "developer",
+          link: "/admin/reports",
+        });
         get().triggerSync(`Add report: ${r.type} - ${r.subject}`);
       },
       updateReportStatus: (id, status) => {
@@ -546,6 +604,26 @@ export const useAdminStore = create<AdminState>()(
         set((s) => ({ reports: s.reports.filter((r) => r.id !== id) }));
         get().logActivity("DELETE_REPORT", `Hapus report ${id}`);
         get().triggerSync(`Delete report ${id}`);
+      },
+
+      /* ===== notifications ===== */
+      addNotification: (n) => {
+        const notif: Notification = {
+          ...n,
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          read: false,
+          createdAt: Date.now(),
+        };
+        set((s) => ({ notifications: [notif, ...s.notifications].slice(0, 100) }));
+      },
+      markNotificationRead: (id) => {
+        set((s) => ({ notifications: s.notifications.map(n => n.id === id ? { ...n, read: true } : n) }));
+      },
+      markAllNotificationsRead: () => {
+        set((s) => ({ notifications: s.notifications.map(n => ({ ...n, read: true })) }));
+      },
+      deleteNotification: (id) => {
+        set((s) => ({ notifications: s.notifications.filter(n => n.id !== id) }));
       },
 
       /* ===== sync from server (GitHub raw) ===== */
@@ -563,6 +641,7 @@ export const useAdminStore = create<AdminState>()(
           about: data.about ?? s.about,
           reviews: data.reviews ?? s.reviews,
           reports: data.reports ?? s.reports,
+          notifications: data.notifications ?? s.notifications,
         }));
       },
 

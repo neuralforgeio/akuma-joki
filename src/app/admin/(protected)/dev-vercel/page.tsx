@@ -8,7 +8,7 @@ import { HelpBanner } from "@/components/admin/help-tooltip";
 import {
   Rocket, RefreshCw, FileText, Settings, Trash2, Plus,
   CheckCircle2, XCircle, Clock, ExternalLink, GitBranch, AlertCircle, Activity,
-  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User, RotateCcw,
+  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User, RotateCcw, Copy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -89,6 +89,8 @@ export default function DevVercelPage() {
   const [newEnvValue, setNewEnvValue] = useState("");
   const [addingEnv, setAddingEnv] = useState(false);
   const [activeView, setActiveView] = useState<"deployments" | "env" | "project">("deployments");
+  const [logFilter, setLogFilter] = useState<string>("all");
+  const [logSearch, setLogSearch] = useState("");
 
   useEffect(() => {
     if (!isDeveloper()) {
@@ -566,31 +568,75 @@ export default function DevVercelPage() {
                     <h2 className="text-sm font-semibold text-zinc-100">Build Logs</h2>
                     <span className="text-[10px] text-zinc-500 font-mono">({logs.length})</span>
                   </div>
-                  <button
-                    onClick={() => fetchLogs(selectedDep.uid)}
-                    disabled={logsLoading}
-                    className="text-[10px] text-zinc-500 hover:text-zinc-300"
-                  >
-                    {logsLoading ? "Loading..." : "Refresh"}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const text = logs.map(l => `[${l.type}] ${l.text || ""}`).join("\n");
+                        try { navigator.clipboard.writeText(text); toast({ title: "✅ All logs copied!" }); } catch {}
+                      }}
+                      disabled={logs.length === 0}
+                      className="inline-flex items-center gap-1 text-[10px] text-zinc-400 hover:text-cyan-400 disabled:opacity-50"
+                    >
+                      <Copy className="size-3" /> Copy All
+                    </button>
+                    <button
+                      onClick={() => fetchLogs(selectedDep.uid)}
+                      disabled={logsLoading}
+                      className="text-[10px] text-zinc-500 hover:text-zinc-300"
+                    >
+                      {logsLoading ? "Loading..." : "Refresh"}
+                    </button>
+                  </div>
                 </div>
+
+                {/* Log type filter & search */}
+                {logs.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    {["all", "stdout", "stderr", "command", "exit"].map(t => {
+                      const count = t === "all" ? logs.length : logs.filter(l => l.type === t).length;
+                      return (
+                        <button
+                          key={t}
+                          onClick={() => setLogFilter(t)}
+                          className={cn(
+                            "rounded-full px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider transition-all border",
+                            logFilter === t ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-400" : "bg-white/5 border-white/10 text-zinc-500 hover:text-zinc-300"
+                          )}
+                        >
+                          {t} ({count})
+                        </button>
+                      );
+                    })}
+                    <input
+                      value={logSearch}
+                      onChange={(e) => setLogSearch(e.target.value)}
+                      placeholder="Search logs..."
+                      className="ml-auto w-40 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[10px] text-zinc-100 outline-none focus:border-cyan-500/40"
+                    />
+                  </div>
+                )}
+
                 {logsLoading ? (
                   <p className="text-sm text-zinc-500 py-8 text-center">Loading logs...</p>
                 ) : logs.length === 0 ? (
                   <p className="text-sm text-zinc-500 py-8 text-center">No logs available</p>
                 ) : (
-                  <div className="bg-black/40 rounded-xl p-3 h-80 overflow-y-auto akuma-scroll font-mono text-[11px] space-y-0.5">
-                    {logs.map((log, i) => (
-                      <div
-                        key={i}
-                        className={cn(
-                          "whitespace-pre-wrap break-all",
-                          log.type === "stderr" ? "text-red-400" : log.type === "exit" ? "text-yellow-400" : log.type === "command" ? "text-cyan-400" : "text-green-400"
-                        )}
-                      >
-                        {log.text}
-                      </div>
-                    ))}
+                  <div className="bg-black/50 rounded-xl p-3 h-80 overflow-y-auto akuma-scroll font-mono text-[11px] space-y-0">
+                    {logs
+                      .filter(l => logFilter === "all" || l.type === logFilter)
+                      .filter(l => !logSearch || (l.text || "").toLowerCase().includes(logSearch.toLowerCase()))
+                      .map((log, i) => {
+                        const time = log.ts ? new Date(log.ts).toLocaleTimeString("en-US", { hour12: false }) : "";
+                        const colorClass = log.type === "stderr" ? "text-red-400" : log.type === "exit" ? "text-yellow-400" : log.type === "command" ? "text-cyan-400" : "text-green-400";
+                        const badgeColor = log.type === "stderr" ? "bg-red-500/20 text-red-400" : log.type === "exit" ? "bg-yellow-500/20 text-yellow-400" : log.type === "command" ? "bg-cyan-500/20 text-cyan-400" : "bg-green-500/20 text-green-400";
+                        return (
+                          <div key={i} className="flex items-start gap-2 py-0.5 hover:bg-white/3 px-1 rounded group">
+                            <span className="text-zinc-700 shrink-0 select-none">{time}</span>
+                            <span className={cn("shrink-0 px-1 rounded text-[8px] uppercase font-bold", badgeColor)}>{log.type}</span>
+                            <span className={cn("whitespace-pre-wrap break-all", colorClass)}>{log.text}</span>
+                          </div>
+                        );
+                      })}
                   </div>
                 )}
               </div>

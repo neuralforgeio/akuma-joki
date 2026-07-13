@@ -10,6 +10,7 @@ import type { Game, ProductItem } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
 import { useWishlist } from "@/lib/wishlist";
 import { LanguageToggle } from "./language-toggle";
+import { NotificationBell } from "./notification-bell";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -25,11 +26,14 @@ export function Navbar() {
   const [mobileGamesOpen, setMobileGamesOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [aiSearching, setAiSearching] = useState(false);
+  const [aiResults, setAiResults] = useState<SearchEntry[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const gamesDropdownRef = useRef<HTMLDivElement>(null);
+  const aiSearchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  type SearchEntry = { type: "game" | "item"; label: string; sublabel: string; href: string; emoji: string; accent: string; priceLabel?: string };
+  type SearchEntry = { type: "game" | "item" | "ai"; label: string; sublabel: string; href: string; emoji: string; accent: string; priceLabel?: string };
   const searchIndex = useMemo<SearchEntry[]>(() => {
     const entries: SearchEntry[] = [];
     for (const g of games) {
@@ -46,6 +50,48 @@ export function Navbar() {
     return searchIndex.filter((e) => e.label.toLowerCase().includes(q) || e.sublabel.toLowerCase().includes(q)).slice(0, 8);
   }, [searchQuery, searchIndex]);
 
+  // AI search: trigger debounced jika query >= 3 chars & contains keywords
+  useEffect(() => {
+    if (aiSearchTimer.current) clearTimeout(aiSearchTimer.current);
+    const q = searchQuery.trim();
+    if (q.length < 4) {
+      setAiResults([]);
+      setAiSearching(false);
+      return;
+    }
+    // Trigger AI search for natural language queries
+    const isNaturalLanguage = /\b(termurah|termahal|paling|murah|mahal|untuk|rekomendasi|best|cheap|populer|hot)\b/i.test(q) || q.split(" ").length >= 3;
+    if (!isNaturalLanguage) {
+      setAiResults([]);
+      return;
+    }
+    setAiSearching(true);
+    aiSearchTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/ai-search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        if (data.ok && data.results) {
+          setAiResults(data.results.map((r: any) => ({
+            type: "ai" as const,
+            label: r.productName,
+            sublabel: `${r.gameName} · AI match`,
+            href: `/store/${r.gameSlug}`,
+            emoji: r.gameEmoji,
+            accent: r.gameAccent,
+            priceLabel: r.priceLabel,
+          })));
+        } else {
+          setAiResults([]);
+        }
+      } catch {
+        setAiResults([]);
+      } finally {
+        setAiSearching(false);
+      }
+    }, 800);
+    return () => { if (aiSearchTimer.current) clearTimeout(aiSearchTimer.current); };
+  }, [searchQuery]);
+
   useEffect(() => {
     const h = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) setSearchOpen(false);
@@ -54,7 +100,7 @@ export function Navbar() {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
-  useEffect(() => { // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
     setSearchOpen(false); setSearchQuery(""); setGamesOpen(false); setMobileGamesOpen(false);
   }, [pathname]);
   useEffect(() => { if (searchOpen) { const t = setTimeout(() => searchInputRef.current?.focus(), 100); return () => clearTimeout(t); } }, [searchOpen]);
@@ -191,21 +237,45 @@ export function Navbar() {
                   <input ref={searchInputRef} type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cari game atau joki..." aria-label="Cari" className="w-full bg-transparent px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none" />
                 </div>
                 <div className="max-h-72 overflow-y-auto">
-                  {searchResults.length === 0 ? (
-                    <p className="px-4 py-6 text-center text-xs text-zinc-500">{searchQuery ? "Tidak ada hasil" : "Ketik untuk mencari"}</p>
-                  ) : searchResults.map((r, i) => (
-                    <Link key={`${r.type}-${i}`} href={r.href} onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm" style={{ borderColor: r.accent + "40" }}>{r.emoji}</span>
-                      <div className="min-w-0 flex-1"><p className="text-sm text-zinc-100 truncate">{r.label}</p><p className="text-[10px] text-zinc-500 truncate">{r.sublabel}</p></div>
-                      {r.priceLabel && <span className="text-xs font-semibold text-violet-400 shrink-0">{r.priceLabel}</span>}
-                    </Link>
-                  ))}
+                  {aiSearching && (
+                    <div className="px-3 py-2.5 flex items-center gap-2 text-xs text-violet-400 border-b border-white/5">
+                      <span className="size-3 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
+                      <span>🤖 AI mencari item terbaik...</span>
+                    </div>
+                  )}
+                  {aiResults.length > 0 && (
+                    <>
+                      <p className="px-3 py-1.5 text-[9px] uppercase tracking-wider text-violet-400 bg-violet-500/5 border-b border-white/5">🤖 AI Recommendations</p>
+                      {aiResults.slice(0, 3).map((r, i) => (
+                        <Link key={`ai-${i}`} href={r.href} onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="flex items-center gap-3 px-3 py-2.5 hover:bg-violet-500/5 transition-colors border-b border-white/5">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm" style={{ borderColor: r.accent + "40", backgroundColor: r.accent + "10" }}>{r.emoji}</span>
+                          <div className="min-w-0 flex-1"><p className="text-sm text-zinc-100 truncate">{r.label}</p><p className="text-[10px] text-violet-400 truncate">{r.sublabel}</p></div>
+                          {r.priceLabel && <span className="text-xs font-semibold text-violet-400 shrink-0">{r.priceLabel}</span>}
+                        </Link>
+                      ))}
+                    </>
+                  )}
+                  {searchResults.length === 0 && aiResults.length === 0 && !aiSearching ? (
+                    <p className="px-4 py-6 text-center text-xs text-zinc-500">{searchQuery ? "Tidak ada hasil" : "Ketik untuk mencari... (coba: 'joki termurah')"}</p>
+                  ) : searchResults.length > 0 ? (
+                    <>
+                      {aiResults.length > 0 && <p className="px-3 py-1.5 text-[9px] uppercase tracking-wider text-zinc-500 border-b border-white/5">Hasil lain</p>}
+                      {searchResults.map((r, i) => (
+                        <Link key={`${r.type}-${i}`} href={r.href} onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm" style={{ borderColor: r.accent + "40" }}>{r.emoji}</span>
+                          <div className="min-w-0 flex-1"><p className="text-sm text-zinc-100 truncate">{r.label}</p><p className="text-[10px] text-zinc-500 truncate">{r.sublabel}</p></div>
+                          {r.priceLabel && <span className="text-xs font-semibold text-violet-400 shrink-0">{r.priceLabel}</span>}
+                        </Link>
+                      ))}
+                    </>
+                  ) : null}
                 </div>
                 <div className="border-t border-white/8 px-3 py-2"><p className="text-[10px] text-zinc-600">Ctrl+K · Esc tutup</p></div>
               </div>
             )}
           </div>
           <LanguageToggle />
+          <NotificationBell />
           <Link href="/wishlist" aria-label="Wishlist" className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-zinc-400 hover:text-pink-400 hover:border-pink-500/30 transition-all">
             <Heart className="size-4" />
             {wishlistHydrated && wishlistCount > 0 && (
