@@ -206,6 +206,96 @@
   },
   "faq": [],
   "waReplies": [],
+  "about": {
+    "title": "Tentang AKUMA JOKI",
+    "tagline": "Joki & Store Roblox premium yang aman, cepat, dan terpercaya.",
+    "description": "AKUMA JOKI adalah layanan joki & store Roblox yang lahir dari passion para gamer untuk gamer. Kami mengerti betapa berharganya akun, waktu, dan progress kamu — itulah kenapa setiap order ditangani oleh joki profesional dengan transparansi penuh, dari proses hingga selesai.",
+    "mission": "Misi kami sederhana: memberikan layanan joki terbaik dengan harga bersahabat, tanpa mengorbankan keamanan akun & kenyamanan customer. Setiap pelanggan adalah prioritas, setiap order adalah tanggung jawab.",
+    "features": [
+      {
+        "id": "f1",
+        "icon": "🛡️",
+        "title": "Aman & Terpercaya",
+        "desc": "Akun kamu ditangani joki profesional. Tidak ada cheat, tidak ada resiko banned."
+      },
+      {
+        "id": "f2",
+        "icon": "⚡",
+        "title": "Proses Cepat",
+        "desc": "Order diproses secepat mungkin dengan update progres real-time via WhatsApp."
+      },
+      {
+        "id": "f3",
+        "icon": "💰",
+        "title": "Harga Bersahabat",
+        "desc": "Harga fair, transparan, tanpa biaya tersembunyi. Cocok untuk pelajar & mahasiswa."
+      },
+      {
+        "id": "f4",
+        "icon": "🎧",
+        "title": "CS Responsif",
+        "desc": "Admin online 16 jam sehari. Jawaban cepat, ramah, dan selalu siap bantu."
+      }
+    ],
+    "stats": [
+      {
+        "id": "s1",
+        "label": "Order Selesai",
+        "value": "48+"
+      },
+      {
+        "id": "s2",
+        "label": "Customer Puas",
+        "value": "97"
+      },
+      {
+        "id": "s3",
+        "label": "Game Aktif",
+        "value": "5+"
+      },
+      {
+        "id": "s4",
+        "label": "Tahun Pengalaman",
+        "value": "3+"
+      }
+    ],
+    "updatedAt": 1783931460868
+  },
+  "reviews": [],
+  "reports": [],
+  "notifications": [],
+  "orders": [
+    {
+      "gameName": "Blox Fruits",
+      "productName": "CDK",
+      "priceLabel": "20K",
+      "username": "test",
+      "password": "test",
+      "id": "mrius8pmmqr3d4",
+      "createdAt": 1783924830490,
+      "status": "new"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "Raid Full Skill",
+      "priceLabel": "10K",
+      "username": "test",
+      "password": "test",
+      "id": "mrius8pmlvhjgi",
+      "createdAt": 1783924830490,
+      "status": "new"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "200 Level",
+      "priceLabel": "4K",
+      "username": "test",
+      "password": "test",
+      "id": "mrius8plmmi5bb",
+      "createdAt": 1783924830489,
+      "status": "new"
+    }
+  ],
   "version": 1,
-  "updatedAt": "2026-07-12T12:03:43.024Z"
+  "updatedAt": "2026-07-13T08:31:00.868Z"
 }
