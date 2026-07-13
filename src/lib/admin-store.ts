@@ -46,6 +46,7 @@ export type Announcement = {
 
 export type Order = {
   id: string;
+  orderId: string; // 8-digit uppercase ID for user tracking (e.g., "AK3X9F2K")
   gameName: string;
   productName: string;
   priceLabel: string;
@@ -164,7 +165,7 @@ type AdminState = {
   setTakedown: (on: boolean, reason?: string) => void;
 
   /* orders */
-  addOrder: (o: Omit<Order, "id" | "createdAt" | "status">) => void;
+  addOrder: (o: Omit<Order, "id" | "createdAt" | "status" | "orderId"> & { orderId?: string; status?: Order["status"] }) => void;
   updateOrderStatus: (id: string, status: Order["status"]) => void;
   deleteOrder: (id: string) => void;
 
@@ -224,6 +225,7 @@ type AdminState = {
     reviews: Review[];
     reports: ContactReport[];
     notifications: Notification[];
+    orders: Order[];
   }>) => void;
 
   /* settings */
@@ -235,6 +237,20 @@ type AdminState = {
 
 function uid(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+/**
+ * Generate 8-digit uppercase alphanumeric order ID.
+ * Format: "AK" + 6 random chars (A-Z, 0-9)
+ * Example: "AK3X9F2K"
+ */
+export function generateOrderId(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I,O,0,1 (avoid confusion)
+  let id = "AK";
+  for (let i = 0; i < 6; i++) {
+    id += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return id;
 }
 
 function todayStr(): string {
@@ -392,18 +408,20 @@ export const useAdminStore = create<AdminState>()(
         const order: Order = {
           ...o,
           id: uid(),
+          orderId: o.orderId || generateOrderId(),
           createdAt: Date.now(),
-          status: "new",
+          status: o.status || "processing",
         };
         set((s) => ({ orders: [order, ...s.orders] }));
         // Auto-create notification for admin
         get().addNotification({
           type: "order_new",
           title: "Order Baru Masuk!",
-          message: `${order.productName} (${order.gameName}) - ${order.priceLabel} oleh ${order.username}`,
+          message: `[${order.orderId}] ${order.productName} (${order.gameName}) - ${order.priceLabel} oleh ${order.username}`,
           targetRole: "all",
           link: "/admin/pesanan",
         });
+        get().triggerSync(`Add order: ${order.orderId} - ${order.productName}`);
       },
       updateOrderStatus: (id, status) => {
         const order = get().orders.find(o => o.id === id);
@@ -411,12 +429,14 @@ export const useAdminStore = create<AdminState>()(
           orders: s.orders.map((o) => (o.id === id ? { ...o, status } : o)),
         }));
         get().logActivity("ORDER_STATUS", `Order ${id} → ${status}`);
+        // Push to GitHub for audit trail
+        get().triggerSync(`Order ${order?.orderId || id} → ${status}`);
         // Auto-create notification for user if order exists
         if (order) {
           get().addNotification({
             type: "order_status",
             title: "Status Order Diperbarui",
-            message: `Order ${order.productName} sekarang: ${status.toUpperCase()}`,
+            message: `Order ${order.orderId} (${order.productName}) sekarang: ${status.toUpperCase()}`,
             targetRole: "all",
             targetUser: order.username,
             link: `/track-order`,
@@ -487,6 +507,7 @@ export const useAdminStore = create<AdminState>()(
           reviews: s.reviews,
           reports: s.reports,
           notifications: s.notifications,
+          orders: s.orders,
           version: 1,
           updatedAt: new Date().toISOString(),
         };
@@ -642,6 +663,7 @@ export const useAdminStore = create<AdminState>()(
           reviews: data.reviews ?? s.reviews,
           reports: data.reports ?? s.reports,
           notifications: data.notifications ?? s.notifications,
+          orders: data.orders ?? s.orders,
         }));
       },
 

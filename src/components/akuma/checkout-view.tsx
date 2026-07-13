@@ -5,15 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowLeft, ShoppingBag, User, Lock, MessageCircle,
-  Gamepad2, Trash2, ShieldCheck, Eye, EyeOff, ShoppingCart,
+  Gamepad2, Trash2, ShieldCheck, Eye, EyeOff, ShoppingCart, CheckCircle2,
 } from "lucide-react";
 import { useAkumaStore, useHasHydrated } from "@/lib/store";
 import { WHATSAPP_NUMBER, getGameBySlug } from "@/lib/games-data";
 import { PixelButton } from "./pixel-button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { useAdminStore } from "@/lib/admin-store";
+import { useAdminStore, generateOrderId } from "@/lib/admin-store";
 import { useCart } from "@/lib/cart";
+import { motion, AnimatePresence } from "framer-motion";
+import { Copy, Check, Search } from "lucide-react";
 
 export function CheckoutView() {
   const hydrated = useHasHydrated();
@@ -27,6 +29,8 @@ export function CheckoutView() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [successModal, setSuccessModal] = useState<{ orderIds: string[] } | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   if (!hydrated) { return <CheckoutSkeleton />; }
 
@@ -42,41 +46,50 @@ export function CheckoutView() {
     if (!username.trim() || !password.trim()) { toast({ title: "Data belum lengkap", description: "Isi username & password Roblox dulu ya.", variant: "destructive" }); return; }
     if (!agreed) { toast({ title: "Konfirmasi dulu", description: "Centang persetujuan untuk lanjut.", variant: "destructive" }); return; }
 
-    // Build message: multi-cart format if cart has items, single format otherwise
+    // Generate 8-digit uppercase order IDs
+    const orderIds: string[] = [];
+    const numOrders = hasCart ? cartItems.length : 1;
+    for (let i = 0; i < numOrders; i++) orderIds.push(generateOrderId());
+
+    // Build message with order IDs
     let message = "";
     if (hasCart && cartItems.length > 1) {
-      // MULTI-JOKI FORMAT
       message = `*AKUMA JOKI - MULTI ORDER* 🔥\n\n*Daftar Joki:*\n`;
       cartItems.forEach((item, i) => {
-        message += `${i + 1}. ${item.gameEmoji} ${item.gameName} - ${item.productName} (${item.priceLabel})\n`;
+        message += `${i + 1}. [${orderIds[i]}] ${item.gameEmoji} ${item.gameName} - ${item.productName} (${item.priceLabel})\n`;
       });
       message += `\n*Total Item:* ${cartItems.length}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan multiple joki, mau lanjut ke pembayaran. Terima kasih!`;
     } else if (hasCart && cartItems.length === 1) {
-      // SINGLE ITEM FROM CART
       const item = cartItems[0];
-      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Game:* ${item.gameName}\n*Joki:* ${item.productName}\n*Harga:* ${item.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
+      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Order ID: ${orderIds[0]}*\n\n*Game:* ${item.gameName}\n*Joki:* ${item.productName}\n*Harga:* ${item.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
     } else if (order) {
-      // SINGLE ITEM FROM DIRECT SELECT
-      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Game:* ${order.gameName}\n*Joki:* ${order.productName}\n*Harga:* ${order.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
+      message = `*AKUMA JOKI - NEW ORDER* 🔥\n\n*Order ID: ${orderIds[0]}*\n\n*Game:* ${order.gameName}\n*Joki:* ${order.productName}\n*Harga:* ${order.priceLabel}\n\n*Data Akun Roblox:*\n*Username:* ${username.trim()}\n*Password:* ${password.trim()}\n\nSaya sudah memesan, mau lanjut ke pembayaran. Terima kasih!`;
     }
 
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
     try { const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; document.body.appendChild(a); a.click(); document.body.removeChild(a); } catch { window.open(url, "_blank"); }
 
-    // Save orders to admin store
+    // Save orders to admin store with order IDs (auto-push to GitHub)
     try {
       if (hasCart) {
-        cartItems.forEach((item) => {
-          useAdminStore.getState().addOrder({ gameName: item.gameName, productName: item.productName, priceLabel: item.priceLabel, username: username.trim(), password: password.trim() });
+        cartItems.forEach((item, i) => {
+          useAdminStore.getState().addOrder({ orderId: orderIds[i], gameName: item.gameName, productName: item.productName, priceLabel: item.priceLabel, username: username.trim(), password: password.trim() });
         });
         cartClear();
       } else if (order) {
-        useAdminStore.getState().addOrder({ gameName: order.gameName, productName: order.productName, priceLabel: order.priceLabel, username: username.trim(), password: password.trim() });
+        useAdminStore.getState().addOrder({ orderId: orderIds[0], gameName: order.gameName, productName: order.productName, priceLabel: order.priceLabel, username: username.trim(), password: password.trim() });
       }
+      clearOrder();
     } catch { /* ignore */ }
 
+    // Show success modal with order IDs
+    setSuccessModal({ orderIds });
     toast({ title: "Membuka WhatsApp…", description: "Pesan order otomatis sudah disiapkan. Kirim ke admin ya!" });
+  };
+
+  const copyOrderId = (id: string) => {
+    try { navigator.clipboard.writeText(id); setCopiedId(id); setTimeout(() => setCopiedId(null), 2000); } catch {}
   };
 
   return (
@@ -266,6 +279,79 @@ export function CheckoutView() {
           </div>
         )}
       </section>
+
+      {/* Success Modal with Order IDs */}
+      <AnimatePresence>
+        {successModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSuccessModal(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-nav-strong rounded-3xl max-w-md w-full p-6 sm:p-8 text-center"
+              style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
+            >
+              {/* Success icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.2 }}
+                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/15 border border-green-500/30"
+              >
+                <CheckCircle2 className="size-8 text-green-400" />
+              </motion.div>
+
+              <h2 className="text-lg sm:text-xl font-bold text-zinc-100 mb-1">Order Berhasil Dibuat!</h2>
+              <p className="text-sm text-zinc-500 mb-5">Simpan Order ID di bawah untuk melacak status joki kamu.</p>
+
+              {/* Order IDs */}
+              <div className="space-y-2 mb-5">
+                {successModal.orderIds.map((id, i) => (
+                  <div key={i} className="glass rounded-xl p-3 flex items-center justify-between">
+                    <div className="text-left">
+                      <p className="text-[9px] uppercase text-zinc-500 tracking-wider">Order ID {successModal.orderIds.length > 1 ? `#${i + 1}` : ""}</p>
+                      <p className="text-lg font-mono font-bold text-violet-400 tracking-wider">{id}</p>
+                    </div>
+                    <button
+                      onClick={() => copyOrderId(id)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:bg-white/10 transition-all"
+                    >
+                      {copiedId === id ? <><Check className="size-3.5 text-green-400" /> Copied</> : <><Copy className="size-3.5" /> Copy</>}
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setSuccessModal(null); window.location.href = "/track-order"; }}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-2.5 text-sm font-medium text-white hover:from-violet-500 hover:to-violet-400 transition-all"
+                >
+                  <Search className="size-4" /> Track Order
+                </button>
+                <button
+                  onClick={() => setSuccessModal(null)}
+                  className="inline-flex items-center justify-center rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/10 transition-all"
+                >
+                  Tutup
+                </button>
+              </div>
+
+              <p className="mt-4 text-[10px] text-zinc-600">
+                💡 Order ID juga terkirim ke WhatsApp admin. Status: <span className="text-yellow-400">Processing</span>
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
