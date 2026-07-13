@@ -262,8 +262,31 @@
     "updatedAt": 1783931460868
   },
   "reviews": [],
-  "reports": [],
-  "notifications": [],
+  "reports": [
+    {
+      "name": "test nama",
+      "contact": "",
+      "type": "bug",
+      "subject": "test",
+      "description": "test",
+      "page": "https://akuma-joki.vercel.app/contact",
+      "id": "mriyyblvdsu9",
+      "status": "new",
+      "createdAt": 1783931832643
+    }
+  ],
+  "notifications": [
+    {
+      "type": "report_new",
+      "title": "Laporan bug: test",
+      "message": "Dari test nama: test",
+      "targetRole": "developer",
+      "link": "/admin/reports",
+      "id": "mriyyblwr1u0",
+      "read": false,
+      "createdAt": 1783931832644
+    }
+  ],
   "orders": [
     {
       "gameName": "Blox Fruits",
@@ -297,5 +320,5 @@
     }
   ],
   "version": 1,
-  "updatedAt": "2026-07-13T08:31:00.868Z"
+  "updatedAt": "2026-07-13T08:37:12.644Z"
 }
