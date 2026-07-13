@@ -8,9 +8,10 @@ import type { Game } from "@/lib/games-data";
 import type { ProductItem, ProductCategory } from "@/lib/games-data";
 import { GAMES } from "@/lib/games-data";
 import { useAkumaStore } from "@/lib/store";
+import { useAdminStore } from "@/lib/admin-store";
 import { useReviews } from "@/lib/reviews";
 import { useRecentlyViewed } from "@/lib/recently-viewed";
-import { useCart } from "@/lib/cart";
+import { useCart, MAX_CART_ITEMS } from "@/lib/cart";
 import { useToast } from "@/hooks/use-toast";
 import { PixelButton } from "./pixel-button";
 import { Reveal } from "./reveal";
@@ -30,6 +31,7 @@ export function StoreView({ game }: { game: Game }) {
   const trackGameView = useAdminStore((s) => s.trackGameView);
   const { toast } = useToast();
   const [selectedItem, setSelectedItem] = useState<{ item: ProductItem; category: string } | null>(null);
+  const [cartLimitModal, setCartLimitModal] = useState(false);
 
   // Track game view on mount
   useEffect(() => {
@@ -104,7 +106,7 @@ export function StoreView({ game }: { game: Game }) {
 
   const handleAddToCart = () => {
     if (!selectedItem) return;
-    cartAdd({
+    const success = cartAdd({
       id: `${game.slug}-${selectedItem.item.id}`,
       gameSlug: game.slug,
       gameName: game.name,
@@ -115,6 +117,17 @@ export function StoreView({ game }: { game: Game }) {
       price: selectedItem.item.price,
       category: selectedItem.category,
     });
+    if (!success) {
+      // Cart full (5 items) or duplicate
+      const isDuplicate = cartHas(`${game.slug}-${selectedItem.item.id}`);
+      if (isDuplicate) {
+        toast({ title: "Item sudah ada di keranjang", variant: "destructive" });
+      } else {
+        // Show limit modal
+        setCartLimitModal(true);
+      }
+      return;
+    }
     setSelectedItem(null);
     // Toast notification, NOT redirect
     toast({ title: "Ditambahkan ke keranjang! 🛒", description: `${selectedItem.item.name} (${selectedItem.item.priceLabel})` });
@@ -471,6 +484,51 @@ export function StoreView({ game }: { game: Game }) {
           </span>
         </Link>
       )}
+
+      {/* Cart Limit Modal */}
+      <AnimatePresence>
+        {cartLimitModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setCartLimitModal(false)}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-nav-strong rounded-3xl max-w-sm w-full p-6 text-center"
+              style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
+            >
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/15 border border-red-500/30">
+                <AlertTriangle className="size-7 text-red-400" />
+              </div>
+              <h2 className="text-lg font-bold text-zinc-100 mb-1">Limit 5 Order Tercapai</h2>
+              <p className="text-sm text-zinc-500 mb-5">
+                Untuk sementara, maksimal {MAX_CART_ITEMS} joki per order. Hapus item dari keranjang untuk menambah yang baru, atau checkout sekarang.
+              </p>
+              <div className="flex gap-2">
+                <Link
+                  href="/checkout"
+                  onClick={() => setCartLimitModal(false)}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-2.5 text-sm font-medium text-white hover:from-violet-500 hover:to-violet-400 transition-all"
+                >
+                  <ShoppingCart className="size-4" /> Checkout Sekarang
+                </Link>
+                <button
+                  onClick={() => setCartLimitModal(false)}
+                  className="inline-flex items-center justify-center rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/10 transition-all"
+                >
+                  Tutup
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
