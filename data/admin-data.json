@@ -273,54 +273,48 @@
   "reports": [],
   "notifications": [
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKXYHBUH] Raid Full Skill (Blox Fruits) - 10K oleh test",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKXYHBUH (200 Level) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrj2ev0counn",
+      "targetUser": "test",
+      "link": "/track-order",
+      "id": "mrj64tpqacsr",
       "read": false,
-      "createdAt": 1783937643132
+      "createdAt": 1783943893358
     },
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKXYHBUH] Raid 1-10 (Blox Fruits) - 10K oleh test",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKXYHBUH (300 Level) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrj2ev00zo28",
+      "targetUser": "test",
+      "link": "/track-order",
+      "id": "mrj64t0i2m2r",
       "read": false,
-      "createdAt": 1783937643120
+      "createdAt": 1783943892450
     },
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKXYHBUH] 300 Level (Blox Fruits) - 6K oleh test",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKXYHBUH (Raid 1-10) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrj2euzv3lav",
+      "targetUser": "test",
+      "link": "/track-order",
+      "id": "mrj64sk0m4i0",
       "read": false,
-      "createdAt": 1783937643115
+      "createdAt": 1783943891856
     },
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKXYHBUH] 200 Level (Blox Fruits) - 4K oleh test",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKXYHBUH (Raid Full Skill) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrj2euzkfzuz",
+      "targetUser": "test",
+      "link": "/track-order",
+      "id": "mrj64ra0zjd3",
       "read": false,
-      "createdAt": 1783937643104
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKXYHBUH] 100 Level (Blox Fruits) - 2K oleh test",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrj2euz6y3h3",
-      "read": false,
-      "createdAt": 1783937643090
+      "createdAt": 1783943890200
     }
   ],
   "orders": [
@@ -333,7 +327,7 @@
       "password": "test",
       "id": "mrj2ev032pyo9z",
       "createdAt": 1783937643123,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -344,7 +338,7 @@
       "password": "test",
       "id": "mrj2euzx6jnp7r",
       "createdAt": 1783937643117,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -355,7 +349,7 @@
       "password": "test",
       "id": "mrj2euzqlersch",
       "createdAt": 1783937643110,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -366,7 +360,7 @@
       "password": "test",
       "id": "mrj2euzb5mh3tp",
       "createdAt": 1783937643095,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -377,7 +371,7 @@
       "password": "test",
       "id": "mrj2euxtth7063",
       "createdAt": 1783937643041,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKVVC9EU",
@@ -424,14 +418,8 @@
       "status": "processing"
     }
   ],
-  "gameViews": [
-    {
-      "slug": "blox-fruits",
-      "date": "2026-07-13",
-      "count": 2
-    }
-  ],
+  "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-13T10:14:03.136Z"
+  "updatedAt": "2026-07-13T11:58:14.421Z"
 }
