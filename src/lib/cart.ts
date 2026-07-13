@@ -35,7 +35,9 @@ export const useCart = create<CartState>()(
       _hasHydrated: false,
       setHasHydrated: (v) => set({ _hasHydrated: v }),
       add: (item) => {
-        if (get().items.some((i) => i.id === item.id)) return; // no duplicate
+        const items = get().items;
+        if (items.some((i) => i.id === item.id)) return; // no duplicate
+        if (items.length >= 5) return; // max 5 items per cart
         set((s) => ({ items: [...s.items, item] }));
       },
       remove: (id) => set((s) => ({ items: s.items.filter((i) => i.id !== id) })),

@@ -32,6 +32,10 @@ export function CheckoutView() {
   const [successModal, setSuccessModal] = useState<{ orderIds: string[] } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  const MAX_ORDERS = 5;
+  const orderCount = cartItems.length || (order ? 1 : 0);
+  const maxReached = orderCount >= MAX_ORDERS;
+
   if (!hydrated) { return <CheckoutSkeleton />; }
 
   // Determine if we have cart items or single order
@@ -39,10 +43,11 @@ export function CheckoutView() {
   const hasOrder = !!order;
   const hasAnything = hasCart || hasOrder;
   const game = getGameBySlug(order?.gameSlug ?? null);
-  const canSubmit = hasAnything && username.trim().length > 0 && password.trim().length > 0 && agreed;
+  const canSubmit = hasAnything && username.trim().length > 0 && password.trim().length > 0 && agreed && !maxReached;
 
   const handleOrder = () => {
     if (!hasAnything) return;
+    if (maxReached) { toast({ title: "Maksimal 5 joki per order", description: "Hapus item atau selesaikan order dulu.", variant: "destructive" }); return; }
     if (!username.trim() || !password.trim()) { toast({ title: "Data belum lengkap", description: "Isi username & password Roblox dulu ya.", variant: "destructive" }); return; }
     if (!agreed) { toast({ title: "Konfirmasi dulu", description: "Centang persetujuan untuk lanjut.", variant: "destructive" }); return; }
 
@@ -180,6 +185,13 @@ export function CheckoutView() {
                     </span>
                   </label>
 
+                  {maxReached && (
+                    <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-center">
+                      <p className="text-xs text-red-400 font-medium">⚠️ Maksimal 5 joki per order tercapai!</p>
+                      <p className="text-[10px] text-zinc-500 mt-0.5">Hapus item dari keranjang untuk menambah yang lain.</p>
+                    </div>
+                  )}
+
                   <PixelButton
                     size="xl"
                     className="w-full"
@@ -191,7 +203,9 @@ export function CheckoutView() {
                   </PixelButton>
 
                   <p className="text-center text-[10px] text-[#9a93a8]">
-                    Tombol akan aktif setelah data terisi &amp; persetujuan dicentang.
+                    {maxReached
+                      ? "Limit 5 joki tercapai. Hapus item untuk lanjut."
+                      : `Maksimal 5 joki per order · ${orderCount}/${MAX_ORDERS} terpakai`}
                   </p>
                 </div>
               </div>

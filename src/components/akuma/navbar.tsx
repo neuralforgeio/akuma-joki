@@ -50,7 +50,7 @@ export function Navbar() {
     return searchIndex.filter((e) => e.label.toLowerCase().includes(q) || e.sublabel.toLowerCase().includes(q)).slice(0, 8);
   }, [searchQuery, searchIndex]);
 
-  // AI search: trigger debounced jika query >= 3 chars & contains keywords
+  // AI search: trigger debounced jika query >= 4 chars
   useEffect(() => {
     if (aiSearchTimer.current) clearTimeout(aiSearchTimer.current);
     const q = searchQuery.trim();
@@ -59,12 +59,7 @@ export function Navbar() {
       setAiSearching(false);
       return;
     }
-    // Trigger AI search for natural language queries
-    const isNaturalLanguage = /\b(termurah|termahal|paling|murah|mahal|untuk|rekomendasi|best|cheap|populer|hot)\b/i.test(q) || q.split(" ").length >= 3;
-    if (!isNaturalLanguage) {
-      setAiResults([]);
-      return;
-    }
+    // Trigger AI search untuk semua query >= 4 chars
     setAiSearching(true);
     aiSearchTimer.current = setTimeout(async () => {
       try {
@@ -88,7 +83,7 @@ export function Navbar() {
       } finally {
         setAiSearching(false);
       }
-    }, 800);
+    }, 600);
     return () => { if (aiSearchTimer.current) clearTimeout(aiSearchTimer.current); };
   }, [searchQuery]);
 

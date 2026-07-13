@@ -185,7 +185,7 @@ const AUTO_OPEN_DELAY = 12000;
 
 type Role = "cs" | "user";
 /** Variant bubble CS untuk rendering khusus (structured content). */
-type MsgVariant = "text" | "price-list";
+type MsgVariant = "text" | "price-list" | "order-input";
 type Msg = {
   id: number;
   role: Role;
@@ -716,7 +716,7 @@ export function WhatsAppWidget() {
       }
 
       if (isOrderQuery && !orderIdMatch) {
-        // User asks about order but didn't provide ID → ask for Order ID
+        // User asks about order but didn't provide ID → ask for Order ID with input box
         setTyping(true);
         window.setTimeout(() => {
           setTyping(false);
@@ -725,9 +725,10 @@ export function WhatsAppWidget() {
             {
               id: nextId(),
               role: "cs",
-              text: "📦 Untuk cek status order, ketik Order ID kamu (8 digit, mis. AK3X9F2K).\n\nOrder ID ada di modal setelah checkout & di pesan WhatsApp yang dikirim ke admin.",
+              text: "📦 Untuk cek status order, silakan ketik Order ID kamu (8 digit, mis. AK3X9F2K) di bawah ini:",
               ts: Date.now(),
               badge: "AUTO",
+              variant: "order-input",
             },
           ]);
           if (!muted) playBlip("recv");
@@ -1573,18 +1574,29 @@ export function WhatsAppWidget() {
 
 /* ============================ Sub-components ============================ */
 
-/** TypingText — animasi reveal text huruf demi huruf (typing effect) */
-function TypingText({ text, speed = 15 }: { text: string; speed?: number }) {
+/** TypingText — animasi reveal text huruf demi huruf (typing effect)
+ *  Hanya animate untuk pesan BARU (id > lastSeenId).
+ *  Pesan lama (saat widget dibuka kembali) langsung show tanpa animasi.
+ */
+function TypingText({ text, msgId }: { text: string; msgId: number }) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    // Skip animation untuk text yang sangat panjang (> 300 chars) atau yang ada newline
-    if (text.length > 300) {
+    // Cek apakah pesan ini sudah pernah dilihat (ada di sessionStorage)
+    const seenKey = `akuma-wa-seen-${msgId}`;
+    const wasSeen = sessionStorage.getItem(seenKey) === "1";
+
+    // Skip animation untuk text panjang atau yang sudah dilihat
+    if (wasSeen || text.length > 300) {
       setDisplayed(text);
       setDone(true);
       return;
     }
+
+    // Tandai sebagai sudah dilihat
+    sessionStorage.setItem(seenKey, "1");
+
     let i = 0;
     const interval = setInterval(() => {
       if (i < text.length) {
@@ -1594,9 +1606,9 @@ function TypingText({ text, speed = 15 }: { text: string; speed?: number }) {
         clearInterval(interval);
         setDone(true);
       }
-    }, speed);
+    }, 15);
     return () => clearInterval(interval);
-  }, [text, speed]);
+  }, [text, msgId]);
 
   return (
     <span className={cn(!done && "after:content-['▋'] after:text-violet-400 after:animate-pulse")}>
@@ -1605,11 +1617,68 @@ function TypingText({ text, speed = 15 }: { text: string; speed?: number }) {
   );
 }
 
+/** OrderInputContent — input box untuk user masukkan Order ID, lalu auto-reply status */
+function OrderInputContent({ msgId }: { msgId: number }) {
+  const [orderId, setOrderId] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+
+  const handleSubmit = () => {
+    const id = orderId.trim().toUpperCase();
+    if (id.length < 8) return;
+
+    setSubmitted(true);
+    const orders = useAdminStore.getState().orders;
+    const order = orders.find(o => o.orderId?.toUpperCase() === id);
+
+    if (order) {
+      const statusLabel = order.status === "processing" ? "🔄 Sedang Diproses" :
+        order.status === "done" ? "✅ Selesai" :
+        order.status === "cancelled" ? "❌ Dibatalkan" : "🆕 Baru";
+      setResult(`📦 Order ${order.orderId}\n\nGame: ${order.gameName}\nJoki: ${order.productName}\nHarga: ${order.priceLabel}\nStatus: ${statusLabel}\n\n${order.status === "processing" ? "Joki sedang berjalan! Mohon tunggu ya 🙏" : order.status === "done" ? "Order kamu sudah selesai! 🎉" : "Ada yang bisa kami bantu?"}`);
+    } else {
+      setResult(`❌ Order ID "${id}" tidak ditemukan.\n\nPastikan ID benar (8 digit). Cek di modal setelah checkout atau di pesan WhatsApp admin.`);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm text-[#e5e5e5]">📦 Ketik Order ID kamu (8 digit):</p>
+      {!submitted ? (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={orderId}
+            onChange={(e) => setOrderId(e.target.value.toUpperCase())}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            placeholder="AK3X9F2K"
+            maxLength={8}
+            className="flex-1 bg-[#0a0a0a] border-2 border-[#a020f0]/40 text-[#e5e5e5] px-2 py-1.5 text-sm font-mono uppercase tracking-wider outline-none focus:border-[#a020f0] pixel-corner"
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={orderId.length < 8}
+            className="bg-[#a020f0] text-white px-3 py-1.5 text-xs font-pixel uppercase pixel-corner hover:bg-[#c44bff] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            Cek
+          </button>
+        </div>
+      ) : (
+        <div className="bg-[#0a0a0a] border border-[#2a2436] rounded-md p-2.5">
+          <p className="text-[10px] text-[#9a93a8] mb-1">Order ID: {orderId}</p>
+          <p className="text-sm text-[#e5e5e5] whitespace-pre-line">{result}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
   const isUser = msg.role === "user";
   const isRedirect = msg.role === "cs" && msg.text === REDIRECT_MSG;
   const isHours = msg.role === "cs" && msg.text === HOURS_REPLY;
   const isPriceList = msg.variant === "price-list";
+  const isOrderInput = msg.variant === "order-input";
   // Baca csAvatar langsung dari store (Bubble adalah sub-component, tidak punya akses ke scope parent)
   const csAvatar = useAdminStore((s) => s.settings.csAvatar);
   const isCaraOrder = msg.role === "cs" && msg.text === CARA_ORDER_REPLY;
@@ -1662,12 +1731,14 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
         >
           {isPriceList ? (
             <PriceListContent games={priceGames} single={!!msg.priceGameSlug} />
+          ) : isOrderInput ? (
+            <OrderInputContent msgId={msg.id} />
           ) : isCaraOrder ? (
             <span className="whitespace-pre-line">{msg.text}</span>
           ) : isUser ? (
             <span className="whitespace-pre-line">{msg.text}</span>
           ) : (
-            <span className="whitespace-pre-line"><TypingText text={msg.text} /></span>
+            <span className="whitespace-pre-line"><TypingText text={msg.text} msgId={msg.id} /></span>
           )}
         </div>
         <div
