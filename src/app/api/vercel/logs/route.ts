@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     // Jika tidak ada deploymentId, ambil latest
     if (!deploymentId) {
       const depRes = await fetch(
-        `https://api.vercel.com/v6/deployments?app=${encodeURIComponent(PROJECT_NAME)}&limit=1&state=LATEST`,
+        `https://api.vercel.com/v6/deployments?app=${encodeURIComponent(PROJECT_NAME)}&limit=1`,
         { headers: { Authorization: `Bearer ${VERCEL_TOKEN}` } }
       );
       if (!depRes.ok) {
@@ -40,9 +40,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get deployment events (logs)
+    // Get deployment events (logs) — pakai v3 (v6 return "Invalid API version")
     const logsRes = await fetch(
-      `https://api.vercel.com/v6/deployments/${deploymentId}/events?limit=${limit}&types=stdout,stderr,command,exit`,
+      `https://api.vercel.com/v3/deployments/${deploymentId}/events?limit=${limit}&types=stdout,stderr,command,exit`,
       { headers: { Authorization: `Bearer ${VERCEL_TOKEN}` } }
     );
 
