@@ -8,9 +8,10 @@ import { HelpBanner } from "@/components/admin/help-tooltip";
 import {
   Rocket, RefreshCw, FileText, Settings, Trash2, Plus,
   CheckCircle2, XCircle, Clock, ExternalLink, GitBranch, AlertCircle, Activity,
-  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User, RotateCcw, Copy,
+  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User, RotateCcw, Copy, Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { confirmAction } from "@/lib/confirm-modal";
 
 type Deployment = {
   uid: string;
@@ -91,6 +92,7 @@ export default function DevVercelPage() {
   const [activeView, setActiveView] = useState<"deployments" | "env" | "project">("deployments");
   const [logFilter, setLogFilter] = useState<string>("all");
   const [logSearch, setLogSearch] = useState("");
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
   useEffect(() => {
     if (!isDeveloper()) {
@@ -141,6 +143,23 @@ export default function DevVercelPage() {
       setLogsLoading(false);
     }
   }, [toast]);
+
+  // Auto-refresh logs setiap 5 detik jika autoRefresh aktif & deployment terpilih
+  useEffect(() => {
+    if (!autoRefresh || !selectedDep) return;
+    const interval = setInterval(() => {
+      fetchLogs(selectedDep.uid);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [autoRefresh, selectedDep, fetchLogs]);
+
+  // Auto-refresh deployments list setiap 15 detik
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDeployments();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [fetchDeployments]);
 
   const handleDeploy = async (action: "redeploy" | "deploy-git" | "rollback" | "promote", refOrId?: string) => {
     setDeploying(true);
@@ -222,19 +241,26 @@ export default function DevVercelPage() {
   };
 
   const handleDeleteEnv = async (id: string, key: string) => {
-    if (!confirm(`Hapus env var '${key}'?`)) return;
-    try {
-      const res = await fetch(`/api/vercel/env?id=${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (data.ok) {
-        toast({ title: `✅ ${data.message}` });
-        fetchEnvs();
-      } else {
-        toast({ title: data.error || "Failed", variant: "destructive" });
-      }
-    } catch {
-      toast({ title: "Failed", variant: "destructive" });
-    }
+    confirmAction({
+      title: "Hapus Env Var?",
+      message: `Env var '${key}' akan dihapus permanen dari project.`,
+      variant: "danger",
+      confirmLabel: "Hapus",
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/vercel/env?id=${id}`, { method: "DELETE" });
+          const data = await res.json();
+          if (data.ok) {
+            toast({ title: `✅ ${data.message}` });
+            fetchEnvs();
+          } else {
+            toast({ title: data.error || "Failed", variant: "destructive" });
+          }
+        } catch {
+          toast({ title: "Failed", variant: "destructive" });
+        }
+      },
+    });
   };
 
   const handleSelectDeployment = (dep: Deployment) => {
@@ -526,9 +552,13 @@ export default function DevVercelPage() {
                   </button>
                   <button
                     onClick={() => {
-                      if (confirm(`Rollback ke deployment ini?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nIni akan membuat deployment PRODUCTION baru dengan code yang sama.`)) {
-                        handleDeploy("rollback", selectedDep.uid);
-                      }
+                      confirmAction({
+                        title: "Instant Rollback?",
+                        message: `Rollback ke deployment ini?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nIni akan membuat deployment PRODUCTION baru dengan code yang sama.`,
+                        variant: "warning",
+                        confirmLabel: "Rollback",
+                        onConfirm: () => handleDeploy("rollback", selectedDep.uid),
+                      });
                     }}
                     disabled={deploying}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-500/15 border border-yellow-500/30 px-3 py-2 text-xs text-yellow-400 hover:bg-yellow-500/25 transition-all disabled:opacity-50"
@@ -537,9 +567,13 @@ export default function DevVercelPage() {
                   </button>
                   <button
                     onClick={() => {
-                      if (confirm(`Promote deployment ini ke production?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nProduction URL akan update ke versi ini.`)) {
-                        handleDeploy("promote", selectedDep.uid);
-                      }
+                      confirmAction({
+                        title: "Promote to Production?",
+                        message: `Promote deployment ini ke production?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nProduction URL akan update ke versi ini.`,
+                        variant: "info",
+                        confirmLabel: "Promote",
+                        onConfirm: () => handleDeploy("promote", selectedDep.uid),
+                      });
                     }}
                     disabled={deploying}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-green-500/15 border border-green-500/30 px-3 py-2 text-xs text-green-400 hover:bg-green-500/25 transition-all disabled:opacity-50"
@@ -549,9 +583,13 @@ export default function DevVercelPage() {
                   {(selectedDep.state === "BUILDING" || selectedDep.state === "QUEUED" || selectedDep.state === "INITIALIZING") && (
                     <button
                       onClick={() => {
-                        if (confirm(`Cancel deployment ini?\n\n${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nBuild akan dihentikan.`)) {
-                          handleCancelDeploy(selectedDep.uid);
-                        }
+                        confirmAction({
+                          title: "Cancel Deploy?",
+                          message: `Cancel deployment ini?\n\n${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nBuild akan dihentikan.`,
+                          variant: "danger",
+                          confirmLabel: "Cancel Deploy",
+                          onConfirm: () => handleCancelDeploy(selectedDep.uid),
+                        });
                       }}
                       disabled={deploying}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-red-500/15 border border-red-500/30 px-3 py-2 text-xs text-red-400 hover:bg-red-500/25 transition-all disabled:opacity-50"
@@ -579,6 +617,31 @@ export default function DevVercelPage() {
                     >
                       <Copy className="size-3" /> Copy All
                     </button>
+                    <button
+                      onClick={() => {
+                        const text = logs.map(l => `[${new Date(l.ts || 0).toISOString()}] [${l.type}] ${l.text || ""}`).join("\n");
+                        const blob = new Blob([text], { type: "text/plain" });
+                        const a = document.createElement("a");
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `akuma-logs-${selectedDep.uid.slice(0, 12)}-${Date.now()}.log`;
+                        a.click();
+                        URL.revokeObjectURL(a.href);
+                        toast({ title: "✅ Logs downloaded!" });
+                      }}
+                      disabled={logs.length === 0}
+                      className="inline-flex items-center gap-1 text-[10px] text-zinc-400 hover:text-green-400 disabled:opacity-50"
+                    >
+                      <Download className="size-3" /> Download .log
+                    </button>
+                    <label className="inline-flex items-center gap-1 text-[10px] text-zinc-400 hover:text-violet-400 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoRefresh}
+                        onChange={(e) => setAutoRefresh(e.target.checked)}
+                        className="size-3 rounded"
+                      />
+                      Auto-refresh
+                    </label>
                     <button
                       onClick={() => fetchLogs(selectedDep.uid)}
                       disabled={logsLoading}

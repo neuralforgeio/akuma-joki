@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Upload, Check, X, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
+import { confirmAction } from "@/lib/confirm-modal";
 
 /**
  * AvatarCrop — component upload + crop foto profile (circle crop).
@@ -36,7 +37,14 @@ export function AvatarCrop({
   // Handle file upload
   const handleFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert("File terlalu besar (max 5MB)");
+      confirmAction({
+        title: "File Terlalu Besar",
+        message: "Ukuran file maksimal 5MB.",
+        variant: "warning",
+        confirmLabel: "OK",
+        cancelLabel: "Tutup",
+        onConfirm: () => {},
+      });
       return;
     }
     const reader = new FileReader();

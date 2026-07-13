@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Reveal } from "@/components/akuma/reveal";
 import { Starfield, MovingGrid } from "@/components/akuma/backgrounds";
 import { WHATSAPP_NUMBER } from "@/lib/games-data";
+import { confirmAction } from "@/lib/confirm-modal";
 
 export function WishlistView() {
   const items = useWishlist((s) => s.items);
@@ -114,7 +115,18 @@ export function WishlistView() {
             <MessageCircle className="size-4" /> Share via WhatsApp
           </button>
           <button
-            onClick={() => { if (confirm("Hapus semua wishlist?")) { clear(); toast({ title: "Wishlist dikosongkan" }); } }}
+            onClick={() => {
+              confirmAction({
+                title: "Hapus Semua Wishlist?",
+                message: "Semua item wishlist akan dihapus permanen.",
+                variant: "danger",
+                confirmLabel: "Hapus Semua",
+                onConfirm: () => {
+                  clear();
+                  toast({ title: "Wishlist dikosongkan" });
+                },
+              });
+            }}
             className="inline-flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500/20 transition-all"
           >
             <Trash2 className="size-4" /> Clear All

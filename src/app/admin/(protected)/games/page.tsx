@@ -6,6 +6,7 @@ import { PixelButton } from "@/components/akuma/pixel-button";
 import { HelpBanner } from "@/components/admin/help-tooltip";
 import { Gamepad2, Plus, Edit3, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { confirmAction } from "@/lib/confirm-modal";
 
 export default function AdminGamesPage() {
   const games = useAdminStore((s) => s.games);
@@ -13,10 +14,16 @@ export default function AdminGamesPage() {
   const { toast } = useToast();
 
   const handleDelete = (slug: string, name: string) => {
-    if (confirm(`Hapus game "${name}"? Ini tidak bisa diundo.`)) {
-      deleteGame(slug);
-      toast({ title: "Game dihapus", description: name });
-    }
+    confirmAction({
+      title: "Hapus Game?",
+      message: `Hapus game "${name}"? Ini tidak bisa diundo.`,
+      variant: "danger",
+      confirmLabel: "Hapus",
+      onConfirm: () => {
+        deleteGame(slug);
+        toast({ title: "Game dihapus", description: name });
+      },
+    });
   };
 
   return (

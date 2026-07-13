@@ -10,6 +10,7 @@ import { Save, Plus, Trash2, RotateCcw, Eye } from "lucide-react";
 import Link from "next/link";
 import { DEFAULT_ABOUT } from "@/lib/games-data";
 import type { AboutContent, AboutFeature, AboutStat } from "@/lib/games-data";
+import { confirmAction } from "@/lib/confirm-modal";
 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -95,10 +96,17 @@ export default function AboutAdminPage() {
   };
 
   const handleReset = () => {
-    if (!confirm("Reset ke default? Perubahan akan hilang.")) return;
-    setDraft({ ...DEFAULT_ABOUT, updatedAt: Date.now() });
-    setDirty(true);
-    toast({ title: "Draft direset ke default" });
+    confirmAction({
+      title: "Reset About Page?",
+      message: "Perubahan akan hilang dan dikembalikan ke default.",
+      variant: "warning",
+      confirmLabel: "Reset",
+      onConfirm: () => {
+        setDraft({ ...DEFAULT_ABOUT, updatedAt: Date.now() });
+        setDirty(true);
+        toast({ title: "Draft direset ke default" });
+      },
+    });
   };
 
   if (!hydrated) {

@@ -31,9 +31,9 @@ const MENU: MenuItem[] = [
   { href: "/admin/settings", label: "Settings", icon: Settings, roles: ["developer", "admin"] },
   { href: "/admin/game-analytics", label: "Game Analytics", icon: BarChart3, roles: ["developer"] },
   { href: "/admin/live-chat", label: "Live Chat", icon: MessageSquare, roles: ["developer", "admin"] },
+  { href: "/admin/reports", label: "Reports", icon: Inbox, roles: ["developer", "admin"] },
   // Developer-only features
   { href: "/admin/about", label: "About Page", icon: Info, roles: ["developer"] },
-  { href: "/admin/reports", label: "Reports", icon: Inbox, roles: ["developer"] },
   { href: "/admin/dev-vercel", label: "Vercel Control", icon: Rocket, roles: ["developer"] },
   { href: "/admin/dev-console", label: "Dev Console", icon: Terminal, roles: ["developer"] },
   { href: "/admin/dev-data", label: "Data Inspector", icon: Database, roles: ["developer"] },
@@ -81,7 +81,7 @@ export function AdminSidebar() {
   // Split: standard items vs developer items
   // Dev items = routes starting with /admin/dev- + /admin/about + /admin/reports
   const isDevItem = (href: string) =>
-    href.startsWith("/admin/dev-") || href === "/admin/about" || href === "/admin/reports";
+    href.startsWith("/admin/dev-") || href === "/admin/about";
   const standardItems = visibleMenu.filter((m) => !isDevItem(m.href));
   const devItems = visibleMenu.filter((m) => isDevItem(m.href));
 

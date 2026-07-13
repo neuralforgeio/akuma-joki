@@ -7,6 +7,7 @@ import { Package, Trash2, MessageCircle, CheckCircle2, Clock, XCircle, Copy, Che
 import { WHATSAPP_NUMBER } from "@/lib/games-data";
 import type { Order } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
+import { confirmAction } from "@/lib/confirm-modal";
 
 const STATUS_META: Record<Order["status"], { bg: string; text: string; border: string; icon: typeof Package; label: string }> = {
   new: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/40", icon: Clock, label: "Baru" },
@@ -164,7 +165,15 @@ export default function PesananPage() {
                         <MessageCircle className="size-3" /> WA
                       </button>
                       <button
-                        onClick={() => { if (confirm("Hapus pesanan ini?")) deleteOrder(o.id); }}
+                        onClick={() => {
+                          confirmAction({
+                            title: "Hapus Pesanan?",
+                            message: "Pesanan akan dihapus permanen.",
+                            variant: "danger",
+                            confirmLabel: "Hapus",
+                            onConfirm: () => deleteOrder(o.id),
+                          });
+                        }}
                         className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[10px] font-medium transition-all border bg-white/5 border-white/10 text-zinc-400 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30"
                       >
                         <Trash2 className="size-3" /> Hapus

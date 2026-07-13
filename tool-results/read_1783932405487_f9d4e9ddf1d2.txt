@@ -1,0 +1,789 @@
+     1→"use client";
+     2→
+     3→import { useState, useEffect, useCallback } from "react";
+     4→import { useRouter } from "next/navigation";
+     5→import { isDeveloper } from "@/lib/auth";
+     6→import { useToast } from "@/hooks/use-toast";
+     7→import { HelpBanner } from "@/components/admin/help-tooltip";
+     8→import {
+     9→  Rocket, RefreshCw, FileText, Settings, Trash2, Plus,
+    10→  CheckCircle2, XCircle, Clock, ExternalLink, GitBranch, AlertCircle, Activity,
+    11→  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User, RotateCcw, Copy,
+    12→} from "lucide-react";
+    13→import { cn } from "@/lib/utils";
+    14→
+    15→type Deployment = {
+    16→  uid: string;
+    17→  url: string;
+    18→  state: string;
+    19→  created: number;
+    20→  ready: number | null;
+    21→  building: number | null;
+    22→  source: string;
+    23→  commit: string | null;
+    24→  commitSha: string | null;
+    25→  commitRef: string | null;
+    26→  author: string | null;
+    27→  authorAvatar: string | null;
+    28→  target: string | null;
+    29→  alias: string[];
+    30→  inspectorUrl: string | null;
+    31→  memoryUsage: number | null;
+    32→  duration: number | null;
+    33→};
+    34→
+    35→type EnvVar = {
+    36→  id: string;
+    37→  key: string;
+    38→  type: string;
+    39→  target: string[];
+    40→  createdAt: string;
+    41→  updatedBy?: string;
+    42→};
+    43→
+    44→type LogEntry = { type: string; text: string; ts: number };
+    45→
+    46→const STATE_META: Record<string, { color: string; bg: string; label: string; icon: typeof CheckCircle2 }> = {
+    47→  READY: { color: "#10b981", bg: "rgba(16,185,129,0.1)", label: "Ready", icon: CheckCircle2 },
+    48→  BUILDING: { color: "#fbbf24", bg: "rgba(251,191,36,0.1)", label: "Building", icon: Clock },
+    49→  ERROR: { color: "#ef4444", bg: "rgba(239,68,68,0.1)", label: "Error", icon: XCircle },
+    50→  QUEUED: { color: "#22d3ee", bg: "rgba(34,211,238,0.1)", label: "Queued", icon: Clock },
+    51→  CANCELED: { color: "#71717a", bg: "rgba(113,113,122,0.1)", label: "Canceled", icon: XCircle },
+    52→  INITIALIZING: { color: "#a78bfa", bg: "rgba(167,139,250,0.1)", label: "Initializing", icon: Clock },
+    53→};
+    54→
+    55→function formatTime(ts: number) {
+    56→  return new Date(ts).toLocaleString("id-ID", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+    57→}
+    58→
+    59→function formatRelative(ts: number) {
+    60→  const diff = Date.now() - ts;
+    61→  if (diff < 60000) return "just now";
+    62→  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    63→  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    64→  return `${Math.floor(diff / 86400000)}d ago`;
+    65→}
+    66→
+    67→function formatDuration(ms: number | null) {
+    68→  if (!ms) return "-";
+    69→  if (ms < 1000) return `${ms}ms`;
+    70→  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+    71→  return `${Math.floor(ms / 60000)}m ${Math.floor((ms % 60000) / 1000)}s`;
+    72→}
+    73→
+    74→const PROJECT_URL = "https://akuma-joki.vercel.app/";
+    75→
+    76→export default function DevVercelPage() {
+    77→  const router = useRouter();
+    78→  const { toast } = useToast();
+    79→  const [authorized, setAuthorized] = useState(false);
+    80→  const [deployments, setDeployments] = useState<Deployment[]>([]);
+    81→  const [loading, setLoading] = useState(false);
+    82→  const [deploying, setDeploying] = useState(false);
+    83→  const [selectedDep, setSelectedDep] = useState<Deployment | null>(null);
+    84→  const [logs, setLogs] = useState<LogEntry[]>([]);
+    85→  const [logsLoading, setLogsLoading] = useState(false);
+    86→  const [envs, setEnvs] = useState<EnvVar[]>([]);
+    87→  const [envLoading, setEnvLoading] = useState(false);
+    88→  const [newEnvKey, setNewEnvKey] = useState("");
+    89→  const [newEnvValue, setNewEnvValue] = useState("");
+    90→  const [addingEnv, setAddingEnv] = useState(false);
+    91→  const [activeView, setActiveView] = useState<"deployments" | "env" | "project">("deployments");
+    92→  const [logFilter, setLogFilter] = useState<string>("all");
+    93→  const [logSearch, setLogSearch] = useState("");
+    94→
+    95→  useEffect(() => {
+    96→    if (!isDeveloper()) {
+    97→      toast({ title: "Akses ditolak: developer only", variant: "destructive" });
+    98→      router.replace("/admin");
+    99→      return;
+   100→    }
+   101→    setAuthorized(true);
+   102→    fetchDeployments();
+   103→    fetchEnvs();
+   104→  }, [router, toast]);
+   105→
+   106→  const fetchDeployments = useCallback(async () => {
+   107→    setLoading(true);
+   108→    try {
+   109→      const res = await fetch("/api/vercel/deployments?limit=30", { cache: "no-store" });
+   110→      const data = await res.json();
+   111→      if (data.ok) setDeployments(data.deployments);
+   112→      else toast({ title: data.error || "Failed to fetch deployments", variant: "destructive" });
+   113→    } catch {
+   114→      toast({ title: "Failed to fetch deployments", variant: "destructive" });
+   115→    } finally {
+   116→      setLoading(false);
+   117→    }
+   118→  }, [toast]);
+   119→
+   120→  const fetchEnvs = useCallback(async () => {
+   121→    setEnvLoading(true);
+   122→    try {
+   123→      const res = await fetch("/api/vercel/env", { cache: "no-store" });
+   124→      const data = await res.json();
+   125→      if (data.ok) setEnvs(data.envs);
+   126→    } catch { /* ignore */ }
+   127→    finally { setEnvLoading(false); }
+   128→  }, []);
+   129→
+   130→  const fetchLogs = useCallback(async (deploymentId: string) => {
+   131→    setLogsLoading(true);
+   132→    setLogs([]);
+   133→    try {
+   134→      const res = await fetch(`/api/vercel/logs?deploymentId=${deploymentId}&limit=100`, { cache: "no-store" });
+   135→      const data = await res.json();
+   136→      if (data.ok) setLogs(data.logs);
+   137→      else toast({ title: data.error || "Failed to fetch logs", variant: "destructive" });
+   138→    } catch {
+   139→      toast({ title: "Failed to fetch logs", variant: "destructive" });
+   140→    } finally {
+   141→      setLogsLoading(false);
+   142→    }
+   143→  }, [toast]);
+   144→
+   145→  const handleDeploy = async (action: "redeploy" | "deploy-git" | "rollback" | "promote", refOrId?: string) => {
+   146→    setDeploying(true);
+   147→    try {
+   148→      const body: any = { action };
+   149→      if ((action === "rollback" || action === "promote" || action === "redeploy") && refOrId) {
+   150→        body.deploymentId = refOrId;
+   151→      } else if (action === "deploy-git" && refOrId) {
+   152→        body.ref = refOrId;
+   153→      }
+   154→
+   155→      const res = await fetch("/api/vercel/deploy", {
+   156→        method: "POST",
+   157→        headers: { "Content-Type": "application/json" },
+   158→        body: JSON.stringify(body),
+   159→      });
+   160→      const data = await res.json();
+   161→      if (data.ok) {
+   162→        toast({ title: `✅ ${data.message}`, description: data.url ? `URL: ${data.url}` : undefined });
+   163→        setTimeout(() => fetchDeployments(), 3000);
+   164→      } else {
+   165→        toast({ title: data.error || "Deploy failed", variant: "destructive" });
+   166→      }
+   167→    } catch {
+   168→      toast({ title: "Deploy request failed", variant: "destructive" });
+   169→    } finally {
+   170→      setDeploying(false);
+   171→    }
+   172→  };
+   173→
+   174→  const handleCancelDeploy = async (deploymentId: string) => {
+   175→    setDeploying(true);
+   176→    try {
+   177→      const res = await fetch("/api/vercel/cancel", {
+   178→        method: "POST",
+   179→        headers: { "Content-Type": "application/json" },
+   180→        body: JSON.stringify({ deploymentId }),
+   181→      });
+   182→      const data = await res.json();
+   183→      if (data.ok) {
+   184→        toast({ title: `✅ ${data.message}` });
+   185→        setTimeout(() => fetchDeployments(), 2000);
+   186→      } else {
+   187→        toast({ title: data.error || "Cancel failed", variant: "destructive" });
+   188→      }
+   189→    } catch {
+   190→      toast({ title: "Cancel request failed", variant: "destructive" });
+   191→    } finally {
+   192→      setDeploying(false);
+   193→    }
+   194→  };
+   195→
+   196→  const handleAddEnv = async () => {
+   197→    if (!newEnvKey.trim() || !newEnvValue.trim()) {
+   198→      toast({ title: "Key & value wajib diisi", variant: "destructive" });
+   199→      return;
+   200→    }
+   201→    setAddingEnv(true);
+   202→    try {
+   203→      const res = await fetch("/api/vercel/env", {
+   204→        method: "POST",
+   205→        headers: { "Content-Type": "application/json" },
+   206→        body: JSON.stringify({ key: newEnvKey.trim(), value: newEnvValue.trim() }),
+   207→      });
+   208→      const data = await res.json();
+   209→      if (data.ok) {
+   210→        toast({ title: `✅ ${data.message}` });
+   211→        setNewEnvKey("");
+   212→        setNewEnvValue("");
+   213→        fetchEnvs();
+   214→      } else {
+   215→        toast({ title: data.error || "Failed", variant: "destructive" });
+   216→      }
+   217→    } catch {
+   218→      toast({ title: "Failed to add env", variant: "destructive" });
+   219→    } finally {
+   220→      setAddingEnv(false);
+   221→    }
+   222→  };
+   223→
+   224→  const handleDeleteEnv = async (id: string, key: string) => {
+   225→    if (!confirm(`Hapus env var '${key}'?`)) return;
+   226→    try {
+   227→      const res = await fetch(`/api/vercel/env?id=${id}`, { method: "DELETE" });
+   228→      const data = await res.json();
+   229→      if (data.ok) {
+   230→        toast({ title: `✅ ${data.message}` });
+   231→        fetchEnvs();
+   232→      } else {
+   233→        toast({ title: data.error || "Failed", variant: "destructive" });
+   234→      }
+   235→    } catch {
+   236→      toast({ title: "Failed", variant: "destructive" });
+   237→    }
+   238→  };
+   239→
+   240→  const handleSelectDeployment = (dep: Deployment) => {
+   241→    setSelectedDep(dep);
+   242→    fetchLogs(dep.uid);
+   243→  };
+   244→
+   245→  if (!authorized) {
+   246→    return (
+   247→      <div className="flex items-center justify-center py-20">
+   248→        <p className="font-pixel text-xs uppercase text-violet-400 animate-pulse">Memeriksa akses...</p>
+   249→      </div>
+   250→    );
+   251→  }
+   252→
+   253→  // Stats
+   254→  const stats = {
+   255→    total: deployments.length,
+   256→    ready: deployments.filter(d => d.state === "READY").length,
+   257→    building: deployments.filter(d => d.state === "BUILDING" || d.state === "INITIALIZING" || d.state === "QUEUED").length,
+   258→    errors: deployments.filter(d => d.state === "ERROR").length,
+   259→  };
+   260→
+   261→  return (
+   262→    <div className="space-y-5">
+   263→      <HelpBanner
+   264→        title="Vercel Control"
+   265→        description="Kelola deployment AKUMA JOKI (akuma-joki.vercel.app). Full control untuk developer."
+   266→        tips={[
+   267→          "Deployments: klik deployment mana pun untuk lihat detail & logs",
+   268→          "Trigger deploy: redeploy latest atau deploy dari git ref",
+   269→          "Env vars: tambah/hapus env vars (production/preview/dev)",
+   270→          "Project info: URL, framework, target deployments",
+   271→          "Token: akuma_joki_token (di Vercel project env vars)",
+   272→        ]}
+   273→      />
+   274→
+   275→      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+   276→        <div>
+   277→          <h1 className="text-xl font-bold text-gradient">Vercel Control</h1>
+   278→          <p className="mt-1 text-sm text-zinc-500 flex items-center gap-2 flex-wrap">
+   279→            <a href={PROJECT_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-cyan-400 hover:underline">
+   280→              <Globe className="size-3.5" /> akuma-joki.vercel.app
+   281→            </a>
+   282→            <span className="text-zinc-700">·</span>
+   283→            <span>{stats.total} deployments</span>
+   284→            <span className="text-zinc-700">·</span>
+   285→            <span className="text-green-400">{stats.ready} ready</span>
+   286→            {stats.building > 0 && <><span className="text-zinc-700">·</span><span className="text-yellow-400">{stats.building} building</span></>}
+   287→            {stats.errors > 0 && <><span className="text-zinc-700">·</span><span className="text-red-400">{stats.errors} errors</span></>}
+   288→          </p>
+   289→        </div>
+   290→        <div className="flex items-center gap-2">
+   291→          <a
+   292→            href={PROJECT_URL}
+   293→            target="_blank"
+   294→            rel="noopener noreferrer"
+   295→            className="inline-flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/30 px-3 py-2 text-sm text-green-400 hover:bg-green-500/20 transition-all"
+   296→          >
+   297→            <ExternalLink className="size-4" /> Live
+   298→          </a>
+   299→          <button
+   300→            onClick={fetchDeployments}
+   301→            disabled={loading}
+   302→            className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm text-zinc-300 hover:bg-white/10 transition-all disabled:opacity-50"
+   303→          >
+   304→            <RefreshCw className={cn("size-4", loading && "animate-spin")} /> Refresh
+   305→          </button>
+   306→        </div>
+   307→      </div>
+   308→
+   309→      {/* Quick Actions */}
+   310→      <div className="grid sm:grid-cols-3 gap-3">
+   311→        <button
+   312→          onClick={() => handleDeploy("redeploy")}
+   313→          disabled={deploying}
+   314→          className="glass rounded-2xl p-4 text-left hover:border-violet-500/30 transition-all disabled:opacity-50"
+   315→        >
+   316→          <div className="flex items-center gap-3">
+   317→            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/15 border border-violet-500/30">
+   318→              <Rocket className="size-5 text-violet-400" />
+   319→            </div>
+   320→            <div className="min-w-0">
+   321→              <p className="text-sm font-semibold text-zinc-100">Redeploy Latest</p>
+   322→              <p className="text-[10px] text-zinc-500">Trigger deploy dari latest commit</p>
+   323→            </div>
+   324→          </div>
+   325→        </button>
+   326→        <button
+   327→          onClick={() => handleDeploy("deploy-git", "main")}
+   328→          disabled={deploying}
+   329→          className="glass rounded-2xl p-4 text-left hover:border-cyan-500/30 transition-all disabled:opacity-50"
+   330→        >
+   331→          <div className="flex items-center gap-3">
+   332→            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/15 border border-cyan-500/30">
+   333→              <GitBranch className="size-5 text-cyan-400" />
+   334→            </div>
+   335→            <div className="min-w-0">
+   336→              <p className="text-sm font-semibold text-zinc-100">Deploy from main</p>
+   337→              <p className="text-[10px] text-zinc-500">Deploy dari branch main</p>
+   338→            </div>
+   339→          </div>
+   340→        </button>
+   341→        <a
+   342→          href="https://vercel.com/dashboard"
+   343→          target="_blank"
+   344→          rel="noopener noreferrer"
+   345→          className="glass rounded-2xl p-4 hover:border-white/20 transition-all"
+   346→        >
+   347→          <div className="flex items-center gap-3">
+   348→            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10">
+   349→              <ExternalLink className="size-5 text-zinc-400" />
+   350→            </div>
+   351→            <div className="min-w-0">
+   352→              <p className="text-sm font-semibold text-zinc-100">Vercel Dashboard</p>
+   353→              <p className="text-[10px] text-zinc-500">Buka dashboard Vercel</p>
+   354→            </div>
+   355→          </div>
+   356→        </a>
+   357→      </div>
+   358→
+   359→      {/* View tabs */}
+   360→      <div className="flex gap-1.5 border-b border-white/8 pb-1">
+   361→        {[
+   362→          { id: "deployments" as const, label: "Deployments", icon: Activity },
+   363→          { id: "env" as const, label: "Env Vars", icon: Settings },
+   364→          { id: "project" as const, label: "Project Info", icon: Globe },
+   365→        ].map(t => {
+   366→          const Icon = t.icon;
+   367→          return (
+   368→            <button
+   369→              key={t.id}
+   370→              onClick={() => setActiveView(t.id)}
+   371→              className={cn(
+   372→                "inline-flex items-center gap-1.5 px-4 py-2 rounded-t-lg text-sm font-medium transition-all",
+   373→                activeView === t.id ? "bg-violet-500/10 text-violet-400 border-b-2 border-violet-500" : "text-zinc-500 hover:text-zinc-300"
+   374→              )}
+   375→            >
+   376→              <Icon className="size-4" /> {t.label}
+   377→            </button>
+   378→          );
+   379→        })}
+   380→      </div>
+   381→
+   382→      {/* DEPLOYMENTS VIEW */}
+   383→      {activeView === "deployments" && (
+   384→        <div className="grid lg:grid-cols-5 gap-4">
+   385→          {/* Deployments list (left) */}
+   386→          <div className={cn("glass rounded-2xl p-4", selectedDep ? "lg:col-span-2" : "lg:col-span-5")}>
+   387→            <div className="mb-3 flex items-center justify-between">
+   388→              <div className="flex items-center gap-2">
+   389→                <Activity className="size-4 text-violet-400" />
+   390→                <h2 className="text-sm font-semibold text-zinc-100">All Deployments</h2>
+   391→                <span className="text-[10px] text-zinc-500">({deployments.length})</span>
+   392→              </div>
+   393→            </div>
+   394→            {loading ? (
+   395→              <p className="text-sm text-zinc-500 py-8 text-center">Loading...</p>
+   396→            ) : deployments.length === 0 ? (
+   397→              <p className="text-sm text-zinc-500 py-8 text-center">No deployments found</p>
+   398→            ) : (
+   399→              <div className="space-y-1.5 max-h-[600px] overflow-y-auto akuma-scroll">
+   400→                {deployments.map(d => {
+   401→                  const meta = STATE_META[d.state] || STATE_META.READY;
+   402→                  const StateIcon = meta.icon;
+   403→                  const isSelected = selectedDep?.uid === d.uid;
+   404→                  return (
+   405→                    <button
+   406→                      key={d.uid}
+   407→                      onClick={() => handleSelectDeployment(d)}
+   408→                      className={cn(
+   409→                        "w-full text-left rounded-xl p-3 transition-all border",
+   410→                        isSelected ? "bg-violet-500/10 border-violet-500/40" : "bg-white/3 border-transparent hover:bg-white/5 hover:border-white/10"
+   411→                      )}
+   412→                    >
+   413→                      <div className="flex items-center gap-3">
+   414→                        <div
+   415→                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+   416→                          style={{ backgroundColor: meta.bg, color: meta.color }}
+   417→                        >
+   418→                          <StateIcon className="size-4" />
+   419→                        </div>
+   420→                        <div className="min-w-0 flex-1">
+   421→                          <p className="text-sm text-zinc-100 truncate">
+   422→                            {d.commit || `${d.source} · ${formatTime(d.created)}`}
+   423→                          </p>
+   424→                          <p className="text-[10px] text-zinc-500 flex items-center gap-1.5 flex-wrap">
+   425→                            {d.commitRef && <span className="inline-flex items-center gap-0.5"><GitBranch className="size-2.5" />{d.commitRef}</span>}
+   426→                            <span>·</span>
+   427→                            <span>{formatRelative(d.created)}</span>
+   428→                            {d.target === "production" && <span className="text-violet-400 font-semibold">· PROD</span>}
+   429→                          </p>
+   430→                        </div>
+   431→                        <ChevronRight className="size-4 text-zinc-600 shrink-0" />
+   432→                      </div>
+   433→                    </button>
+   434→                  );
+   435→                })}
+   436→              </div>
+   437→            )}
+   438→          </div>
+   439→
+   440→          {/* Detail view (right) */}
+   441→          {selectedDep && (
+   442→            <div className="lg:col-span-3 space-y-4">
+   443→              {/* Back button (mobile) */}
+   444→              <button
+   445→                onClick={() => { setSelectedDep(null); setLogs([]); }}
+   446→                className="lg:hidden inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200"
+   447→              >
+   448→                <ArrowLeft className="size-3.5" /> Back to list
+   449→              </button>
+   450→
+   451→              {/* Deployment info */}
+   452→              <div className="glass rounded-2xl p-4">
+   453→                <div className="flex items-center justify-between mb-3">
+   454→                  <div className="flex items-center gap-2">
+   455→                    {(() => {
+   456→                      const meta = STATE_META[selectedDep.state] || STATE_META.READY;
+   457→                      const StateIcon = meta.icon;
+   458→                      return (
+   459→                        <>
+   460→                          <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: meta.bg, color: meta.color }}>
+   461→                            <StateIcon className="size-4" />
+   462→                          </div>
+   463→                          <span className="text-sm font-semibold text-zinc-100">{meta.label}</span>
+   464→                        </>
+   465→                      );
+   466→                    })()}
+   467→                  </div>
+   468→                  <div className="flex items-center gap-1">
+   469→                    <a
+   470→                      href={`https://${selectedDep.url}`}
+   471→                      target="_blank"
+   472→                      rel="noopener noreferrer"
+   473→                      className="inline-flex items-center gap-1 rounded-lg bg-green-500/10 border border-green-500/30 px-2.5 py-1.5 text-[11px] text-green-400 hover:bg-green-500/20 transition-all"
+   474→                    >
+   475→                      <ExternalLink className="size-3" /> Visit
+   476→                    </a>
+   477→                    {selectedDep.inspectorUrl && (
+   478→                      <a
+   479→                        href={selectedDep.inspectorUrl}
+   480→                        target="_blank"
+   481→                        rel="noopener noreferrer"
+   482→                        className="inline-flex items-center gap-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 px-2.5 py-1.5 text-[11px] text-cyan-400 hover:bg-cyan-500/20 transition-all"
+   483→                      >
+   484→                        <Code className="size-3" /> Inspector
+   485→                      </a>
+   486→                    )}
+   487→                  </div>
+   488→                </div>
+   489→
+   490→                <div className="space-y-2">
+   491→                  {selectedDep.commit && (
+   492→                    <InfoRow icon={GitBranch} label="Commit" value={selectedDep.commit} />
+   493→                  )}
+   494→                  {selectedDep.commitSha && (
+   495→                    <InfoRow icon={Code} label="SHA" value={selectedDep.commitSha.slice(0, 12)} mono />
+   496→                  )}
+   497→                  {selectedDep.author && (
+   498→                    <InfoRow icon={User} label="Author" value={selectedDep.author} avatar={selectedDep.authorAvatar} />
+   499→                  )}
+   500→                  <InfoRow icon={Clock} label="Created" value={formatTime(selectedDep.created)} />
+   501→                  {selectedDep.ready && (
+   502→                    <InfoRow icon={CheckCircle2} label="Ready" value={formatTime(selectedDep.ready)} />
+   503→                  )}
+   504→                  {selectedDep.duration && (
+   505→                    <InfoRow icon={Timer} label="Duration" value={formatDuration(selectedDep.duration)} />
+   506→                  )}
+   507→                  {selectedDep.memoryUsage && (
+   508→                    <InfoRow icon={MemoryStick} label="Memory" value={`${(selectedDep.memoryUsage / 1024 / 1024).toFixed(1)} MB`} />
+   509→                  )}
+   510→                  {selectedDep.target && (
+   511→                    <InfoRow icon={Rocket} label="Target" value={selectedDep.target} badge />
+   512→                  )}
+   513→                  {selectedDep.alias.length > 0 && (
+   514→                    <InfoRow icon={Globe} label="Alias" value={selectedDep.alias.join(", ")} />
+   515→                  )}
+   516→                </div>
+   517→
+   518→                {/* Action buttons: Redeploy, Rollback, Promote, Cancel */}
+   519→                <div className="mt-4 pt-4 border-t border-white/8 flex flex-wrap gap-2">
+   520→                  <button
+   521→                    onClick={() => handleDeploy("redeploy", selectedDep.uid)}
+   522→                    disabled={deploying}
+   523→                    className="inline-flex items-center gap-1.5 rounded-lg bg-violet-500/15 border border-violet-500/30 px-3 py-2 text-xs text-violet-400 hover:bg-violet-500/25 transition-all disabled:opacity-50"
+   524→                  >
+   525→                    <Rocket className="size-3.5" /> Redeploy
+   526→                  </button>
+   527→                  <button
+   528→                    onClick={() => {
+   529→                      if (confirm(`Rollback ke deployment ini?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nIni akan membuat deployment PRODUCTION baru dengan code yang sama.`)) {
+   530→                        handleDeploy("rollback", selectedDep.uid);
+   531→                      }
+   532→                    }}
+   533→                    disabled={deploying}
+   534→                    className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-500/15 border border-yellow-500/30 px-3 py-2 text-xs text-yellow-400 hover:bg-yellow-500/25 transition-all disabled:opacity-50"
+   535→                  >
+   536→                    <RotateCcw className="size-3.5" /> Instant Rollback
+   537→                  </button>
+   538→                  <button
+   539→                    onClick={() => {
+   540→                      if (confirm(`Promote deployment ini ke production?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nProduction URL akan update ke versi ini.`)) {
+   541→                        handleDeploy("promote", selectedDep.uid);
+   542→                      }
+   543→                    }}
+   544→                    disabled={deploying}
+   545→                    className="inline-flex items-center gap-1.5 rounded-lg bg-green-500/15 border border-green-500/30 px-3 py-2 text-xs text-green-400 hover:bg-green-500/25 transition-all disabled:opacity-50"
+   546→                  >
+   547→                    <CheckCircle2 className="size-3.5" /> Promote to Prod
+   548→                  </button>
+   549→                  {(selectedDep.state === "BUILDING" || selectedDep.state === "QUEUED" || selectedDep.state === "INITIALIZING") && (
+   550→                    <button
+   551→                      onClick={() => {
+   552→                        if (confirm(`Cancel deployment ini?\n\n${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nBuild akan dihentikan.`)) {
+   553→                          handleCancelDeploy(selectedDep.uid);
+   554→                        }
+   555→                      }}
+   556→                      disabled={deploying}
+   557→                      className="inline-flex items-center gap-1.5 rounded-lg bg-red-500/15 border border-red-500/30 px-3 py-2 text-xs text-red-400 hover:bg-red-500/25 transition-all disabled:opacity-50"
+   558→                    >
+   559→                      <XCircle className="size-3.5" /> Cancel Deploy
+   560→                    </button>
+   561→                  )}
+   562→                </div>
+   563→              </div>
+   564→              <div className="glass rounded-2xl p-4">
+   565→                <div className="flex items-center justify-between mb-3">
+   566→                  <div className="flex items-center gap-2">
+   567→                    <FileText className="size-4 text-cyan-400" />
+   568→                    <h2 className="text-sm font-semibold text-zinc-100">Build Logs</h2>
+   569→                    <span className="text-[10px] text-zinc-500 font-mono">({logs.length})</span>
+   570→                  </div>
+   571→                  <div className="flex items-center gap-2">
+   572→                    <button
+   573→                      onClick={() => {
+   574→                        const text = logs.map(l => `[${l.type}] ${l.text || ""}`).join("\n");
+   575→                        try { navigator.clipboard.writeText(text); toast({ title: "✅ All logs copied!" }); } catch {}
+   576→                      }}
+   577→                      disabled={logs.length === 0}
+   578→                      className="inline-flex items-center gap-1 text-[10px] text-zinc-400 hover:text-cyan-400 disabled:opacity-50"
+   579→                    >
+   580→                      <Copy className="size-3" /> Copy All
+   581→                    </button>
+   582→                    <button
+   583→                      onClick={() => fetchLogs(selectedDep.uid)}
+   584→                      disabled={logsLoading}
+   585→                      className="text-[10px] text-zinc-500 hover:text-zinc-300"
+   586→                    >
+   587→                      {logsLoading ? "Loading..." : "Refresh"}
+   588→                    </button>
+   589→                  </div>
+   590→                </div>
+   591→
+   592→                {/* Log type filter & search */}
+   593→                {logs.length > 0 && (
+   594→                  <div className="flex flex-wrap items-center gap-2 mb-2">
+   595→                    {["all", "stdout", "stderr", "command", "exit"].map(t => {
+   596→                      const count = t === "all" ? logs.length : logs.filter(l => l.type === t).length;
+   597→                      return (
+   598→                        <button
+   599→                          key={t}
+   600→                          onClick={() => setLogFilter(t)}
+   601→                          className={cn(
+   602→                            "rounded-full px-2.5 py-1 text-[9px] font-mono uppercase tracking-wider transition-all border",
+   603→                            logFilter === t ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-400" : "bg-white/5 border-white/10 text-zinc-500 hover:text-zinc-300"
+   604→                          )}
+   605→                        >
+   606→                          {t} ({count})
+   607→                        </button>
+   608→                      );
+   609→                    })}
+   610→                    <input
+   611→                      value={logSearch}
+   612→                      onChange={(e) => setLogSearch(e.target.value)}
+   613→                      placeholder="Search logs..."
+   614→                      className="ml-auto w-40 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[10px] text-zinc-100 outline-none focus:border-cyan-500/40"
+   615→                    />
+   616→                  </div>
+   617→                )}
+   618→
+   619→                {logsLoading ? (
+   620→                  <p className="text-sm text-zinc-500 py-8 text-center">Loading logs...</p>
+   621→                ) : logs.length === 0 ? (
+   622→                  <p className="text-sm text-zinc-500 py-8 text-center">No logs available</p>
+   623→                ) : (
+   624→                  <div className="bg-black/50 rounded-xl p-3 h-80 overflow-y-auto akuma-scroll font-mono text-[11px] space-y-0">
+   625→                    {logs
+   626→                      .filter(l => logFilter === "all" || l.type === logFilter)
+   627→                      .filter(l => !logSearch || (l.text || "").toLowerCase().includes(logSearch.toLowerCase()))
+   628→                      .map((log, i) => {
+   629→                        const time = log.ts ? new Date(log.ts).toLocaleTimeString("en-US", { hour12: false }) : "";
+   630→                        const colorClass = log.type === "stderr" ? "text-red-400" : log.type === "exit" ? "text-yellow-400" : log.type === "command" ? "text-cyan-400" : "text-green-400";
+   631→                        const badgeColor = log.type === "stderr" ? "bg-red-500/20 text-red-400" : log.type === "exit" ? "bg-yellow-500/20 text-yellow-400" : log.type === "command" ? "bg-cyan-500/20 text-cyan-400" : "bg-green-500/20 text-green-400";
+   632→                        return (
+   633→                          <div key={i} className="flex items-start gap-2 py-0.5 hover:bg-white/3 px-1 rounded group">
+   634→                            <span className="text-zinc-700 shrink-0 select-none">{time}</span>
+   635→                            <span className={cn("shrink-0 px-1 rounded text-[8px] uppercase font-bold", badgeColor)}>{log.type}</span>
+   636→                            <span className={cn("whitespace-pre-wrap break-all", colorClass)}>{log.text}</span>
+   637→                          </div>
+   638→                        );
+   639→                      })}
+   640→                  </div>
+   641→                )}
+   642→              </div>
+   643→            </div>
+   644→          )}
+   645→        </div>
+   646→      )}
+   647→
+   648→      {/* ENV VARS VIEW */}
+   649→      {activeView === "env" && (
+   650→        <div className="glass rounded-2xl p-5">
+   651→          <div className="mb-4 flex items-center justify-between">
+   652→            <div className="flex items-center gap-2">
+   653→              <Settings className="size-4 text-amber-400" />
+   654→              <h2 className="text-sm font-semibold text-zinc-100">Environment Variables</h2>
+   655→              <span className="text-[10px] text-zinc-500">({envs.length})</span>
+   656→            </div>
+   657→            <button
+   658→              onClick={fetchEnvs}
+   659→              disabled={envLoading}
+   660→              className="text-[10px] text-zinc-500 hover:text-zinc-300"
+   661→            >
+   662→              {envLoading ? "Loading..." : "Refresh"}
+   663→            </button>
+   664→          </div>
+   665→
+   666→          <div className="glass rounded-xl p-3 mb-3 space-y-2">
+   667→            <div className="flex gap-2">
+   668→              <input
+   669→                type="text"
+   670→                value={newEnvKey}
+   671→                onChange={(e) => setNewEnvKey(e.target.value)}
+   672→                placeholder="KEY (mis. DATABASE_URL)"
+   673→                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 font-mono outline-none focus:border-violet-500/40"
+   674→              />
+   675→              <input
+   676→                type="password"
+   677→                value={newEnvValue}
+   678→                onChange={(e) => setNewEnvValue(e.target.value)}
+   679→                placeholder="value"
+   680→                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40"
+   681→              />
+   682→              <button
+   683→                onClick={handleAddEnv}
+   684→                disabled={addingEnv}
+   685→                className="inline-flex items-center gap-1.5 rounded-lg bg-violet-500/20 border border-violet-500/30 px-3 py-2 text-sm text-violet-400 hover:bg-violet-500/30 transition-all disabled:opacity-50"
+   686→              >
+   687→                <Plus className="size-3.5" /> Add
+   688→              </button>
+   689→            </div>
+   690→            <p className="text-[10px] text-zinc-600">
+   691→              Value di-encrypt oleh Vercel. Tidak bisa dilihat setelah disimpan (security).
+   692→            </p>
+   693→          </div>
+   694→
+   695→          {envs.length === 0 ? (
+   696→            <p className="text-sm text-zinc-500 py-4 text-center">
+   697→              {envLoading ? "Loading..." : "No env vars found"}
+   698→            </p>
+   699→          ) : (
+   700→            <div className="space-y-1.5">
+   701→              {envs.map(e => (
+   702→                <div key={e.id} className="glass rounded-lg px-3 py-2 flex items-center gap-3">
+   703→                  <div className="min-w-0 flex-1">
+   704→                    <p className="text-sm text-zinc-100 font-mono truncate">{e.key}</p>
+   705→                    <p className="text-[10px] text-zinc-600">
+   706→                      {e.type} · {e.target.join(", ")} · {formatTime(new Date(e.createdAt).getTime())}
+   707→                    </p>
+   708→                  </div>
+   709→                  <button
+   710→                    onClick={() => handleDeleteEnv(e.id, e.key)}
+   711→                    className="rounded-lg p-1.5 text-zinc-500 hover:text-red-400 hover:bg-white/5 transition-all shrink-0"
+   712→                    aria-label="Hapus"
+   713→                  >
+   714→                    <Trash2 className="size-3.5" />
+   715→                  </button>
+   716→                </div>
+   717→              ))}
+   718→            </div>
+   719→          )}
+   720→        </div>
+   721→      )}
+   722→
+   723→      {/* PROJECT INFO VIEW */}
+   724→      {activeView === "project" && (
+   725→        <div className="glass rounded-2xl p-5 space-y-3">
+   726→          <div className="flex items-center gap-2 mb-2">
+   727→            <Globe className="size-4 text-cyan-400" />
+   728→            <h2 className="text-sm font-semibold text-zinc-100">Project Info</h2>
+   729→          </div>
+   730→          <div className="grid sm:grid-cols-2 gap-3">
+   731→            <InfoCard label="Production URL" value={PROJECT_URL} link />
+   732→            <InfoCard label="Project Name" value="akuma-joki" />
+   733→            <InfoCard label="Framework" value="Next.js" />
+   734→            <InfoCard label="Repository" value="luminarydearx/akuma-joki" link="https://github.com/luminarydearx/akuma-joki" />
+   735→            <InfoCard label="Branch" value="main" />
+   736→            <InfoCard label="Token Env" value="akuma_joki_token" mono />
+   737→          </div>
+   738→          <div className="glass rounded-xl p-3 mt-3">
+   739→            <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Quick Links</p>
+   740→            <div className="flex flex-wrap gap-2 mt-2">
+   741→              <a href={PROJECT_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-green-500/10 border border-green-500/30 px-3 py-1.5 text-xs text-green-400 hover:bg-green-500/20 transition-all">
+   742→                <ExternalLink className="size-3" /> Live Site
+   743→              </a>
+   744→              <a href="https://github.com/luminarydearx/akuma-joki" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 transition-all">
+   745→                <GitBranch className="size-3" /> GitHub
+   746→              </a>
+   747→              <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 transition-all">
+   748→                <ExternalLink className="size-3" /> Vercel Dashboard
+   749→              </a>
+   750→            </div>
+   751→          </div>
+   752→        </div>
+   753→      )}
+   754→    </div>
+   755→  );
+   756→}
+   757→
+   758→function InfoRow({ icon: Icon, label, value, mono, badge, avatar }: { icon: typeof Code; label: string; value: string; mono?: boolean; badge?: boolean; avatar?: string | null }) {
+   759→  return (
+   760→    <div className="flex items-center gap-3 py-1.5 border-b border-white/5 last:border-0">
+   761→      <Icon className="size-3.5 text-zinc-500 shrink-0" />
+   762→      <span className="text-[11px] text-zinc-500 uppercase tracking-wider w-20 shrink-0">{label}</span>
+   763→      <div className="flex-1 min-w-0 flex items-center gap-2">
+   764→        {avatar && <img src={avatar} alt="" className="size-4 rounded-full" />}
+   765→        <span className={cn("text-sm text-zinc-100 truncate", mono && "font-mono text-cyan-400")}>
+   766→          {badge ? <span className="px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400 text-[10px] uppercase">{value}</span> : value}
+   767→        </span>
+   768→      </div>
+   769→    </div>
+   770→  );
+   771→}
+   772→
+   773→function InfoCard({ label, value, link, mono }: { label: string; value: string; link?: boolean | string; mono?: boolean }) {
+   774→  const isLink = link === true || typeof link === "string";
+   775→  const href = typeof link === "string" ? link : value;
+   776→  return (
+   777→    <div className="glass rounded-xl p-3">
+   778→      <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">{label}</p>
+   779→      {isLink ? (
+   780→        <a href={href} target="_blank" rel="noopener noreferrer" className={cn("text-sm text-cyan-400 hover:underline truncate block", mono && "font-mono")}>
+   781→          {value}
+   782→        </a>
+   783→      ) : (
+   784→        <p className={cn("text-sm text-zinc-100 truncate", mono && "font-mono")}>{value}</p>
+   785→      )}
+   786→    </div>
+   787→  );
+   788→}
+   789→

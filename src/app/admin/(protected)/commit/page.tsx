@@ -5,6 +5,7 @@ import { useAdminStore } from "@/lib/admin-store";
 import { PixelButton } from "@/components/akuma/pixel-button";
 import { useToast } from "@/hooks/use-toast";
 import { GitCommit, Save, RotateCcw, History, Rocket, RefreshCw } from "lucide-react";
+import { confirmAction } from "@/lib/confirm-modal";
 
 export default function CommitPage() {
   const commits = useAdminStore((s) => s.commits);
@@ -25,32 +26,45 @@ export default function CommitPage() {
   };
 
   const handleRollback = (id: string, msg: string) => {
-    if (confirm(`Rollback ke commit "${msg}"? Data saat ini akan diganti dengan snapshot.`)) {
-      rollbackCommit(id);
-      toast({ title: "Rollback berhasil!" });
-    }
+    confirmAction({
+      title: "Rollback Commit?",
+      message: `Rollback ke commit "${msg}"? Data saat ini akan diganti dengan snapshot.`,
+      variant: "warning",
+      confirmLabel: "Rollback",
+      onConfirm: () => {
+        rollbackCommit(id);
+        toast({ title: "Rollback berhasil!" });
+      },
+    });
   };
 
   const handleTriggerDeploy = async () => {
-    if (!confirm("Trigger deploy ke Vercel? Ini akan redeploy latest commit.")) return;
-    setDeploying(true);
-    try {
-      const res = await fetch("/api/vercel/deploy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "redeploy" }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        toast({ title: `✅ ${data.message}`, description: data.url ? `URL: ${data.url}` : undefined });
-      } else {
-        toast({ title: data.error || "Deploy failed", variant: "destructive" });
-      }
-    } catch {
-      toast({ title: "Deploy request failed", variant: "destructive" });
-    } finally {
-      setDeploying(false);
-    }
+    confirmAction({
+      title: "Trigger Vercel Deploy?",
+      message: "Ini akan redeploy latest commit ke Vercel.",
+      variant: "info",
+      confirmLabel: "Deploy",
+      onConfirm: async () => {
+        setDeploying(true);
+        try {
+          const res = await fetch("/api/vercel/deploy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "redeploy" }),
+          });
+          const data = await res.json();
+          if (data.ok) {
+            toast({ title: `✅ ${data.message}`, description: data.url ? `URL: ${data.url}` : undefined });
+          } else {
+            toast({ title: data.error || "Deploy failed", variant: "destructive" });
+          }
+        } catch {
+          toast({ title: "Deploy request failed", variant: "destructive" });
+        } finally {
+          setDeploying(false);
+        }
+      },
+    });
   };
 
   return (

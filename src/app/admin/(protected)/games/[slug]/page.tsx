@@ -7,6 +7,7 @@ import { PixelButton } from "@/components/akuma/pixel-button";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
 import Link from "next/link";
+import { confirmAction } from "@/lib/confirm-modal";
 
 export default function EditGamePage() {
   const router = useRouter();
@@ -180,7 +181,13 @@ export default function EditGamePage() {
               </h3>
               <button
                 onClick={() => {
-                  if (confirm(`Hapus kategori ${cat.name}?`)) deleteCategory(slug, cat.id);
+                  confirmAction({
+                    title: "Hapus Kategori?",
+                    message: `Kategori ${cat.name} akan dihapus permanen beserta semua item di dalamnya.`,
+                    variant: "danger",
+                    confirmLabel: "Hapus",
+                    onConfirm: () => deleteCategory(slug, cat.id),
+                  });
                 }}
                 className="flex items-center gap-1 font-pixel text-[7px] uppercase text-[#ff3b6b] border-2 border-[#ff3b6b]/40 px-2 py-1 pixel-corner hover:bg-[#ff3b6b]/10"
               >

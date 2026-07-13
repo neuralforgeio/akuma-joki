@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useAdminStore } from "@/lib/admin-store";
 import { useToast } from "@/hooks/use-toast";
 import { FileImage, Upload, Trash2, Download } from "lucide-react";
+import { confirmAction } from "@/lib/confirm-modal";
 
 export default function ArtifactPage() {
   const artifacts = useAdminStore((s) => s.artifacts);
@@ -119,7 +120,13 @@ export default function ArtifactPage() {
               </button>
               <button
                 onClick={() => {
-                  if (confirm("Hapus artifact?")) deleteArtifact(a.id);
+                  confirmAction({
+                    title: "Hapus Artifact?",
+                    message: "Artifact akan dihapus permanen.",
+                    variant: "danger",
+                    confirmLabel: "Hapus",
+                    onConfirm: () => deleteArtifact(a.id),
+                  });
                 }}
                 className="flex items-center justify-center border-2 border-[#ff3b6b]/40 text-[#ff3b6b] px-2 py-1.5 pixel-corner hover:bg-[#ff3b6b]/10"
               >

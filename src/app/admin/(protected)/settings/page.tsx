@@ -6,6 +6,7 @@ import { useAdminStore } from "@/lib/admin-store";
 import { useToast } from "@/hooks/use-toast";
 import { Save, Download, Upload, RefreshCw } from "lucide-react";
 import { AvatarCrop } from "@/components/admin/avatar-crop";
+import { confirmAction } from "@/lib/confirm-modal";
 
 export default function SettingsPage() {
   const settings = useAdminStore((s) => s.settings);
@@ -54,7 +55,18 @@ export default function SettingsPage() {
     reader.readAsText(file);
   };
 
-  const handleReset = () => { if (confirm("Reset SEMUA data ke default?")) { resetAll(); toast({ title: "Data direset!" }); } };
+  const handleReset = () => {
+    confirmAction({
+      title: "Reset SEMUA Data?",
+      message: "Semua data akan dikembalikan ke default. Tidak bisa diundo.",
+      variant: "danger",
+      confirmLabel: "Reset Semua",
+      onConfirm: () => {
+        resetAll();
+        toast({ title: "Data direset!" });
+      },
+    });
+  };
 
   return (
     <div className="space-y-5">

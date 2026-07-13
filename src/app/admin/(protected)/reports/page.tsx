@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isDeveloper } from "@/lib/auth";
+import { isAuthenticated } from "@/lib/auth";
 import { useAdminStore } from "@/lib/admin-store";
 import { useToast } from "@/hooks/use-toast";
 import { HelpBanner } from "@/components/admin/help-tooltip";
 import { Bug, Lightbulb, HelpCircle, AlertTriangle, Trash2, CheckCircle2, Eye, Download, Filter, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { confirmAction } from "@/lib/confirm-modal";
 
 type ReportType = "bug" | "suggestion" | "question" | "complaint";
 type ReportStatus = "new" | "read" | "resolved";
@@ -43,9 +44,9 @@ export default function ReportsAdminPage() {
   const [selected, setSelected] = useState<typeof reports[0] | null>(null);
 
   useEffect(() => {
-    if (!isDeveloper()) {
-      toast({ title: "Akses ditolak: developer only", variant: "destructive" });
-      router.replace("/admin");
+    if (!isAuthenticated()) {
+      toast({ title: "Akses ditolak: login dulu", variant: "destructive" });
+      router.replace("/admin/login");
       return;
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -59,10 +60,17 @@ export default function ReportsAdminPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm("Hapus laporan ini?")) return;
-    deleteReport(id);
-    if (selected?.id === id) setSelected(null);
-    toast({ title: "Laporan dihapus" });
+    confirmAction({
+      title: "Hapus Laporan?",
+      message: "Laporan akan dihapus permanen.",
+      variant: "danger",
+      confirmLabel: "Hapus",
+      onConfirm: () => {
+        deleteReport(id);
+        if (selected?.id === id) setSelected(null);
+        toast({ title: "Laporan dihapus" });
+      },
+    });
   };
 
   const handleExport = () => {
