@@ -559,7 +559,7 @@ export function WhatsAppWidget() {
   /* ---------- effects ---------- */
   // clock untuk update status online/offline tiap menit
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 60000);
+    const id = window.setInterval(() => setNow(Date.now()), 10000); // update every 10s
     return () => window.clearInterval(id);
   }, []);
 
@@ -791,9 +791,10 @@ export function WhatsAppWidget() {
             csMsg = {
               id: 0,
               role: "cs",
-              text: STATUS_REPLY,
+              text: "📦 Untuk cek status order, silakan masukkan Order ID kamu di kotak di bawah ini:",
               ts: 0,
               badge: "AUTO",
+              variant: "order-input",
             };
             break;
           case "hours":
@@ -830,7 +831,14 @@ export function WhatsAppWidget() {
             csMsg = { id: 0, role: "cs", text: LOGIN_AMAN_REPLY, ts: 0, badge: "AUTO" };
             break;
           case "update-progres":
-            csMsg = { id: 0, role: "cs", text: UPDATE_PROGRES_REPLY, ts: 0, badge: "AUTO" };
+            csMsg = {
+              id: 0,
+              role: "cs",
+              text: "📊 Untuk cek progres joki, silakan masukkan Order ID kamu di kotak di bawah ini:",
+              ts: 0,
+              badge: "AUTO",
+              variant: "order-input",
+            };
             break;
           case "kontak":
             csMsg = { id: 0, role: "cs", text: KONTAK_REPLY, ts: 0, badge: "AUTO" };

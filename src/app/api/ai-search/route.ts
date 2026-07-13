@@ -1,20 +1,19 @@
 /**
  * API Route: /api/ai-search
  *
- * AI-powered search menggunakan GLM (z-ai-web-dev-sdk).
- * Parse natural language query & return ranked items.
+ * Smart search — parse natural language query & return ranked items.
+ * NO GLM/SDK needed. Pure algorithmic search.
  *
- * Query: ?q=termurah+blox+fruits
+ * Query: ?q=joki+termurah
  *
- * Flow:
- * 1. Get all games & items from GitHub (via /api/synced-data logic)
- * 2. Send query + items context to GLM
- * 3. GLM return ranked item IDs with relevance score
- * 4. Return matched items with AI explanation
+ * Logic:
+ * 1. Fetch all items from GitHub (admin-data.json)
+ * 2. Parse query intent: "termurah" = sort by price asc, "termahal" = desc, etc.
+ * 3. Filter by game name, product name, tag, description
+ * 4. Return ranked results
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_API_URL = "https://api.github.com/repos/luminarydearx/akuma-joki/contents/data/admin-data.json";
@@ -73,6 +72,35 @@ async function fetchAllItems(): Promise<SearchItem[]> {
   }
 }
 
+/** Parse query intent */
+function parseIntent(q: string): { sort: "asc" | "desc" | "none"; gameFilter?: string; keywords: string[] } {
+  const lower = q.toLowerCase();
+  let sort: "asc" | "desc" | "none" = "none";
+
+  if (/\b(termurah|murah|cheap|cheapest|paling murah|termurah)\b/i.test(lower)) sort = "asc";
+  if (/\b(termahal|mahal|expensive|priciest|paling mahal)\b/i.test(lower)) sort = "desc";
+
+  // Extract game name
+  const gameMap: Record<string, string> = {
+    "blox": "blox-fruits",
+    "blox fruits": "blox-fruits",
+    "expedition": "expedition-antarctica",
+    "antarctica": "expedition-antarctica",
+    "retail": "retail-tycoon-2",
+    "tycoon": "retail-tycoon-2",
+  };
+  let gameFilter: string | undefined;
+  for (const [key, slug] of Object.entries(gameMap)) {
+    if (lower.includes(key)) { gameFilter = slug; break; }
+  }
+
+  // Extract keywords (remove intent words)
+  const intentWords = ["termurah", "termahal", "murah", "mahal", "paling", "joki", "cheap", "expensive", "best", "untuk", "rekomendasi", "populer", "hot"];
+  const keywords = lower.split(/\s+/).filter(w => w.length > 2 && !intentWords.includes(w));
+
+  return { sort, gameFilter, keywords };
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q");
@@ -87,86 +115,53 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const zai = await ZAI.create();
+    const intent = parseIntent(q);
+    let results = [...items];
 
-    // Build context: compact list of items
-    const itemsContext = items.slice(0, 50).map((it, i) => 
-      `${i + 1}. [${it.id}] ${it.gameName} - ${it.productName} (${it.priceLabel})${it.tag ? ` [${it.tag}]` : ""}${it.description ? ` - ${it.description.slice(0, 60)}` : ""}`
-    ).join("\n");
-
-    const completion = await zai.chat.completions.create({
-      messages: [
-        {
-          role: "assistant",
-          content: "Kamu adalah asisten search untuk AKUMA JOKI (layanan joki game Roblox). User akan bertanya dengan natural language. Tugasmu: pilih item yang paling relevan dengan query user. Return JSON array of item IDs (format: 'gameSlug-itemId'). Max 5 items, diurutkan dari paling relevan. Jika query tentang harga, pilih yang sesuai. Jika tentang game tertentu, filter sesuai.",
-        },
-        {
-          role: "user",
-          content: `Query user: "${q}"\n\nDaftar item tersedia:\n${itemsContext}\n\nReturn JSON array of item IDs (max 5, paling relevan duluan). Format: ["blox-fruits-lvl-100", "blox-fruits-raid-1-10"]`,
-        }
-      ],
-      thinking: { type: "disabled" },
-    });
-
-    const response = completion.choices?.[0]?.message?.content || "";
-
-    // Parse JSON array from response
-    const idMatch = response.match(/\[[\s\S]*?\]/);
-    let matchedIds: string[] = [];
-    if (idMatch) {
-      try {
-        matchedIds = JSON.parse(idMatch[0]);
-      } catch { /* ignore parse error */ }
+    // Filter by game
+    if (intent.gameFilter) {
+      results = results.filter(it => it.gameSlug === intent.gameFilter);
     }
 
-    // Filter items by matched IDs
-    const matched = matchedIds
-      .map(id => items.find(it => it.id === id))
-      .filter(Boolean) as SearchItem[];
+    // Filter by keywords
+    if (intent.keywords.length > 0) {
+      results = results.filter(it => {
+        const haystack = `${it.productName} ${it.gameName} ${it.description || ""} ${it.tag || ""} ${it.category}`.toLowerCase();
+        return intent.keywords.some(kw => haystack.includes(kw));
+      });
+    }
 
-    // Fallback: if AI returns nothing, do simple text match
-    if (matched.length === 0) {
+    // If no results from keyword filter, do broader match
+    if (results.length === 0) {
       const ql = q.toLowerCase();
-      const fallback = items.filter(it =>
+      results = items.filter(it =>
         it.productName.toLowerCase().includes(ql) ||
         it.gameName.toLowerCase().includes(ql) ||
         (it.description || "").toLowerCase().includes(ql) ||
         (it.tag || "").toLowerCase().includes(ql)
-      ).slice(0, 5);
-      return NextResponse.json({
-        ok: true,
-        query: q,
-        results: fallback,
-        count: fallback.length,
-        source: "fallback",
-        aiResponse: response.slice(0, 200),
-      });
+      );
     }
+
+    // Sort
+    if (intent.sort === "asc") {
+      results.sort((a, b) => a.price - b.price);
+    } else if (intent.sort === "desc") {
+      results.sort((a, b) => b.price - a.price);
+    }
+
+    // Limit to 5
+    results = results.slice(0, 5);
 
     return NextResponse.json({
       ok: true,
       query: q,
-      results: matched,
-      count: matched.length,
-      source: "ai",
-      aiResponse: response.slice(0, 200),
+      results,
+      count: results.length,
+      source: "smart-search",
+      intent: intent.sort !== "none" ? `sorted ${intent.sort}` : "relevance",
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
-    // Fallback to simple search on AI error
-    const ql = q.toLowerCase();
-    const fallback = items.filter(it =>
-      it.productName.toLowerCase().includes(ql) ||
-      it.gameName.toLowerCase().includes(ql) ||
-      (it.description || "").toLowerCase().includes(ql)
-    ).slice(0, 5);
-    return NextResponse.json({
-      ok: true,
-      query: q,
-      results: fallback,
-      count: fallback.length,
-      source: "fallback",
-      error: msg,
-    });
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
