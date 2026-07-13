@@ -264,6 +264,17 @@
   "reviews": [],
   "reports": [
     {
+      "name": "Dearly",
+      "contact": "",
+      "type": "bug",
+      "subject": "hsdia",
+      "description": "test",
+      "page": "https://akuma-joki.vercel.app/contact",
+      "id": "mriz07ssizqp",
+      "status": "new",
+      "createdAt": 1783931921020
+    },
+    {
       "name": "test nama",
       "contact": "",
       "type": "bug",
@@ -276,6 +287,16 @@
     }
   ],
   "notifications": [
+    {
+      "type": "report_new",
+      "title": "Laporan bug: hsdia",
+      "message": "Dari Dearly: test",
+      "targetRole": "developer",
+      "link": "/admin/reports",
+      "id": "mriz07ss70in",
+      "read": false,
+      "createdAt": 1783931921020
+    },
     {
       "type": "report_new",
       "title": "Laporan bug: test",
@@ -320,5 +341,5 @@
     }
   ],
   "version": 1,
-  "updatedAt": "2026-07-13T08:37:12.644Z"
+  "updatedAt": "2026-07-13T08:38:41.020Z"
 }
