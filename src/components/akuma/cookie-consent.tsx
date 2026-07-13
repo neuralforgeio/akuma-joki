@@ -4,15 +4,33 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Cookie, X, Check } from "lucide-react";
 
-const CONSENT_KEY = "akuma-cookie-consent";
+const CONSENT_COOKIE = "akuma-cc";
+const CONSENT_DAYS = 365; // 1 year
 
 /**
  * CookieConsent — banner GDPR-style yang muncul sekali di bagian bawah.
- * User pilih: Accept All atau Decline. Persistent di localStorage.
- * Setelah consent diberikan, banner tidak muncul lagi.
  *
- * Tema pixel-art Akuma (dark bg, pixel-corner, neon accent).
+ * 🔒 PERSISTENT: Pakai document.cookie dengan max-age 1 tahun.
+ *    TIDAK pakai localStorage (supaya tidak ke-clear oleh cache-bust/clear-cache).
+ *    Setelah user Accept/Decline → cookie diset → banner TIDAK muncul lagi
+ *    meski versi app berubah, meski localStorage di-clear.
  */
+function setCookie(name: string, value: string, days: number) {
+  try {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax; Secure`;
+  } catch { /* ignore */ }
+}
+
+function getCookie(name: string): string | null {
+  try {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function CookieConsent() {
   const [show, setShow] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -20,35 +38,24 @@ export function CookieConsent() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    try {
-      const consent = localStorage.getItem(CONSENT_KEY);
-      if (!consent) {
-        // delay 3 detik agar tidak ganggu first paint
-        const t = setTimeout(() => {
-          setShow(true);
-        }, 3000);
-        return () => clearTimeout(t);
-      }
-    } catch {
-      /* ignore */
+    // Cek cookie (bukan localStorage) — persistent selamanya
+    const consent = getCookie(CONSENT_COOKIE);
+    if (!consent) {
+      // delay 3 detik agar tidak ganggu first paint
+      const t = setTimeout(() => {
+        setShow(true);
+      }, 3000);
+      return () => clearTimeout(t);
     }
   }, []);
 
   const handleAccept = () => {
-    try {
-      localStorage.setItem(CONSENT_KEY, JSON.stringify({ accepted: true, at: Date.now() }));
-    } catch {
-      /* ignore */
-    }
+    setCookie(CONSENT_COOKIE, JSON.stringify({ accepted: true, at: Date.now() }), CONSENT_DAYS);
     setShow(false);
   };
 
   const handleDecline = () => {
-    try {
-      localStorage.setItem(CONSENT_KEY, JSON.stringify({ accepted: false, at: Date.now() }));
-    } catch {
-      /* ignore */
-    }
+    setCookie(CONSENT_COOKIE, JSON.stringify({ accepted: false, at: Date.now() }), CONSENT_DAYS);
     setShow(false);
   };
 

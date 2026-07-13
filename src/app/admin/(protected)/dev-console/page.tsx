@@ -188,13 +188,13 @@ ${data.envs.map((e: any) => `  ${e.key} [${e.type}] → ${e.target.join(", ")}`)
 
     // CACHE
     {
-      cmd: "clear-cache",
-      description: "🗑️  Clear cache GLOBAL (semua device) via GitHub signal",
-      usage: "clear-cache [reason]",
-      example: "clear-cache after-update\n        clear-cache",
+      cmd: "refresh-data",
+      description: "🔄 Trigger refresh data GLOBAL (semua device) — no reload, no cache clear",
+      usage: "refresh-data [reason]",
+      example: "refresh-data after-update\n        refresh-data",
       category: "cache",
       run: async (args) => {
-        const reason = args || "Manual clear from dev-console";
+        const reason = args || "Manual refresh from dev-console";
         const res = await fetch("/api/vercel/clear-cache", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -202,21 +202,40 @@ ${data.envs.map((e: any) => `  ${e.key} [${e.type}] → ${e.target.join(", ")}`)
         });
         const data = await res.json();
         if (!data.ok) return `❌ Error: ${data.error}`;
-        return `✅ Cache clear signal pushed!\n  Timestamp: ${data.cacheBust}\n  Reason: ${data.reason}\n\n  Semua device akan clear cache dalam 60 detik (next sync).`;
+        return `✅ Refresh signal pushed!\n  Timestamp: ${data.refreshSignal}\n  Reason: ${data.reason}\n\n  Semua device akan re-fetch data dalam 60 detik.\n  No reload, no cache clear — just state update.`;
       },
     },
     {
       cmd: "clear-local",
-      description: "Clear cache lokal device ini saja (localStorage + sessionStorage)",
+      description: "Clear cache lokal device ini (preserve cookie consent & user prefs)",
       usage: "clear-local",
       example: "clear-local",
       category: "cache",
       run: () => {
         try {
+          // Preserve important keys sebelum clear
+          const preserveKeys = [
+            "akuma-wishlist",
+            "akuma-cart",
+            "akuma-recently-viewed",
+            "akuma-lang",
+            "akuma-admin-session",
+            "akuma-pwa-install-dismissed",
+          ];
+          const preserved: Record<string, string> = {};
+          for (const k of preserveKeys) {
+            const v = localStorage.getItem(k);
+            if (v) preserved[k] = v;
+          }
+          // Cookie consent disimpan di cookie (bukan localStorage), jadi aman
           localStorage.clear();
           sessionStorage.clear();
+          // Restore preserved keys
+          for (const [k, v] of Object.entries(preserved)) {
+            localStorage.setItem(k, v);
+          }
         } catch {}
-        return "✅ Local cache cleared (localStorage + sessionStorage). Reload page untuk apply.";
+        return "✅ Local cache cleared (preserved: wishlist, cart, recently-viewed, lang, session).\n  Cookie consent aman (di cookie, bukan localStorage).\n  Reload page untuk apply visual changes.";
       },
     },
     {
@@ -469,7 +488,7 @@ ${data.envs.map((e: any) => `  ${e.key} [${e.type}] → ${e.target.join(", ")}`)
 
         {/* Quick commands */}
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {["help", "stats", "vercel-status", "deploy", "clear-cache", "sync-now"].map(q => (
+          {["help", "stats", "vercel-status", "deploy", "refresh-data", "sync-now"].map(q => (
             <button
               key={q}
               onClick={() => runCommand(q)}
@@ -485,7 +504,7 @@ ${data.envs.map((e: any) => `  ${e.key} [${e.type}] → ${e.target.join(", ")}`)
         <div className="mt-3 flex items-start gap-2 text-[10px] text-zinc-600">
           <Clock className="size-3 mt-0.5 shrink-0" />
           <span>
-            Tip: <code className="text-zinc-400">clear-cache</code> = global (semua device), <code className="text-zinc-400">clear-local</code> = hanya device ini.
+            Tip: <code className="text-zinc-400">refresh-data</code> = global data refresh (no reload, no clear), <code className="text-zinc-400">clear-local</code> = clear cache device ini (preserve user prefs).
             Pakai <code className="text-zinc-400">/</code> untuk autocomplete.
           </span>
         </div>

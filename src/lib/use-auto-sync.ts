@@ -8,12 +8,13 @@ import { SYNCED_UPDATED_AT } from "@/lib/games-data";
  * useAutoSync — polling data dari server (GitHub raw via /api/synced-data)
  * setiap 60 detik, compare `updatedAt` dengan local, update state jika beda.
  *
- * Juga check cache-bust signal dari /api/vercel/clear-cache. Jika timestamp
- * beda dengan local, clear localStorage + sessionStorage + reload page.
+ * 🔒 PRINSIP: TIDAK PERNAH reload page, TIDAK PERNAH clear localStorage.
+ *    Update hanya via syncFromServer() → React re-render otomatis.
  *
  * Cara kerja:
  * 1. Saat mount: fetch /api/synced-data, compare updatedAt
  * 2. Jika beda → call syncFromServer(data) → state update (games, reviews, about, dll)
+ *    → React re-render otomatis (no reload needed)
  * 3. Set interval 60 detik untuk re-check
  * 4. Cleanup interval saat unmount
  *
@@ -23,20 +24,10 @@ import { SYNCED_UPDATED_AT } from "@/lib/games-data";
  */
 
 const POLL_INTERVAL = 60_000; // 60 detik
-const CACHE_BUST_KEY = "akuma-cache-bust-ts";
 
 export function useAutoSync() {
   const syncFromServer = useAdminStore((s) => s.syncFromServer);
   const lastUpdatedAt = useRef<string | null>(SYNCED_UPDATED_AT);
-  const lastCacheBust = useRef<number>(0);
-
-  // Init lastCacheBust dari localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(CACHE_BUST_KEY);
-      if (stored) lastCacheBust.current = parseInt(stored, 10) || 0;
-    } catch { /* ignore */ }
-  }, []);
 
   useEffect(() => {
     let active = true;
@@ -54,30 +45,13 @@ export function useAutoSync() {
         const serverUpdatedAt = json.updatedAt;
         if (serverUpdatedAt && serverUpdatedAt !== lastUpdatedAt.current) {
           lastUpdatedAt.current = serverUpdatedAt;
+          // Update state in-place — React akan re-render otomatis
+          // TIDAK reload page, TIDAK clear localStorage
           syncFromServer(json.data);
         }
       } catch {
         // silent fail — network error, server down, dll
       }
-
-      // Check cache-bust signal
-      try {
-        const cbRes = await fetch("/api/vercel/clear-cache", { cache: "no-store" });
-        if (cbRes.ok) {
-          const cb = await cbRes.json();
-          if (cb.ok && cb.cacheBust && cb.cacheBust !== lastCacheBust.current) {
-            lastCacheBust.current = cb.cacheBust;
-            try { localStorage.setItem(CACHE_BUST_KEY, String(cb.cacheBust)); } catch { /* ignore */ }
-            // Clear all cache
-            try {
-              localStorage.clear();
-              sessionStorage.clear();
-            } catch { /* ignore */ }
-            // Reload page after short delay
-            setTimeout(() => window.location.reload(), 500);
-          }
-        }
-      } catch { /* ignore */ }
     };
 
     // Initial check after 3s (let page finish hydration first)

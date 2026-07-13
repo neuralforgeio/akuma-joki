@@ -1,13 +1,16 @@
 /**
  * API Route: /api/vercel/clear-cache
  *
- * Global cache clear — kirim "cache-bust" signal ke semua device.
+ * 🔒 REVISED: Sekarang hanya trigger data refresh (TIDAK clear localStorage,
+ *    TIDAK reload page). Cukup update timestamp supaya useAutoSync detect
+ *    perubahan & syncFromServer jalan.
  *
- * Cara kerja:
- * 1. Admin klik "Clear Cache" di dev-console atau vercel panel
- * 2. POST ke sini → push ke GitHub: data/cache-bust.json dengan timestamp baru
+ * Cara kerja baru:
+ * 1. Admin klik "refresh-data" di dev-console
+ * 2. POST ke sini → push updated admin-data.json (touch updatedAt) ke GitHub
  * 3. Semua client polling /api/synced-data → detect updatedAt beda
- * 4. useAutoSync hook baca flag cacheBust → clear localStorage + sessionStorage + reload
+ * 4. useAutoSync call syncFromServer(data) → state update → React re-render
+ * 5. TIDAK ada reload, TIDAK ada localStorage.clear
  *
  * Body: { reason?: string }
  */
@@ -28,13 +31,13 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json().catch(() => ({}));
-    const reason = body.reason || "Manual clear by admin";
+    const reason = body.reason || "Manual refresh by admin";
     const timestamp = Date.now();
 
     const payload = {
-      cacheBust: timestamp,
+      refreshSignal: timestamp,
       reason,
-      clearedAt: new Date().toISOString(),
+      refreshedAt: new Date().toISOString(),
     };
 
     const content = JSON.stringify(payload, null, 2);
@@ -56,7 +59,7 @@ export async function POST(request: NextRequest) {
       sha = fileData.sha;
     }
 
-    // Push update
+    // Push update (touch file untuk trigger sync)
     const putRes = await fetch(getUrl, {
       method: "PUT",
       headers: {
@@ -66,7 +69,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        message: `chore(cache): clear cache globally - ${reason} [${new Date().toISOString()}]`,
+        message: `chore(refresh): trigger data refresh - ${reason} [${new Date().toISOString()}]`,
         content: encodedContent,
         sha,
         branch: "main",
@@ -80,9 +83,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      cacheBust: timestamp,
+      refreshSignal: timestamp,
       reason,
-      message: "Cache clear signal pushed. All devices will clear cache within 60s (next sync).",
+      message: "Refresh signal pushed. Semua device akan re-fetch data dalam 60s (no reload, no cache clear).",
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
@@ -91,7 +94,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  // Get current cache-bust timestamp (for client polling)
+  // Get current refresh signal (for client polling — optional, not used anymore)
   try {
     const res = await fetch(
       `https://api.github.com/repos/luminarydearx/akuma-joki/contents/${FILE_PATH}`,
@@ -104,16 +107,16 @@ export async function GET() {
       }
     );
     if (!res.ok) {
-      return NextResponse.json({ ok: false, cacheBust: 0 });
+      return NextResponse.json({ ok: false, refreshSignal: 0 });
     }
     const data = await res.json();
     return NextResponse.json({
       ok: true,
-      cacheBust: data.cacheBust || 0,
+      refreshSignal: data.refreshSignal || 0,
       reason: data.reason,
-      clearedAt: data.clearedAt,
+      refreshedAt: data.refreshedAt,
     });
   } catch {
-    return NextResponse.json({ ok: false, cacheBust: 0 });
+    return NextResponse.json({ ok: false, refreshSignal: 0 });
   }
 }

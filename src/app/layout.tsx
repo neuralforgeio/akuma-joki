@@ -6,7 +6,6 @@ import { AnnouncementBanner } from "@/components/admin/announcement-banner";
 import { VisitorTracker } from "@/components/admin/visitor-tracker";
 import { NetworkStatus } from "@/components/akuma/network-status";
 import { ClientFloatingComponents } from "@/components/akuma/client-floating";
-import { AutoRefresh } from "@/components/akuma/auto-refresh";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,7 +65,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${pixelFont.variable} font-sans antialiased bg-background text-foreground`}
       >
-        <AutoRefresh />
         <NetworkStatus />
         <AnnouncementBanner />
         <VisitorTracker />
