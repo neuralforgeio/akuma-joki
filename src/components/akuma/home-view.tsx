@@ -127,9 +127,9 @@ export function HomeView() {
       {/* GAME CARDS */}
       <section ref={gamesRef} className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24">
         <div className="text-center mb-10">
-          <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">PILIH GAME</p>
+          <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">{t("home.pilihGame")}</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-gradient">{t("home.storeGame")}</h2>
-          <p className="mt-2 text-sm text-zinc-500">Pilih game favoritmu, lalu lihat daftar joki yang tersedia.</p>
+          <p className="mt-2 text-sm text-zinc-500">{t("home.gameCardDesc")}</p>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
           {!hydrated ? Array.from({ length: 3 }).map((_, i) => <SkeletonGameCard key={i} />) :
@@ -149,8 +149,8 @@ export function HomeView() {
                         {g.categories.map((c) => (<span key={c.id} className="text-[10px] px-2 py-1 rounded-lg bg-white/5 text-zinc-400 border border-white/5">{c.icon} {c.name}</span>))}
                       </div>
                       <div className="mt-4 flex items-center justify-between">
-                        <span className="text-xs text-zinc-600">{g.categories.reduce((a, c) => a + c.items.length, 0)} joki tersedia</span>
-                        <span className="text-sm text-violet-400 group-hover:translate-x-1 transition-transform font-semibold">Mulai →</span>
+                        <span className="text-xs text-zinc-600">{g.categories.reduce((a, c) => a + c.items.length, 0)} {t("home.jokiTersedia")}</span>
+                        <span className="text-sm text-violet-400 group-hover:translate-x-1 transition-transform font-semibold">{t("home.mulai")}</span>
                       </div>
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export function HomeView() {
       {/* WHY CHOOSE */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 border-t border-white/5">
         <div className="text-center mb-10">
-          <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">KEUNGGULAN</p>
+          <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">{t("home.keunggulan")}</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-gradient">{t("home.whyChoose")}</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -177,7 +177,7 @@ export function HomeView() {
             { icon: Wallet, title: t("home.feature3Title"), desc: t("home.feature3Desc"), color: "#fbbf24" },
             { icon: Flame, title: t("home.feature4Title"), desc: t("home.feature4Desc"), color: "#f472b6" },
             { icon: Headphones, title: t("home.feature5Title"), desc: t("home.feature5Desc"), color: "#34d399" },
-            { icon: Trophy, title: "Garansi Hasil", desc: "Jika item/level hilang dalam 24 jam, dikerjakan ulang gratis.", color: "#a78bfa" },
+            { icon: Trophy, title: t("home.feature6Title"), desc: t("home.feature6Desc"), color: "#a78bfa" },
           ].map((f, i) => (
             <Reveal key={f.title} delay={i * 60}>
               <div className="card-lux p-6">
@@ -195,7 +195,7 @@ export function HomeView() {
       {/* TESTIMONIALS */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 border-t border-white/5">
         <div className="text-center mb-10">
-          <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">TESTIMONI</p>
+          <p className="text-xs text-violet-400 uppercase tracking-widest mb-2">{t("home.testimoni")}</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-gradient">{t("home.testimonials")}</h2>
           <p className="mt-2 text-xs text-zinc-600">{t("home.testimonialsSub")}</p>
         </div>

@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <HelpBanner title="Dashboard" description="Ringkasan statistik dan aktivitas website AKUMA JOKI." tips={["Lihat total games, items, pesanan, visitors", "Quick actions untuk akses cepat ke fitur utama", "Activity log menampilkan semua aksi admin", "Visitor chart 7 hari terakhir"]} />
+      <HelpBanner title={t("dash.helpTitle")} description={t("dash.helpDesc")} tips={[t("dash.helpTip1"), t("dash.helpTip2"), t("dash.helpTip3"), t("dash.helpTip4")]} />
       {/* header */}
       <div>
         <h1 className="font-pixel text-base sm:text-lg text-[#e5e5e5] text-glow-neon">
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
         >
           <Power className={`size-3.5 ${takedown ? "text-[#ff3b6b]" : "text-[#6ee7b7]"}`} />
           <span className={`font-pixel text-[8px] uppercase ${takedown ? "text-[#ff3b6b]" : "text-[#6ee7b7]"}`}>
-            {takedown ? "Takedown ON" : "Website Live"}
+            {takedown ? t("dash.takedownOn") : t("dash.websiteLive")}
           </span>
         </div>
         <div
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
         >
           <Megaphone className={`size-3.5 ${announcement?.active ? "text-[#ffd166]" : "text-[#9a93a8]"}`} />
           <span className={`font-pixel text-[8px] uppercase ${announcement?.active ? "text-[#ffd166]" : "text-[#9a93a8]"}`}>
-            {announcement?.active ? "Announcement Active" : "No Announcement"}
+            {announcement?.active ? t("dash.announcementActive") : t("dash.noAnnouncement")}
           </span>
         </div>
       </div>
@@ -126,17 +126,17 @@ export default function AdminDashboard() {
           </PixelButton>
           <PixelButton size="sm" variant="silver" asChild>
             <Link href="/admin/announcement">
-              <Megaphone className="size-3.5" /> Announcement
+              <Megaphone className="size-3.5" /> {t("dash.announcement")}
             </Link>
           </PixelButton>
           <PixelButton size="sm" variant="silver" asChild>
             <Link href="/admin/takedown">
-              <Power className="size-3.5" /> Takedown
+              <Power className="size-3.5" /> {t("dash.takedown")}
             </Link>
           </PixelButton>
           <PixelButton size="sm" variant="silver" asChild>
             <Link href="/admin/commit">
-              <GitCommit className="size-3.5" /> Commit
+              <GitCommit className="size-3.5" /> {t("dash.commit")}
             </Link>
           </PixelButton>
         </div>
@@ -176,13 +176,13 @@ export default function AdminDashboard() {
           <div className="mb-3 flex items-center gap-2">
             <TrendingUp className="size-4 text-[#25D366]" />
             <h3 className="font-pixel text-[9px] uppercase tracking-wide text-[#e5e5e5]">
-              Visitor 7 Hari
+              {t("dash.visitor7")}
             </h3>
           </div>
           <div className="max-h-64 space-y-2 overflow-y-auto">
             {visitors.length === 0 ? (
               <p className="font-pixel text-[7px] uppercase text-[#5a5266] text-center py-4">
-                Belum ada data visitor
+                {t("dash.noVisitorData")}
               </p>
             ) : (
               visitors
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
           <div className="mb-3 flex items-center gap-2">
             <Zap className="size-4 text-[#ffd166]" />
             <h3 className="font-pixel text-[9px] uppercase tracking-wide text-[#e5e5e5]">
-              Commit Terbaru
+              {t("dash.commitTerbaru")}
             </h3>
           </div>
     <div className="space-y-2">

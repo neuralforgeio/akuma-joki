@@ -25,6 +25,18 @@ const PWAInstaller = dynamic(() => import("@/components/akuma/pwa-installer").th
   ssr: false,
   loading: () => null,
 });
+const SocialProof = dynamic(() => import("@/components/akuma/social-proof").then(m => ({ default: m.SocialProof })), {
+  ssr: false,
+  loading: () => null,
+});
+const AchievementToast = dynamic(() => import("@/components/akuma/achievement-toast").then(m => ({ default: m.AchievementToast })), {
+  ssr: false,
+  loading: () => null,
+});
+const PriceCalculator = dynamic(() => import("@/components/akuma/price-calculator").then(m => ({ default: m.PriceCalculator })), {
+  ssr: false,
+  loading: () => null,
+});
 
 /**
  * Wraps all "normal" routes (/, /store/*, /checkout) with the Navbar + Footer
@@ -68,6 +80,9 @@ export default function MainLayout({
         <KeyboardShortcutsHint />
         <PushNotificationOptIn />
         <PWAInstaller />
+        <SocialProof />
+        <AchievementToast />
+        <PriceCalculator />
       </DeferredLoader>
     </div>
   );

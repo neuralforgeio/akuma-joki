@@ -6,6 +6,7 @@ import Image from "next/image";
 import {
   ArrowLeft, ShoppingBag, User, Lock, MessageCircle,
   Gamepad2, Trash2, ShieldCheck, Eye, EyeOff, ShoppingCart, CheckCircle2, Package,
+  RotateCcw,
 } from "lucide-react";
 import { useAkumaStore, useHasHydrated } from "@/lib/store";
 import { WHATSAPP_NUMBER, getGameBySlug } from "@/lib/games-data";
@@ -14,6 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useAdminStore, generateOrderId } from "@/lib/admin-store";
 import { useCart } from "@/lib/cart";
+import { useLoyalty } from "@/lib/loyalty";
+import { checkAchievements } from "@/lib/achievements";
+import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, Search } from "lucide-react";
 
@@ -31,7 +35,11 @@ export function CheckoutView() {
   const [agreed, setAgreed] = useState(false);
   const [successModal, setSuccessModal] = useState<{ orderIds: string[] } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [orderHistory, setOrderHistory] = useState<{ orderId: string; items: number; createdAt: number }[]>([]);
+  const [orderHistory, setOrderHistory] = useState<{ orderId: string; items: number; createdAt: number; snapshot?: { gameSlug: string; gameName: string; gameEmoji: string; productId: string; productName: string; priceLabel: string; price: number; category: string }[] }[]>([]);
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
+  const addPoints = useLoyalty((s) => s.addPoints);
 
   // Load order history on mount
   useEffect(() => {
@@ -42,6 +50,23 @@ export function CheckoutView() {
     } catch { /* ignore */ }
   }, []);
 
+  // Listen for order history changes (realtime update after checkout)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const history = JSON.parse(localStorage.getItem("akuma-order-history") || "[]");
+        setOrderHistory(history);
+      } catch { /* ignore */ }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    // Also poll every 2s for same-tab updates
+    const interval = setInterval(handleStorageChange, 2000);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
   const removeHistoryItem = (orderId: string) => {
     try {
       const history = JSON.parse(localStorage.getItem("akuma-order-history") || "[]");
@@ -49,6 +74,15 @@ export function CheckoutView() {
       localStorage.setItem("akuma-order-history", JSON.stringify(filtered));
       setOrderHistory(filtered);
     } catch { /* ignore */ }
+  };
+
+  const copyOrderIdWithToast = (id: string) => {
+    try {
+      navigator.clipboard.writeText(id);
+      setCopiedId(id);
+      toast({ title: `✅ ${t("checkout.copied")}`, description: id });
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {}
   };
 
   const MAX_ORDERS = 5;
@@ -66,9 +100,9 @@ export function CheckoutView() {
 
   const handleOrder = () => {
     if (!hasAnything) return;
-    if (maxReached) { toast({ title: "Maksimal 5 joki per order", description: "Hapus item atau selesaikan order dulu.", variant: "destructive" }); return; }
-    if (!username.trim() || !password.trim()) { toast({ title: "Data belum lengkap", description: "Isi username & password Roblox dulu ya.", variant: "destructive" }); return; }
-    if (!agreed) { toast({ title: "Konfirmasi dulu", description: "Centang persetujuan untuk lanjut.", variant: "destructive" }); return; }
+    if (maxReached) { toast({ title: t("checkout.maxPerOrder"), description: t("checkout.maxOrderHint"), variant: "destructive" }); return; }
+    if (!username.trim() || !password.trim()) { toast({ title: t("checkout.dataBelumLengkap"), description: t("checkout.dataBelumLengkapDesc"), variant: "destructive" }); return; }
+    if (!agreed) { toast({ title: t("checkout.konfirmasiDulu"), description: t("checkout.konfirmasiDuluDesc"), variant: "destructive" }); return; }
 
     // Generate SINGLE Order ID for ALL items in this order
     const orderId = generateOrderId();
@@ -105,16 +139,52 @@ export function CheckoutView() {
       clearOrder();
     } catch { /* ignore */ }
 
-    // Save Order ID to history (for recovery)
+    // Save Order ID to history (for recovery) — include item snapshot for reorder
     try {
       const history = JSON.parse(localStorage.getItem("akuma-order-history") || "[]");
-      history.unshift({ orderId, items: hasCart ? cartItems.length : 1, createdAt: Date.now() });
+      const snapshot = hasCart
+        ? cartItems.map((item) => ({
+            gameSlug: item.gameSlug,
+            gameName: item.gameName,
+            gameEmoji: item.gameEmoji,
+            productId: item.productId,
+            productName: item.productName,
+            priceLabel: item.priceLabel,
+            price: item.price,
+            category: item.category,
+          }))
+        : order
+        ? [{
+            gameSlug: order.gameSlug,
+            gameName: order.gameName,
+            gameEmoji: getGameBySlug(order.gameSlug)?.emoji ?? "🎮",
+            productId: order.productId,
+            productName: order.productName,
+            priceLabel: order.priceLabel,
+            price: order.price,
+            category: order.category ?? "",
+          }]
+        : [];
+      history.unshift({ orderId, items: hasCart ? cartItems.length : 1, createdAt: Date.now(), snapshot });
       localStorage.setItem("akuma-order-history", JSON.stringify(history.slice(0, 10)));
+    } catch { /* ignore */ }
+
+    // Award loyalty points (Feature 2): 100 points per order + per item bonus
+    try {
+      const itemsCount = hasCart ? cartItems.length : 1;
+      addPoints(itemsCount * 100, "order");
+      // Check achievements (Feature 7)
+      const ordersCount = (JSON.parse(localStorage.getItem("akuma-order-history") || "[]") as any[]).length;
+      checkAchievements({
+        orderCount: ordersCount,
+        loyaltyPoints: useLoyalty.getState().points,
+        cartCount: 0, // cart is cleared by now
+      });
     } catch { /* ignore */ }
 
     // Show success modal with single Order ID
     setSuccessModal({ orderIds: [orderId] });
-    toast({ title: "Membuka WhatsApp…", description: "Pesan order otomatis sudah disiapkan. Kirim ke admin ya!" });
+    toast({ title: t("checkout.membukaWA"), description: t("checkout.membukaWADesc") });
   };
 
   const copyOrderId = (id: string) => {
@@ -131,7 +201,7 @@ export function CheckoutView() {
             href="/"
             className="inline-flex items-center gap-2 font-pixel text-[9px] uppercase text-[#9a93a8] hover:text-[#c44bff] transition-colors"
           >
-            <ArrowLeft className="size-3.5" /> Beranda
+            <ArrowLeft className="size-3.5" /> {t("common.home")}
           </Link>
           <div className="mt-6 flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center border-2 border-[#a020f0] pixel-corner bg-[#121017] shadow-[0_0_22px_rgba(160,32,240,0.5)]">
@@ -139,10 +209,10 @@ export function CheckoutView() {
             </div>
             <div>
               <p className="font-pixel text-[9px] uppercase tracking-[0.3em] text-[#a020f0]">
-                CHECKOUT
+                {t("checkout.title")}
               </p>
               <h1 className="mt-2 font-pixel text-xl sm:text-3xl text-[#e5e5e5] text-glow-neon">
-                SELESAIKAN ORDER
+                {t("checkout.subtitle")}
               </h1>
             </div>
           </div>
@@ -151,30 +221,53 @@ export function CheckoutView() {
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16">
         {!hasAnything ? (
-          <EmptyOrder orderHistory={orderHistory} removeHistoryItem={removeHistoryItem} />
+          <EmptyOrder orderHistory={orderHistory} removeHistoryItem={removeHistoryItem} copyOrderIdWithToast={copyOrderIdWithToast} onReorder={(snapshot) => {
+            // Quick Reorder (Feature 3): add items back to cart
+            let added = 0;
+            for (const s of snapshot) {
+              const ok = useCart.getState().add({
+                id: `${s.gameSlug}-${s.productId}`,
+                gameSlug: s.gameSlug,
+                gameName: s.gameName,
+                gameEmoji: s.gameEmoji,
+                productId: s.productId,
+                productName: s.productName,
+                priceLabel: s.priceLabel,
+                price: s.price,
+                category: s.category,
+              });
+              if (ok) added++;
+            }
+            if (added > 0) {
+              toast({ title: t("reorder.success"), description: `${added} item` });
+              window.location.href = "/checkout";
+            } else {
+              toast({ title: t("reorder.fail"), variant: "destructive" });
+            }
+          }} />
         ) : (
           <div className="grid gap-8 lg:grid-cols-5">
             {/* left: form */}
             <div className="lg:col-span-3">
               <div className="border-2 border-[#a020f0]/50 bg-[#121017] pixel-corner p-6 sm:p-8">
                 <h2 className="font-pixel text-sm sm:text-base text-[#e5e5e5] text-glow-neon">
-                  DATA AKUN ROBLOX
+                  {t("checkout.dataAkun")}
                 </h2>
                 <p className="mt-3 text-sm text-[#9a93a8]">
-                  Isi data akun Roblox-mu dengan benar. Data hanya dipakai untuk proses joki.
+                  {t("checkout.dataAkunDesc")}
                 </p>
 
                 <div className="mt-7 space-y-5">
                   <Field
-                    label="Username Roblox"
+                    label={t("checkout.username")}
                     icon={<User className="size-4" />}
                     type="text"
-                    placeholder="Contoh: akuma_player123"
+                    placeholder={t("checkout.usernamePlaceholder")}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
                   <Field
-                    label="Password Roblox"
+                    label={t("checkout.password")}
                     icon={<Lock className="size-4" />}
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
@@ -204,15 +297,14 @@ export function CheckoutView() {
                       onChange={(e) => setAgreed(e.target.checked)}
                     />
                     <span className="text-xs sm:text-sm text-[#bcb4c9] leading-relaxed">
-                      Saya menyetujui data akun dipakai untuk proses joki &amp; memahami risiko
-                      proses login oleh joki profesional AKUMA.
+                      {t("checkout.agree")}
                     </span>
                   </label>
 
                   {maxReached && (
                     <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-center">
-                      <p className="text-xs text-red-400 font-medium">⚠️ Maksimal 5 joki per order tercapai!</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">Hapus item dari keranjang untuk menambah yang lain.</p>
+                      <p className="text-xs text-red-400 font-medium">⚠️ {t("checkout.maxOrderNotif")}</p>
+                      <p className="text-[10px] text-zinc-500 mt-0.5">{t("checkout.maxOrderHint")}</p>
                     </div>
                   )}
 
@@ -223,20 +315,20 @@ export function CheckoutView() {
                     onClick={handleOrder}
                   >
                     <MessageCircle className="size-5" />
-                    ORDER VIA WHATSAPP
+                    {t("checkout.orderViaWA")}
                   </PixelButton>
 
                   <p className="text-center text-[10px] text-[#9a93a8]">
-                    Maksimal 5 joki per order · {orderCount}/{MAX_ORDERS} terpakai
+                    {t("checkout.maxPerOrder")} · {orderCount}/{MAX_ORDERS} {t("checkout.terpakai")}
                   </p>
                 </div>
               </div>
 
               {/* trust badges */}
               <div className="mt-5 grid grid-cols-3 gap-3">
-                <TrustBadge icon={<ShieldCheck className="size-4" />} text="Data Aman" />
-                <TrustBadge icon={<MessageCircle className="size-4" />} text="Chat Langsung" />
-                <TrustBadge icon={<Gamepad2 className="size-4" />} text="Joki Pro" />
+                <TrustBadge icon={<ShieldCheck className="size-4" />} text={t("checkout.dataAman")} />
+                <TrustBadge icon={<MessageCircle className="size-4" />} text={t("checkout.chatLangsung")} />
+                <TrustBadge icon={<Gamepad2 className="size-4" />} text={t("checkout.jokiPro")} />
               </div>
             </div>
 
@@ -245,7 +337,7 @@ export function CheckoutView() {
               <div className="lg:sticky lg:top-24 glass-strong rounded-2xl overflow-hidden">
                 <div className="border-b border-white/8 px-5 py-4 flex items-center justify-between">
                   <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-                    <ShoppingCart className="size-4 text-violet-400" /> Ringkasan Pesanan
+                    <ShoppingCart className="size-4 text-violet-400" /> {t("checkout.ringkasanPesanan")}
                   </h3>
                   <button
                     onClick={() => { clearOrder(); cartClear(); setUsername(""); setPassword(""); setShowPassword(false); setAgreed(false); }}
@@ -280,12 +372,12 @@ export function CheckoutView() {
                           {game?.emoji ?? "🎮"}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs text-zinc-500">Game</p>
+                          <p className="text-xs text-zinc-500">{t("checkout.game")}</p>
                           <p className="text-sm text-zinc-200 truncate">{order.gameName}</p>
                         </div>
                       </div>
-                      <SummaryRow label="Jenis Joki" value={order.productName} />
-                      {order.category && <SummaryRow label="Kategori" value={order.category} />}
+                      <SummaryRow label={t("checkout.jenisJoki")} value={order.productName} />
+                      {order.category && <SummaryRow label={t("checkout.kategori")} value={order.category} />}
                     </>
                   )}
 
@@ -293,7 +385,7 @@ export function CheckoutView() {
 
                   <div className="flex items-end justify-between">
                     <span className="text-xs text-zinc-500">
-                      {hasCart ? `Total (${cartItems.length} item)` : "Total Harga"}
+                      {hasCart ? `${t("checkout.total")} (${cartItems.length} ${t("common.item")})` : t("checkout.totalHarga")}
                     </span>
                     <span className="text-2xl font-bold text-gradient">
                       {hasCart
@@ -302,12 +394,20 @@ export function CheckoutView() {
                     </span>
                   </div>
 
+                  {/* ETA Predictor (Feature 9) */}
+                  {hasCart && cartItems.length > 0 && (
+                    <OrderETAPredictor items={cartItems.map((i) => ({ price: i.price }))} />
+                  )}
+                  {!hasCart && order && (
+                    <OrderETAPredictor items={[{ price: order.price }]} />
+                  )}
+
                   {/* steps */}
                   <div className="mt-4 border-t border-white/8 pt-4 space-y-3">
-                    <Step n={1} text="Isi data akun Roblox" />
-                    <Step n={2} text="Klik Order via WhatsApp" />
-                    <Step n={3} text="Kirim pesan & lakukan pembayaran" />
-                    <Step n={4} text="Joki diproses oleh admin" />
+                    <Step n={1} text={t("checkout.step1")} />
+                    <Step n={2} text={t("checkout.step2")} />
+                    <Step n={3} text={t("checkout.step3")} />
+                    <Step n={4} text={t("checkout.step4")} />
                   </div>
                 </div>
               </div>
@@ -344,8 +444,8 @@ export function CheckoutView() {
                 <CheckCircle2 className="size-8 text-green-400" />
               </motion.div>
 
-              <h2 className="text-lg sm:text-xl font-bold text-zinc-100 mb-1">Order Berhasil Dibuat!</h2>
-              <p className="text-sm text-zinc-500 mb-5">Simpan Order ID di bawah untuk melacak status joki kamu.</p>
+              <h2 className="text-lg sm:text-xl font-bold text-zinc-100 mb-1">{t("checkout.successTitle")}</h2>
+              <p className="text-sm text-zinc-500 mb-5">{t("checkout.successDesc")}</p>
 
               {/* Order IDs */}
               <div className="space-y-2 mb-5">
@@ -356,10 +456,10 @@ export function CheckoutView() {
                       <p className="text-lg font-mono font-bold text-violet-400 tracking-wider">{id}</p>
                     </div>
                     <button
-                      onClick={() => copyOrderId(id)}
+                      onClick={() => copyOrderIdWithToast(id)}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:bg-white/10 transition-all"
                     >
-                      {copiedId === id ? <><Check className="size-3.5 text-green-400" /> Copied</> : <><Copy className="size-3.5" /> Copy</>}
+                      {copiedId === id ? <><Check className="size-3.5 text-green-400" /> {t("common.copy")}</> : <><Copy className="size-3.5" /> {t("common.copy")}</>}
                     </button>
                   </div>
                 ))}
@@ -371,18 +471,18 @@ export function CheckoutView() {
                   onClick={() => { setSuccessModal(null); window.location.href = "/track-order"; }}
                   className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-2.5 text-sm font-medium text-white hover:from-violet-500 hover:to-violet-400 transition-all"
                 >
-                  <Search className="size-4" /> Track Order
+                  <Search className="size-4" /> {t("checkout.trackOrder")}
                 </button>
                 <button
                   onClick={() => setSuccessModal(null)}
                   className="inline-flex items-center justify-center rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/10 transition-all"
                 >
-                  Tutup
+                  {t("common.close")}
                 </button>
               </div>
 
               <p className="mt-4 text-[10px] text-zinc-600">
-                💡 Order ID juga terkirim ke WhatsApp admin. Status: <span className="text-yellow-400">Processing</span>
+                {t("checkout.orderIdHint")} <span className="text-yellow-400">{t("checkout.statusProcessing")}</span>
               </p>
             </motion.div>
           </motion.div>
@@ -412,6 +512,9 @@ function Field({
   /** Jika diisi, tampilkan tombol eye untuk show/hide password. */
   toggleVisibility?: { show: boolean; onToggle: () => void };
 }) {
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
   return (
     <div>
       <label className="font-pixel text-[9px] uppercase tracking-wide text-[#9a93a8] flex items-center gap-2">
@@ -419,7 +522,7 @@ function Field({
         {label}
         {toggleVisibility && (
           <span className="ml-auto font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8]">
-            {toggleVisibility.show ? "Terlihat" : "Tersembunyi"}
+            {toggleVisibility.show ? t("checkout.terlihat") : t("checkout.tersembunyi")}
           </span>
         )}
       </label>
@@ -453,7 +556,7 @@ function Field({
       </div>
       {toggleVisibility && (
         <p className="mt-1.5 font-pixel text-[7px] uppercase tracking-wide text-[#9a93a8] leading-relaxed">
-          👁 Klik ikon mata untuk cek apakah password sudah benar penulisannya
+          👁 {t("checkout.terlihat")} / {t("checkout.tersembunyi")}
         </p>
       )}
     </div>
@@ -489,7 +592,15 @@ function TrustBadge({ icon, text }: { icon: React.ReactNode; text: string }) {
   );
 }
 
-function EmptyOrder({ orderHistory, removeHistoryItem }: { orderHistory: { orderId: string; items: number; createdAt: number }[]; removeHistoryItem: (id: string) => void }) {
+function EmptyOrder({ orderHistory, removeHistoryItem, copyOrderIdWithToast, onReorder }: {
+  orderHistory: { orderId: string; items: number; createdAt: number; snapshot?: { gameSlug: string; gameName: string; gameEmoji: string; productId: string; productName: string; priceLabel: string; price: number; category: string }[] }[];
+  removeHistoryItem: (id: string) => void;
+  copyOrderIdWithToast: (id: string) => void;
+  onReorder: (snapshot: { gameSlug: string; gameName: string; gameEmoji: string; productId: string; productName: string; priceLabel: string; price: number; category: string }[]) => void;
+}) {
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
   return (
     <div className="max-w-2xl mx-auto">
       {/* Hero card — centered, e-commerce style empty state */}
@@ -501,21 +612,21 @@ function EmptyOrder({ orderHistory, removeHistoryItem }: { orderHistory: { order
 
         {/* Title */}
         <h2 className="text-xl sm:text-2xl font-bold text-zinc-100">
-          Keranjang Anda Kosong
+          {t("checkout.emptyTitle")}
         </h2>
         <p className="mt-2 text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
-          Belum ada joki yang dipilih. Jelajahi store dan pilih joki favorit kamu untuk mulai order.
+          {t("checkout.emptyDesc")}
         </p>
 
         {/* Quick stats / suggestions */}
         <div className="mt-6 grid grid-cols-3 gap-3 max-w-md mx-auto">
           <div className="glass rounded-xl p-3">
             <ShieldCheck className="mx-auto size-5 text-violet-400 mb-1" />
-            <p className="text-[10px] text-zinc-500">Aman</p>
+            <p className="text-[10px] text-zinc-500">{t("checkout.aman")}</p>
           </div>
           <div className="glass rounded-xl p-3">
             <Gamepad2 className="mx-auto size-5 text-cyan-400 mb-1" />
-            <p className="text-[10px] text-zinc-500">Pro Cepat</p>
+            <p className="text-[10px] text-zinc-500">{t("checkout.proCepat")}</p>
           </div>
           <div className="glass rounded-xl p-3">
             <MessageCircle className="mx-auto size-5 text-green-400 mb-1" />
@@ -528,11 +639,11 @@ function EmptyOrder({ orderHistory, removeHistoryItem }: { orderHistory: { order
           <PixelButton size="lg" asChild>
             <Link href="/store/blox-fruits">
               <Gamepad2 className="size-4" />
-              Pilih Joki Sekarang
+              {t("checkout.pilihJoki")}
             </Link>
           </PixelButton>
           <PixelButton size="lg" variant="silver" asChild>
-            <Link href="/">Kembali ke Beranda</Link>
+            <Link href="/">{t("checkout.backHome")}</Link>
           </PixelButton>
         </div>
       </div>
@@ -540,46 +651,55 @@ function EmptyOrder({ orderHistory, removeHistoryItem }: { orderHistory: { order
       {/* Trust badges */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[10px] text-zinc-600">
         <span className="inline-flex items-center gap-1.5">
-          <ShieldCheck className="size-3.5 text-violet-400" /> Garansi Aman
+          <ShieldCheck className="size-3.5 text-violet-400" /> {t("checkout.garansiAman")}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <MessageCircle className="size-3.5 text-green-400" /> CS Responsif
+          <MessageCircle className="size-3.5 text-green-400" /> {t("checkout.csResponsif")}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <Gamepad2 className="size-3.5 text-cyan-400" /> Joki Pro
+          <Gamepad2 className="size-3.5 text-cyan-400" /> {t("checkout.jokiPro")}
         </span>
       </div>
 
-      {/* Order History — recover Order IDs */}
+      {/* Order History — recover Order IDs + Quick Reorder */}
       {orderHistory.length > 0 && (
         <div className="mt-6 glass-nav rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-3">
             <Package className="size-4 text-violet-400" />
-            <h3 className="text-sm font-semibold text-zinc-100">Order History</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">{t("checkout.orderHistory")}</h3>
             <span className="text-[10px] text-zinc-500">({orderHistory.length})</span>
           </div>
-          <p className="text-[11px] text-zinc-500 mb-3">Order ID yang pernah kamu buat. Klik untuk lacak, atau hapus jika tidak diperlukan.</p>
+          <p className="text-[11px] text-zinc-500 mb-3">{t("checkout.historyDesc")}</p>
           <div className="space-y-2 max-h-48 overflow-y-auto akuma-scroll">
             {orderHistory.map((h) => (
               <div key={h.orderId} className="glass rounded-xl p-2.5 flex items-center gap-3">
-                <Link
-                  href={`/track-order`}
-                  onClick={() => { try { navigator.clipboard.writeText(h.orderId); } catch {} }}
-                  className="flex-1 min-w-0 flex items-center gap-2 group"
+                <button
+                  onClick={() => copyOrderIdWithToast(h.orderId)}
+                  className="flex-1 min-w-0 flex items-center gap-2 group text-left"
                 >
                   <span className="font-mono text-sm font-bold text-violet-400 tracking-wider group-hover:underline">{h.orderId}</span>
-                  <span className="text-[10px] text-zinc-600">· {h.items} item · {new Date(h.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}</span>
-                </Link>
+                  <span className="text-[10px] text-zinc-600">· {h.items} {t("common.item")} · {new Date(h.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}</span>
+                </button>
+                {/* Quick Reorder (Feature 3) */}
+                {h.snapshot && h.snapshot.length > 0 && (
+                  <button
+                    onClick={() => onReorder(h.snapshot!)}
+                    className="inline-flex items-center gap-1 rounded-lg bg-violet-500/10 border border-violet-500/20 px-2 py-1 text-[10px] text-violet-400 hover:bg-violet-500/20 transition-all"
+                    aria-label={t("reorder.title")}
+                  >
+                    <RotateCcw className="size-3" /> {t("reorder.title")}
+                  </button>
+                )}
                 <button
-                  onClick={() => { try { navigator.clipboard.writeText(h.orderId); } catch {} }}
+                  onClick={() => copyOrderIdWithToast(h.orderId)}
                   className="text-[10px] text-zinc-500 hover:text-cyan-400 px-2 py-1 rounded"
                 >
-                  Copy
+                  {t("common.copy")}
                 </button>
                 <button
                   onClick={() => removeHistoryItem(h.orderId)}
                   className="text-zinc-500 hover:text-red-400 p-1"
-                  aria-label="Hapus"
+                  aria-label={t("common.delete")}
                 >
                   <Trash2 className="size-3.5" />
                 </button>
@@ -612,6 +732,49 @@ function CheckoutSkeleton() {
             <div className="mt-4 h-3 w-full bg-[#2a2436] rounded" />
             <div className="mt-2 h-3 w-2/3 bg-[#2a2436] rounded" />
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ ETA Predictor (Feature 9) ============================ */
+function OrderETAPredictor({ items }: { items: { price: number }[] }) {
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
+
+  // Per-item ETA based on price
+  // <5K = 30min, <15K = 2h, <30K = 6h, >30K = 12h
+  const etaForPrice = (price: number) => {
+    if (price < 5) return { min: 30, max: 60 }; // 30-60 min
+    if (price < 15) return { min: 1 * 60, max: 3 * 60 }; // 1-3 hours
+    if (price < 30) return { min: 4 * 60, max: 8 * 60 }; // 4-8 hours
+    return { min: 8 * 60, max: 16 * 60 }; // 8-16 hours
+  };
+
+  const totalMin = items.reduce((sum, i) => sum + etaForPrice(i.price).min, 0);
+  const totalMax = items.reduce((sum, i) => sum + etaForPrice(i.price).max, 0);
+
+  const fmt = (mins: number) => {
+    if (mins < 60) return `${mins} ${t("eta.minutes")}`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (m === 0) return `${h} ${t("eta.hours")}`;
+    return `${h} ${t("eta.hours")} ${m} ${t("eta.minutes")}`;
+  };
+
+  return (
+    <div className="mt-4 border border-cyan-500/20 bg-cyan-500/5 rounded-xl px-3 py-2.5">
+      <div className="flex items-center gap-2">
+        <span className="text-base">⏱</span>
+        <div className="flex-1">
+          <p className="text-[10px] text-cyan-400 font-semibold uppercase tracking-wider">
+            {t("eta.title")}
+          </p>
+          <p className="text-xs text-zinc-300 mt-0.5">
+            {t("eta.range")} <span className="font-bold text-cyan-300">{fmt(totalMin)}</span> – <span className="font-bold text-cyan-300">{fmt(totalMax)}</span>
+          </p>
         </div>
       </div>
     </div>

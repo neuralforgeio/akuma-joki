@@ -4,14 +4,16 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, Search, ChevronDown, Gamepad2, Info, Bug, Heart, Package } from "lucide-react";
+import { Menu, X, Search, ChevronDown, Gamepad2, Info, Bug, Heart, Package, Mic } from "lucide-react";
 import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
 import type { Game, ProductItem } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
 import { useWishlist } from "@/lib/wishlist";
 import { useI18n } from "@/lib/i18n";
+import { useToast } from "@/hooks/use-toast";
 import { LanguageToggle } from "./language-toggle";
 import { NotificationBell } from "./notification-bell";
+import { LoyaltyBadge } from "./loyalty-badge";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -24,6 +26,7 @@ export function Navbar() {
   // Subscribe to lang so this component re-renders when language changes
   // (the t function reference is stable and won't trigger re-render by itself)
   useI18n((s) => s.lang);
+  const { toast } = useToast();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -33,6 +36,8 @@ export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [aiSearching, setAiSearching] = useState(false);
   const [aiResults, setAiResults] = useState<SearchEntry[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const gamesDropdownRef = useRef<HTMLDivElement>(null);
@@ -107,6 +112,38 @@ export function Navbar() {
   useEffect(() => { const h = (e: KeyboardEvent) => { if ((e.ctrlKey || e.metaKey) && e.key === "k") { e.preventDefault(); setSearchOpen(v => !v); } if (e.key === "Escape") { setSearchOpen(false); setGamesOpen(false); } }; window.addEventListener("keydown", h); return () => window.removeEventListener("keydown", h); }, []);
   useEffect(() => { const onScroll = () => setScrolled(window.scrollY > 12); onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll); }, []);
 
+  /* ===== Voice Search (Feature 10) ===== */
+  const toggleVoiceSearch = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+    const SR = (typeof window !== "undefined" ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition : null);
+    if (!SR) {
+      // Browser not supported — notify via toast-like alert
+      toast({ title: t("voiceSearch.notSupported"), variant: "destructive" });
+      return;
+    }
+    const rec = new SR();
+    rec.lang = "id-ID";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onstart = () => setIsListening(true);
+    rec.onend = () => setIsListening(false);
+    rec.onerror = () => setIsListening(false);
+    rec.onresult = (e: any) => {
+      const transcript = e.results?.[0]?.[0]?.transcript ?? "";
+      if (transcript) {
+        setSearchQuery(transcript);
+        setSearchOpen(true);
+        setTimeout(() => searchInputRef.current?.focus(), 100);
+      }
+    };
+    recognitionRef.current = rec;
+    rec.start();
+  };
+
   const isHome = pathname === "/";
   const isAbout = pathname === "/about";
   const isContact = pathname === "/contact";
@@ -173,9 +210,9 @@ export function Navbar() {
                 >
                   <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-                      {games.length} Game Tersedia
+                      {games.length} {t("store.jokiTersedia")}
                     </p>
-                    <span className="text-[10px] text-zinc-600">Pilih untuk lihat</span>
+                    <span className="text-[10px] text-zinc-600">{t("store.pilihUntukLihat")}</span>
                   </div>
                   <div className="max-h-80 overflow-y-auto akuma-scroll">
                     {games.map((g) => (
@@ -209,7 +246,7 @@ export function Navbar() {
                     onClick={() => setGamesOpen(false)}
                     className="block px-4 py-2.5 text-center text-[11px] text-violet-400 hover:bg-violet-500/10 transition-colors border-t border-white/8"
                   >
-                    Lihat semua game →
+                    {t("store.viewAllGames")}
                   </Link>
                 </div>
               </div>
@@ -237,7 +274,36 @@ export function Navbar() {
                 style={{ backdropFilter: "blur(32px) saturate(200%)", WebkitBackdropFilter: "blur(32px) saturate(200%)" }}
               >
                 <div className="border-b border-white/8 p-3">
-                  <input ref={searchInputRef} type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("nav.searchPlaceholder")} aria-label="Cari" className="w-full bg-transparent px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none" />
+                  <div className="flex items-center gap-2">
+                    <input ref={searchInputRef} type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("nav.searchPlaceholder")} aria-label="Cari" className="flex-1 bg-transparent px-2 py-1 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none" />
+                    {/* Voice Search (Feature 10) */}
+                    <button
+                      type="button"
+                      onClick={toggleVoiceSearch}
+                      aria-label={t("voiceSearch.start")}
+                      title={t("voiceSearch.start")}
+                      className={cn(
+                        "relative flex h-8 w-8 items-center justify-center rounded-lg border transition-all",
+                        isListening
+                          ? "border-red-500/50 bg-red-500/15 text-red-400"
+                          : "border-white/10 text-zinc-400 hover:text-violet-400 hover:border-violet-500/30"
+                      )}
+                    >
+                      <Mic className="size-3.5" />
+                      {isListening && (
+                        <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
+                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                  {isListening && (
+                    <p className="mt-2 text-[10px] text-red-400 font-medium animate-pulse flex items-center gap-1.5">
+                      <span className="size-1.5 rounded-full bg-red-500 animate-pulse" />
+                      {t("voiceSearch.listening")} — {t("voiceSearch.speakNow")}
+                    </p>
+                  )}
                 </div>
                 <div className="max-h-72 overflow-y-auto">
                   {aiSearching && (
@@ -259,10 +325,10 @@ export function Navbar() {
                     </>
                   )}
                   {searchResults.length === 0 && aiResults.length === 0 && !aiSearching ? (
-                    <p className="px-4 py-6 text-center text-xs text-zinc-500">{searchQuery ? "Tidak ada hasil" : "Ketik untuk mencari... (coba: 'joki termurah')"}</p>
+                    <p className="px-4 py-6 text-center text-xs text-zinc-500">{searchQuery ? t("store.tidakAdaHasil") : t("store.ketikMencari")}</p>
                   ) : searchResults.length > 0 ? (
                     <>
-                      {aiResults.length > 0 && <p className="px-3 py-1.5 text-[9px] uppercase tracking-wider text-zinc-500 border-b border-white/5">Hasil lain</p>}
+                      {aiResults.length > 0 && <p className="px-3 py-1.5 text-[9px] uppercase tracking-wider text-zinc-500 border-b border-white/5">{t("store.hasilLain")}</p>}
                       {searchResults.map((r, i) => (
                         <Link key={`${r.type}-${i}`} href={r.href} onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
                           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm" style={{ borderColor: r.accent + "40" }}>{r.emoji}</span>
@@ -279,6 +345,7 @@ export function Navbar() {
           </div>
           <LanguageToggle />
           <NotificationBell />
+          <LoyaltyBadge />
           <Link href="/wishlist" aria-label="Wishlist" className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-zinc-400 hover:text-pink-400 hover:border-pink-500/30 transition-all">
             <Heart className="size-4" />
             {wishlistHydrated && wishlistCount > 0 && (

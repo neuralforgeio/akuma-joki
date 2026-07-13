@@ -2,6 +2,7 @@
 
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/lib/wishlist";
+import { checkAchievements } from "@/lib/achievements";
 import { cn } from "@/lib/utils";
 
 /**
@@ -37,6 +38,8 @@ export function WishlistButton({
         e.preventDefault();
         e.stopPropagation();
         toggle({ gameSlug, gameName, productId, productName, priceLabel, emoji, addedAt: Date.now() });
+        // Check achievements (Feature 7): wishlist_master (5 items)
+        checkAchievements({ wishlistCount: useWishlist.getState().items.length });
       }}
       aria-label={has ? "Hapus dari wishlist" : "Tambah ke wishlist"}
       className={cn(

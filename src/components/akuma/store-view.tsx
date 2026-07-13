@@ -19,6 +19,10 @@ import { SkeletonGrid } from "./skeleton";
 import { WishlistButton } from "./wishlist-button";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useI18n } from "@/lib/i18n";
+import { checkAchievements } from "@/lib/achievements";
+import { PriceHistoryChart } from "./price-history-chart";
+import { Recommendations } from "./recommendations";
 
 export function StoreView({ game }: { game: Game }) {
   const router = useRouter();
@@ -30,6 +34,9 @@ export function StoreView({ game }: { game: Game }) {
   const addViewed = useRecentlyViewed((s) => s.addViewed);
   const trackGameView = useAdminStore((s) => s.trackGameView);
   const { toast } = useToast();
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
   const [selectedItem, setSelectedItem] = useState<{ item: ProductItem; category: string } | null>(null);
   const [cartLimitModal, setCartLimitModal] = useState(false);
 
@@ -122,7 +129,7 @@ export function StoreView({ game }: { game: Game }) {
       // Close item modal FIRST, then show limit/duplicate message
       setSelectedItem(null);
       if (isDuplicate) {
-        toast({ title: "Item sudah ada di keranjang", variant: "destructive" });
+        toast({ title: t("store.duplicateCart"), variant: "destructive" });
       } else {
         // Show limit modal after item modal closes
         setTimeout(() => setCartLimitModal(true), 100);
@@ -130,7 +137,9 @@ export function StoreView({ game }: { game: Game }) {
       return;
     }
     setSelectedItem(null);
-    toast({ title: "Ditambahkan ke keranjang! 🛒", description: `${selectedItem.item.name} (${selectedItem.item.priceLabel})` });
+    toast({ title: t("store.addedToCart"), description: `${selectedItem.item.name} (${selectedItem.item.priceLabel})` });
+    // Check achievements (Feature 7): cart_full (5 items)
+    checkAchievements({ cartCount: useCart.getState().items.length });
   };
 
   const handleBuyNow = () => {
@@ -178,7 +187,7 @@ export function StoreView({ game }: { game: Game }) {
             href="/"
             className="inline-flex items-center gap-2 font-pixel text-[9px] uppercase text-[#9a93a8] hover:text-[#c44bff] transition-colors"
           >
-            <ArrowLeft className="size-3.5" /> Beranda
+            <ArrowLeft className="size-3.5" /> {t("common.home")}
           </Link>
 
           <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -203,7 +212,7 @@ export function StoreView({ game }: { game: Game }) {
             </div>
             <div className="hidden sm:block">
               <div className="border-2 border-[#a020f0]/50 pixel-corner bg-[#a020f0]/5 px-4 py-3 text-center">
-                <p className="font-pixel text-[8px] uppercase text-[#9a93a8]">Total Joki</p>
+                <p className="font-pixel text-[8px] uppercase text-[#9a93a8]">{t("store.totalJoki")}</p>
                 <p className="mt-1 font-pixel text-lg text-[#c44bff]">
                   {game.categories.reduce((a, c) => a + c.items.length, 0)}
                 </p>
@@ -258,7 +267,7 @@ export function StoreView({ game }: { game: Game }) {
               type="text"
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              placeholder="Cari item... (mis. level, raid, senjata)"
+              placeholder={t("filter.searchPlaceholder")}
               className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-violet-500/40"
             />
             <select
@@ -266,7 +275,7 @@ export function StoreView({ game }: { game: Game }) {
               onChange={(e) => setFilterCategory(e.target.value)}
               className="bg-[#0a0a0a] border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-200 outline-none focus:border-violet-500/40"
             >
-              <option value="all" className="bg-[#0a0a0a]">Semua Kategori</option>
+              <option value="all" className="bg-[#0a0a0a]">{t("filter.allCategories")}</option>
               {game.categories.map((c) => (
                 <option key={c.id} value={c.id} className="bg-[#0a0a0a]">{c.icon} {c.name}</option>
               ))}
@@ -277,7 +286,7 @@ export function StoreView({ game }: { game: Game }) {
                 onChange={(e) => setFilterTag(e.target.value)}
                 className="bg-[#0a0a0a] border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-200 outline-none focus:border-violet-500/40"
               >
-                <option value="all" className="bg-[#0a0a0a]">Semua Tag</option>
+                <option value="all" className="bg-[#0a0a0a]">{t("filter.allTags")}</option>
                 {allTags.map((t) => (
                   <option key={t} value={t} className="bg-[#0a0a0a]">{t}</option>
                 ))}
@@ -288,17 +297,17 @@ export function StoreView({ game }: { game: Game }) {
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-[#0a0a0a] border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-200 outline-none focus:border-violet-500/40"
             >
-              <option value="default" className="bg-[#0a0a0a]">Urutkan: Default</option>
-              <option value="price-asc" className="bg-[#0a0a0a]">Harga: Rendah → Tinggi</option>
-              <option value="price-desc" className="bg-[#0a0a0a]">Harga: Tinggi → Rendah</option>
-              <option value="name" className="bg-[#0a0a0a]">Nama (A-Z)</option>
+              <option value="default" className="bg-[#0a0a0a]">{t("filter.sortDefault")}</option>
+              <option value="price-asc" className="bg-[#0a0a0a]">{t("filter.sortPriceAsc")}</option>
+              <option value="price-desc" className="bg-[#0a0a0a]">{t("filter.sortPriceDesc")}</option>
+              <option value="name" className="bg-[#0a0a0a]">{t("filter.sortName")}</option>
             </select>
             {(filterQuery || filterCategory !== "all" || filterTag !== "all" || sortBy !== "default") && (
               <button
                 onClick={() => { setFilterQuery(""); setFilterCategory("all"); setFilterTag("all"); setSortBy("default"); }}
                 className="inline-flex items-center justify-center gap-1 rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-xs text-zinc-400 hover:text-red-400 hover:border-red-500/30 transition-all"
               >
-                <X className="size-3.5" /> Reset
+                <X className="size-3.5" /> {t("filter.reset")}
               </button>
             )}
           </div>
@@ -309,12 +318,12 @@ export function StoreView({ game }: { game: Game }) {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12 space-y-12">
         {filteredCategories.length === 0 ? (
           <div className="glass rounded-2xl p-12 text-center">
-            <p className="text-sm text-zinc-500">Tidak ada item yang cocok dengan filter.</p>
+            <p className="text-sm text-zinc-500">{t("filter.noResults")}</p>
             <button
               onClick={() => { setFilterQuery(""); setFilterCategory("all"); setFilterTag("all"); setSortBy("default"); }}
               className="mt-3 inline-flex items-center gap-2 rounded-xl bg-violet-500/10 border border-violet-500/20 px-4 py-2 text-sm text-violet-400 hover:bg-violet-500/20 transition-all"
             >
-              Reset Filter
+              {t("filter.resetFilter")}
             </button>
           </div>
         ) : (
@@ -327,7 +336,7 @@ export function StoreView({ game }: { game: Game }) {
               </h2>
               <div className="h-[2px] flex-1 bg-gradient-to-r from-[#a020f0] to-transparent" />
               <span className="font-pixel text-[8px] uppercase text-[#9a93a8]">
-                {cat.items.length} item
+                {cat.items.length} {t("common.item")}
               </span>
             </div>
 
@@ -356,13 +365,16 @@ export function StoreView({ game }: { game: Game }) {
       {/* Reviews section */}
       <StoreReviews game={game} />
 
+      {/* Smart Recommendations (Feature 6) */}
+      <Recommendations currentGameSlug={game.slug} />
+
       {/* other games */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
         <div className="border-2 border-[#a020f0]/40 bg-[#121017]/60 pixel-corner p-6 sm:p-8">
           <div className="flex items-center gap-2 mb-4">
             <Tag className="size-4 text-[#c44bff]" />
             <h3 className="font-pixel text-xs sm:text-sm text-[#e5e5e5] uppercase">
-              Jelajahi Game Lain
+              {t("store.otherGames")}
             </h3>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
@@ -442,8 +454,11 @@ export function StoreView({ game }: { game: Game }) {
               {/* Price */}
               <div className="flex items-end gap-1.5 mb-5">
                 <span className="text-3xl font-bold text-gradient">{selectedItem.item.priceLabel}</span>
-                <span className="text-xs text-zinc-500 mb-1">Robux</span>
+                <span className="text-xs text-zinc-500 mb-1">{t("store.robux")}</span>
               </div>
+
+              {/* Price History Chart (Feature 4) */}
+              <PriceHistoryChart currentPrice={selectedItem.item.price} priceLabel={selectedItem.item.priceLabel} accent={game.accent} />
 
               {/* Actions */}
               <div className="flex gap-2">
@@ -458,16 +473,16 @@ export function StoreView({ game }: { game: Game }) {
                   )}
                 >
                   {selectedItem && cartHas(`${game.slug}-${selectedItem.item.id}`) ? (
-                    <><Check className="size-4" /> Di Keranjang</>
+                    <><Check className="size-4" /> {t("cart.inCart")}</>
                   ) : (
-                    <><Plus className="size-4" /> Keranjang</>
+                    <><Plus className="size-4" /> {t("store.keranjang")}</>
                   )}
                 </button>
                 <button
                   onClick={handleBuyNow}
                   className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-3 text-sm font-medium text-white hover:from-violet-500 hover:to-violet-400 transition-all"
                 >
-                  <ShoppingCart className="size-4" /> Beli Sekarang
+                  <ShoppingCart className="size-4" /> {t("store.beliSekarang")}
                 </button>
               </div>
             </motion.div>
@@ -506,9 +521,9 @@ export function StoreView({ game }: { game: Game }) {
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/15 border border-red-500/30">
                 <AlertTriangle className="size-7 text-red-400" />
               </div>
-              <h2 className="text-lg font-bold text-zinc-100 mb-1">Limit 5 Order Tercapai</h2>
+              <h2 className="text-lg font-bold text-zinc-100 mb-1">{t("checkout.limitTitle")}</h2>
               <p className="text-sm text-zinc-500 mb-5">
-                Untuk sementara, maksimal {MAX_CART_ITEMS} joki per order. Hapus item dari keranjang untuk menambah yang baru, atau checkout sekarang.
+                {t("checkout.limitDesc")}
               </p>
               <div className="flex gap-2">
                 <Link
@@ -516,13 +531,13 @@ export function StoreView({ game }: { game: Game }) {
                   onClick={() => setCartLimitModal(false)}
                   className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-2.5 text-sm font-medium text-white hover:from-violet-500 hover:to-violet-400 transition-all"
                 >
-                  <ShoppingCart className="size-4" /> Checkout Sekarang
+                  <ShoppingCart className="size-4" /> {t("checkout.checkoutNow")}
                 </Link>
                 <button
                   onClick={() => setCartLimitModal(false)}
                   className="inline-flex items-center justify-center rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/10 transition-all"
                 >
-                  Tutup
+                  {t("common.close")}
                 </button>
               </div>
             </motion.div>
@@ -544,6 +559,7 @@ function ProductCard({
     id: string;
     name: string;
     priceLabel: string;
+    price?: number;
     tag?: string;
     description?: string;
     requirement?: string;
@@ -553,6 +569,9 @@ function ProductCard({
   onPick: () => void;
   inCart: boolean;
 }) {
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
   // Promo tags yang dapat badge khusus (glowing + animasi)
   const PROMO_TAGS = ["hot", "popular", "legendary", "starter", "max", "pro", "full climb", "completionist", "quick fix"];
   const isPromo = item.tag && PROMO_TAGS.includes(item.tag.toLowerCase());
@@ -565,6 +584,18 @@ function ProductCard({
       ? "#6ee7b7"
       : game.accent
     : game.accent;
+
+  // Difficulty meter: based on price
+  // <5K = Easy (green), <15K = Medium (yellow), <30K = Hard (orange), >30K = Expert (red)
+  const priceNum = item.price ?? (parseInt(item.priceLabel.replace(/\D/g, ""), 10) || 0);
+  const difficulty =
+    priceNum < 5
+      ? { level: "easy", color: "#6ee7b7", bars: 1 }
+      : priceNum < 15
+      ? { level: "medium", color: "#ffd166", bars: 2 }
+      : priceNum < 30
+      ? { level: "hard", color: "#fb923c", bars: 3 }
+      : { level: "expert", color: "#ff3b6b", bars: 4 };
 
   return (
     <div
@@ -584,7 +615,7 @@ function ProductCard({
             boxShadow: `0 0 12px ${promoColor}`,
           }}
         >
-          PROMO
+          {t("store.promo")}
         </div>
       )}
 
@@ -592,11 +623,11 @@ function ProductCard({
       <div className="relative flex items-center justify-between px-4 py-3 border-b-2 border-[#2a2436] bg-[#0a0a0a]/60">
         <div className="flex items-center gap-1.5">
           <span className="h-2 w-2 bg-[#a020f0] shadow-[0_0_8px_#a020f0]" />
-          <span className="font-pixel text-[8px] uppercase text-[#9a93a8]">Joki</span>
+          <span className="font-pixel text-[8px] uppercase text-[#9a93a8]">{t("store.joki")}</span>
         </div>
         {selected ? (
           <span className="font-pixel text-[7px] uppercase px-2 py-1 bg-[#6ee7b7] text-[#0a0a0a] pixel-corner inline-flex items-center gap-1">
-            <Check className="size-3" /> Dipilih
+            <Check className="size-3" /> {t("store.dipilih")}
           </span>
         ) : item.tag ? (
           <span
@@ -632,11 +663,32 @@ function ProductCard({
             </span>
           </div>
         )}
+
+        {/* Difficulty Meter */}
+        <div className="mt-3 flex items-center gap-2">
+          <span className="font-pixel text-[7px] uppercase text-[#9a93a8] shrink-0">{t("difficulty.label")}</span>
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4].map((b) => (
+              <span
+                key={b}
+                className="h-1.5 w-3 rounded-sm transition-colors"
+                style={{
+                  background: b <= difficulty.bars ? difficulty.color : "rgba(255,255,255,0.08)",
+                  boxShadow: b <= difficulty.bars ? `0 0 6px ${difficulty.color}80` : "none",
+                }}
+              />
+            ))}
+          </div>
+          <span className="font-pixel text-[7px] uppercase" style={{ color: difficulty.color }}>
+            {t(`difficulty.${difficulty.level}`)}
+          </span>
+        </div>
+
         <div className="mt-4 flex items-end gap-1">
           <span className="font-pixel text-2xl sm:text-3xl text-[#c44bff] text-glow-neon">
             {item.priceLabel}
           </span>
-          <span className="font-pixel text-[8px] text-[#9a93a8] uppercase mb-1">price</span>
+          <span className="font-pixel text-[8px] text-[#9a93a8] uppercase mb-1">{t("store.price")}</span>
         </div>
       </div>
 
@@ -653,11 +705,11 @@ function ProductCard({
         >
           {inCart ? (
             <>
-              <Check className="size-3.5" /> Di Keranjang
+              <Check className="size-3.5" /> {t("cart.inCart")}
             </>
           ) : (
             <>
-              <ShoppingCart className="size-3.5" /> Pilih Joki
+              <ShoppingCart className="size-3.5" /> {t("store.pilihJoki")}
             </>
           )}
         </button>
@@ -685,12 +737,17 @@ function StoreReviews({ game }: { game: Game }) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const avgRating = reviews.length > 0 ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
+  const t = useI18n((s) => s.t);
+  // Subscribe to lang so this component re-renders when language changes
+  useI18n((s) => s.lang);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !comment.trim()) return;
     addReview({ gameSlug: game.slug, gameName: game.name, productName: game.name, customerName: name.trim(), rating, comment: comment.trim() });
     setName(""); setRating(5); setComment("");
+    // Check achievements (Feature 7): first_review
+    checkAchievements({ reviewCount: useReviews.getState().reviews.length + 1 });
   };
 
   if (!hydrated) return null;
@@ -699,7 +756,7 @@ function StoreReviews({ game }: { game: Game }) {
     <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
       <div className="flex items-center gap-2 mb-6">
         <Star className="size-5 text-amber-400" />
-        <h2 className="text-lg font-bold text-zinc-100">Review & Rating</h2>
+        <h2 className="text-lg font-bold text-zinc-100">{t("review.title")}</h2>
         {reviews.length > 0 && (
           <span className="ml-2 inline-flex items-center gap-1 rounded-lg bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 text-xs text-amber-400">
             {avgRating.toFixed(1)} ★ · {reviews.length} review
@@ -708,28 +765,28 @@ function StoreReviews({ game }: { game: Game }) {
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <form onSubmit={handleSubmit} className="glass rounded-2xl p-5 space-y-3">
-          <h3 className="text-sm font-semibold text-zinc-300">Tulis Review</h3>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama kamu" required
+          <h3 className="text-sm font-semibold text-zinc-300">{t("review.writeReview")}</h3>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("review.namePlaceholder")} required
             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40" />
           <div className="flex items-center gap-2">
-            <span className="text-xs text-zinc-500">Rating:</span>
+            <span className="text-xs text-zinc-500">{t("review.rating")}</span>
             {[1,2,3,4,5].map((s) => (
               <button key={s} type="button" onClick={() => setRating(s)} className="transition-transform hover:scale-110">
                 <Star className={cn("size-5", s <= rating ? "fill-amber-400 text-amber-400" : "text-zinc-600")} />
               </button>
             ))}
           </div>
-          <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Bagikan pengalaman joki kamu..." rows={3} required
+          <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t("review.commentPlaceholder")} rows={3} required
             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-100 outline-none focus:border-violet-500/40 resize-none" />
           <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-2 text-sm text-white hover:from-violet-500 hover:to-violet-400 transition-all">
-            Kirim Review
+            {t("review.send")}
           </button>
         </form>
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {reviews.length === 0 ? (
             <div className="glass rounded-2xl p-8 text-center">
               <Star className="mx-auto size-8 text-zinc-700 mb-2" />
-              <p className="text-sm text-zinc-500">Belum ada review. Jadikan yang pertama!</p>
+              <p className="text-sm text-zinc-500">{t("review.empty")}</p>
             </div>
           ) : (
             reviews.map((r) => (
