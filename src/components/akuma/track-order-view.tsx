@@ -37,7 +37,7 @@ export function TrackOrderView() {
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [searched, setSearched] = useState(false);
-  const [found, setFound] = useState<typeof orders[0] | null>(null);
+  const [foundItems, setFoundItems] = useState<typeof orders[0][] | null>(null);
   const [copied, setCopied] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -48,18 +48,31 @@ export function TrackOrderView() {
       return;
     }
     setSearched(true);
-    // Search by orderId (8-digit uppercase) — also fallback to old id
-    const result = orders.find(o => o.orderId?.toUpperCase() === q || o.id.toUpperCase() === q);
-    setFound(result || null);
-    if (!result) {
+    // Find ALL orders with this orderId — group them together
+    const results = orders.filter(o => o.orderId?.toUpperCase() === q || o.id.toUpperCase() === q);
+    setFoundItems(results.length > 0 ? results : null);
+    if (results.length === 0) {
       toast({ title: "Order tidak ditemukan", variant: "destructive" });
     }
   };
 
   const copyOrderId = () => {
-    if (!found?.orderId) return;
-    try { navigator.clipboard.writeText(found.orderId); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+    if (!foundItems?.[0]?.orderId) return;
+    try { navigator.clipboard.writeText(foundItems[0].orderId); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
   };
+
+  // Compute overall status from all items
+  const found = foundItems?.[0] || null;
+  const overallStatus = foundItems && foundItems.length > 0 ? (() => {
+    const statuses = foundItems.map(o => o.status);
+    const allDone = statuses.every(s => s === "done");
+    const allProcessing = statuses.every(s => s === "processing");
+    const anyCancelled = statuses.some(s => s === "cancelled");
+    if (allDone) return "done" as const;
+    if (anyCancelled && !allDone) return "cancelled" as const;
+    if (allProcessing) return "processing" as const;
+    return "processing" as const;
+  })() : null;
 
   return (
     <div className="relative min-h-screen overflow-hidden pb-16">
@@ -117,7 +130,7 @@ export function TrackOrderView() {
       {/* Result */}
       <section className="relative mx-auto max-w-2xl px-4 sm:px-6">
         <AnimatePresence mode="wait">
-          {searched && found && (
+          {searched && foundItems && foundItems.length > 0 && overallStatus && (
             <motion.div
               key="found"
               initial={{ opacity: 0, y: 12 }}
@@ -134,21 +147,22 @@ export function TrackOrderView() {
                       <p className="text-2xl font-mono font-bold text-violet-400 tracking-wider">{found.orderId || found.id.slice(0, 8).toUpperCase()}</p>
                       {copied ? <Check className="size-4 text-green-400" /> : <Copy className="size-4 text-zinc-600 group-hover:text-violet-400 transition-colors" />}
                     </button>
+                    <p className="text-[10px] text-zinc-600 mt-0.5">{foundItems.length} item dalam order ini</p>
                   </div>
                   <div
                     className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold"
-                    style={{ color: STATUS_META[found.status].color, backgroundColor: STATUS_META[found.status].bg }}
+                    style={{ color: STATUS_META[overallStatus].color, backgroundColor: STATUS_META[overallStatus].bg }}
                   >
                     {(() => {
-                      const Icon = STATUS_META[found.status].icon;
+                      const Icon = STATUS_META[overallStatus].icon;
                       return <Icon className="size-4" />;
                     })()}
-                    {STATUS_META[found.status].label}
+                    {STATUS_META[overallStatus].label}
                   </div>
                 </div>
 
                 {/* Animated Status Banner */}
-                {found.status === "processing" && (
+                {overallStatus === "processing" && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -164,10 +178,9 @@ export function TrackOrderView() {
                       </motion.div>
                       <div>
                         <p className="text-sm font-semibold text-cyan-400">Joki Sedang Berjalan!</p>
-                        <p className="text-[11px] text-zinc-500">Tim joki kami sedang bekerja pada order kamu. Mohon tunggu.</p>
+                        <p className="text-[11px] text-zinc-500">Tim joki kami sedang bekerja pada {foundItems.length} item order kamu. Mohon tunggu.</p>
                       </div>
                     </div>
-                    {/* Progress bar animation */}
                     <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
                       <motion.div
                         className="h-full bg-gradient-to-r from-cyan-500 to-violet-500"
@@ -179,22 +192,16 @@ export function TrackOrderView() {
                   </motion.div>
                 )}
 
-                {found.status === "done" && (
+                {overallStatus === "done" && (
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="mb-5 rounded-2xl p-4 border border-green-500/30 bg-green-500/5 flex items-center gap-3"
                   >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", delay: 0.2 }}
-                    >
-                      <CheckCircle2 className="size-8 text-green-400" />
-                    </motion.div>
+                    <CheckCircle2 className="size-8 text-green-400" />
                     <div>
-                      <p className="text-sm font-semibold text-green-400">Order Selesai! 🎉</p>
-                      <p className="text-[11px] text-zinc-500">Joki kamu sudah selesai. Terima kasih sudah percaya AKUMA JOKI!</p>
+                      <p className="text-sm font-semibold text-green-400">Semua Order Selesai! 🎉</p>
+                      <p className="text-[11px] text-zinc-500">Semua {foundItems.length} joki sudah selesai. Terima kasih sudah percaya AKUMA JOKI!</p>
                     </div>
                   </motion.div>
                 )}
@@ -205,8 +212,8 @@ export function TrackOrderView() {
                   <div className="relative">
                     <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-white/10" />
                     {(["new", "processing", "done"] as OrderStatus[]).map((status, idx) => {
-                      const isActive = found.status === status;
-                      const isPast = ["new", "processing", "done"].indexOf(found.status) > idx;
+                      const isActive = overallStatus === status;
+                      const isPast = ["new", "processing", "done"].indexOf(overallStatus) > idx;
                       const Icon = STATUS_META[status].icon;
                       return (
                         <div key={status} className="relative flex items-center gap-3 pb-5 last:pb-0">
@@ -242,39 +249,34 @@ export function TrackOrderView() {
                   </div>
                 </div>
 
-                {/* Order details */}
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="glass rounded-xl p-3">
-                    <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Game</p>
-                    <p className="text-sm text-zinc-100">{found.gameName}</p>
-                  </div>
-                  <div className="glass rounded-xl p-3">
-                    <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Produk</p>
-                    <p className="text-sm text-zinc-100">{found.productName}</p>
-                  </div>
-                  <div className="glass rounded-xl p-3">
-                    <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Harga</p>
-                    <p className="text-sm text-violet-400 font-semibold">{found.priceLabel}</p>
-                  </div>
-                  <div className="glass rounded-xl p-3">
-                    <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Tanggal Order</p>
-                    <p className="text-xs text-zinc-400">{formatDate(found.createdAt)}</p>
+                {/* ALL Items in this order */}
+                <div className="mb-4">
+                  <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-2">Daftar Joki ({foundItems.length})</p>
+                  <div className="space-y-2">
+                    {foundItems.map((item, i) => (
+                      <div key={item.id} className="glass rounded-xl p-3 flex items-center gap-3">
+                        <span className="text-[10px] text-zinc-600 shrink-0">#{i + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-zinc-100 truncate">{item.productName}</p>
+                          <p className="text-[10px] text-zinc-500">{item.gameName} · {item.priceLabel}</p>
+                        </div>
+                        <span className={cn("text-[9px] px-2 py-0.5 rounded-full shrink-0",
+                          item.status === "done" ? "bg-green-500/10 text-green-400" :
+                          item.status === "processing" ? "bg-cyan-500/10 text-cyan-400" :
+                          item.status === "cancelled" ? "bg-red-500/10 text-red-400" :
+                          "bg-yellow-500/10 text-yellow-400")}>
+                          {item.status === "done" ? "✅" : item.status === "processing" ? "🔄" : item.status === "cancelled" ? "❌" : "🆕"} {item.status}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {found.note && (
-                  <div className="glass rounded-xl p-3 mb-4">
-                    <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Catatan</p>
-                    <p className="text-xs text-zinc-400">{found.note}</p>
-                  </div>
-                )}
-
-                {found.status === "cancelled" && (
-                  <div className="glass rounded-xl p-3 border-red-500/20 mb-4 flex items-start gap-2">
-                    <AlertCircle className="size-4 text-red-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-red-400">Order ini telah dibatalkan. Hubungi admin untuk info lebih lanjut.</p>
-                  </div>
-                )}
+                {/* Order date */}
+                <div className="glass rounded-xl p-3 mb-4">
+                  <p className="text-[10px] uppercase text-zinc-500 tracking-wider mb-1">Tanggal Order</p>
+                  <p className="text-xs text-zinc-400">{formatDate(found.createdAt)}</p>
+                </div>
 
                 <div className="flex items-center justify-between">
                   <Link
@@ -289,7 +291,7 @@ export function TrackOrderView() {
             </motion.div>
           )}
 
-          {searched && !found && (
+          {searched && (!foundItems || foundItems.length === 0) && (
             <motion.div
               key="notfound"
               initial={{ opacity: 0, y: 12 }}

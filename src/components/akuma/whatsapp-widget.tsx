@@ -692,17 +692,29 @@ export function WhatsAppWidget() {
         // User typed an Order ID → lookup & auto-reply with status
         const orderId = orderIdMatch[0];
         const orders = useAdminStore.getState().orders;
-        const order = orders.find(o => o.orderId?.toUpperCase() === orderId);
+        // Find ALL orders with this orderId (not just first)
+        const matchedOrders = orders.filter(o => o.orderId?.toUpperCase() === orderId);
 
         setTyping(true);
         window.setTimeout(() => {
           setTyping(false);
           let replyText = "";
-          if (order) {
-            const statusLabel = order.status === "processing" ? "🔄 Sedang Diproses" :
-              order.status === "done" ? "✅ Selesai" :
-              order.status === "cancelled" ? "❌ Dibatalkan" : "🆕 Baru";
-            replyText = `📦 *Order ${order.orderId}*\n\nGame: ${order.gameName}\nJoki: ${order.productName}\nHarga: ${order.priceLabel}\nStatus: ${statusLabel}\n\n${order.status === "processing" ? "Joki sedang berjalan! Mohon tunggu ya 🙏" : order.status === "done" ? "Order kamu sudah selesai! Terima kasih sudah percaya AKUMA JOKI 🎉" : "Ada yang bisa kami bantu? Ketik pertanyaan kamu 😊"}`;
+          if (matchedOrders.length > 0) {
+            // Build summary with ALL items
+            const statuses = matchedOrders.map(o => o.status);
+            const allDone = statuses.every(s => s === "done");
+            const allProcessing = statuses.every(s => s === "processing");
+            const anyCancelled = statuses.some(s => s === "cancelled");
+            const overallStatus = allDone ? "✅ Semua Selesai" :
+              anyCancelled ? "❌ Ada yang Dibatalkan" :
+              allProcessing ? "🔄 Semua Sedang Diproses" : "🔄 Sebagian Diproses";
+
+            replyText = `📦 *Order ${orderId}*\n\n*Total Item:* ${matchedOrders.length}\n*Status:* ${overallStatus}\n\n*Daftar Joki:*\n`;
+            matchedOrders.forEach((o, i) => {
+              const itemStatus = o.status === "done" ? "✅" : o.status === "processing" ? "🔄" : o.status === "cancelled" ? "❌" : "🆕";
+              replyText += `${i + 1}. ${itemStatus} ${o.productName} (${o.gameName}) - ${o.priceLabel}\n`;
+            });
+            replyText += `\n${allDone ? "Semua joki sudah selesai! Terima kasih sudah percaya AKUMA JOKI 🎉" : allProcessing ? "Semua joki sedang berjalan! Mohon tunggu ya 🙏" : "Ada yang bisa kami bantu? Ketik pertanyaan kamu 😊"}`;
           } else {
             replyText = `❌ Order ID "${orderId}" tidak ditemukan.\n\nPastikan ID benar (8 digit, huruf besar). Order ID ada di modal setelah checkout & di pesan WhatsApp yang dikirim ke admin.\n\nButuh bantuan? Admin akan membalas via WhatsApp 😊`;
           }
@@ -1637,13 +1649,25 @@ function OrderInputContent({ msgId }: { msgId: number }) {
 
     setSubmitted(true);
     const orders = useAdminStore.getState().orders;
-    const order = orders.find(o => o.orderId?.toUpperCase() === id);
+    // Find ALL orders with this orderId
+    const matchedOrders = orders.filter(o => o.orderId?.toUpperCase() === id);
 
-    if (order) {
-      const statusLabel = order.status === "processing" ? "🔄 Sedang Diproses" :
-        order.status === "done" ? "✅ Selesai" :
-        order.status === "cancelled" ? "❌ Dibatalkan" : "🆕 Baru";
-      setResult(`📦 Order ${order.orderId}\n\nGame: ${order.gameName}\nJoki: ${order.productName}\nHarga: ${order.priceLabel}\nStatus: ${statusLabel}\n\n${order.status === "processing" ? "Joki sedang berjalan! Mohon tunggu ya 🙏" : order.status === "done" ? "Order kamu sudah selesai! 🎉" : "Ada yang bisa kami bantu?"}`);
+    if (matchedOrders.length > 0) {
+      const statuses = matchedOrders.map(o => o.status);
+      const allDone = statuses.every(s => s === "done");
+      const allProcessing = statuses.every(s => s === "processing");
+      const anyCancelled = statuses.some(s => s === "cancelled");
+      const overallStatus = allDone ? "✅ Semua Selesai" :
+        anyCancelled ? "❌ Ada yang Dibatalkan" :
+        allProcessing ? "🔄 Semua Sedang Diproses" : "🔄 Sebagian Diproses";
+
+      let result = `📦 Order ${id}\n\nTotal Item: ${matchedOrders.length}\nStatus: ${overallStatus}\n\nDaftar Joki:\n`;
+      matchedOrders.forEach((o, i) => {
+        const itemStatus = o.status === "done" ? "✅" : o.status === "processing" ? "🔄" : o.status === "cancelled" ? "❌" : "🆕";
+        result += `${i + 1}. ${itemStatus} ${o.productName} (${o.gameName}) - ${o.priceLabel}\n`;
+      });
+      result += `\n${allDone ? "Semua joki sudah selesai! 🎉" : allProcessing ? "Joki sedang berjalan! Mohon tunggu ya 🙏" : "Ada yang bisa kami bantu?"}`;
+      setResult(result);
     } else {
       setResult(`❌ Order ID "${id}" tidak ditemukan.\n\nPastikan ID benar (8 digit). Cek di modal setelah checkout atau di pesan WhatsApp admin.`);
     }
