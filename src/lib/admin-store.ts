@@ -82,6 +82,21 @@ export type VisitorEntry = {
   count: number;
 };
 
+export type GameViewEntry = {
+  slug: string;
+  date: string; // YYYY-MM-DD
+  count: number;
+};
+
+export type ChatMessage = {
+  id: string;
+  role: "user" | "cs";
+  text: string;
+  userId?: string; // identifier for user session
+  ts: number;
+  read: boolean;
+};
+
 export type Artifact = {
   id: string;
   name: string;
@@ -135,6 +150,8 @@ type AdminState = {
   commits: CommitEntry[];
   activityLog: ActivityEntry[];
   visitors: VisitorEntry[];
+  gameViews: GameViewEntry[];
+  chatMessages: ChatMessage[];
   artifacts: Artifact[];
   waReplies: WAReply[];
   faq: FAQItem[];
@@ -182,6 +199,13 @@ type AdminState = {
   /* visitors */
   trackVisitor: () => void;
 
+  /* game views */
+  trackGameView: (slug: string) => void;
+
+  /* live chat */
+  sendChatMessage: (msg: Omit<ChatMessage, "id" | "ts" | "read">) => void;
+  markChatRead: (id: string) => void;
+
   /* artifacts */
   addArtifact: (a: Omit<Artifact, "id" | "createdAt">) => void;
   deleteArtifact: (id: string) => void;
@@ -226,6 +250,8 @@ type AdminState = {
     reports: ContactReport[];
     notifications: Notification[];
     orders: Order[];
+    gameViews: GameViewEntry[];
+    chatMessages: ChatMessage[];
   }>) => void;
 
   /* settings */
@@ -268,6 +294,8 @@ export const useAdminStore = create<AdminState>()(
       commits: [],
       activityLog: [],
       visitors: [],
+      gameViews: [],
+      chatMessages: [],
       artifacts: [],
       waReplies: [],
       faq: SYNCED_FAQ,
@@ -508,6 +536,8 @@ export const useAdminStore = create<AdminState>()(
           reports: s.reports,
           notifications: s.notifications,
           orders: s.orders,
+          gameViews: s.gameViews,
+          chatMessages: s.chatMessages,
           version: 1,
           updatedAt: new Date().toISOString(),
         };
@@ -528,6 +558,37 @@ export const useAdminStore = create<AdminState>()(
         } else {
           set({ visitors: [...visitors, { date: today, count: 1 }] });
         }
+      },
+
+      /* ===== game views ===== */
+      trackGameView: (slug) => {
+        const today = todayStr();
+        const views = get().gameViews;
+        const existing = views.find((v) => v.slug === slug && v.date === today);
+        if (existing) {
+          set({
+            gameViews: views.map((v) =>
+              v.slug === slug && v.date === today ? { ...v, count: v.count + 1 } : v
+            ),
+          });
+        } else {
+          set({ gameViews: [...views, { slug, date: today, count: 1 }] });
+        }
+      },
+
+      /* ===== live chat ===== */
+      sendChatMessage: (msg) => {
+        const message: ChatMessage = {
+          ...msg,
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          ts: Date.now(),
+          read: false,
+        };
+        set((s) => ({ chatMessages: [...s.chatMessages, message].slice(-200) }));
+        get().triggerSync(`Chat: ${msg.role} → ${msg.text.slice(0, 50)}`);
+      },
+      markChatRead: (id) => {
+        set((s) => ({ chatMessages: s.chatMessages.map(m => m.id === id ? { ...m, read: true } : m) }));
       },
 
       /* ===== artifacts ===== */
@@ -664,6 +725,8 @@ export const useAdminStore = create<AdminState>()(
           reports: data.reports ?? s.reports,
           notifications: data.notifications ?? s.notifications,
           orders: data.orders ?? s.orders,
+          gameViews: data.gameViews ?? s.gameViews,
+          chatMessages: data.chatMessages ?? s.chatMessages,
         }));
       },
 

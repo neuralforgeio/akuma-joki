@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ShoppingCart, Tag, Check, AlertTriangle, Lock, Star, X, Plus, Minus } from "lucide-react";
@@ -27,8 +27,14 @@ export function StoreView({ game }: { game: Game }) {
   const cartHas = useCart((s) => s.has);
   const cartCount = useCart((s) => s.items.length);
   const addViewed = useRecentlyViewed((s) => s.addViewed);
+  const trackGameView = useAdminStore((s) => s.trackGameView);
   const { toast } = useToast();
   const [selectedItem, setSelectedItem] = useState<{ item: ProductItem; category: string } | null>(null);
+
+  // Track game view on mount
+  useEffect(() => {
+    trackGameView(game.slug);
+  }, [game.slug, trackGameView]);
 
   /* ===== Advanced Filter State ===== */
   const [filterQuery, setFilterQuery] = useState("");

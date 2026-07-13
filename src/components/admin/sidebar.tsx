@@ -29,6 +29,8 @@ const MENU: MenuItem[] = [
   { href: "/admin/templates", label: "WA Templates", icon: MessageSquare, roles: ["developer", "admin"] },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle, roles: ["developer", "admin"] },
   { href: "/admin/settings", label: "Settings", icon: Settings, roles: ["developer", "admin"] },
+  { href: "/admin/game-analytics", label: "Game Analytics", icon: BarChart3, roles: ["developer"] },
+  { href: "/admin/live-chat", label: "Live Chat", icon: MessageSquare, roles: ["developer", "admin"] },
   // Developer-only features
   { href: "/admin/about", label: "About Page", icon: Info, roles: ["developer"] },
   { href: "/admin/reports", label: "Reports", icon: Inbox, roles: ["developer"] },
