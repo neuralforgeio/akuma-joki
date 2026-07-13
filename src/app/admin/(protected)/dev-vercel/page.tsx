@@ -8,7 +8,7 @@ import { HelpBanner } from "@/components/admin/help-tooltip";
 import {
   Rocket, RefreshCw, FileText, Settings, Trash2, Plus,
   CheckCircle2, XCircle, Clock, ExternalLink, GitBranch, AlertCircle, Activity,
-  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User,
+  ChevronRight, ArrowLeft, Code, Globe, Cpu, MemoryStick, Timer, User, RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -140,13 +140,21 @@ export default function DevVercelPage() {
     }
   }, [toast]);
 
-  const handleDeploy = async (action: "redeploy" | "deploy-git", ref?: string) => {
+  const handleDeploy = async (action: "redeploy" | "deploy-git" | "rollback" | "promote", refOrId?: string) => {
     setDeploying(true);
     try {
+      const body: any = { action };
+      // Jika action redeploy/rollback/promote dan ada ID, kirim sebagai deploymentId
+      if ((action === "rollback" || action === "promote" || action === "redeploy") && refOrId) {
+        body.deploymentId = refOrId;
+      } else if (action === "deploy-git" && refOrId) {
+        body.ref = refOrId;
+      }
+
       const res = await fetch("/api/vercel/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, ref }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (data.ok) {
@@ -483,9 +491,40 @@ export default function DevVercelPage() {
                     <InfoRow icon={Globe} label="Alias" value={selectedDep.alias.join(", ")} />
                   )}
                 </div>
-              </div>
 
-              {/* Logs */}
+                {/* Action buttons: Redeploy, Rollback, Promote */}
+                <div className="mt-4 pt-4 border-t border-white/8 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleDeploy("redeploy", selectedDep.uid)}
+                    disabled={deploying}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-violet-500/15 border border-violet-500/30 px-3 py-2 text-xs text-violet-400 hover:bg-violet-500/25 transition-all disabled:opacity-50"
+                  >
+                    <Rocket className="size-3.5" /> Redeploy
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm(`Rollback ke deployment ini?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nIni akan membuat deployment PRODUCTION baru dengan code yang sama.`)) {
+                        handleDeploy("rollback", selectedDep.uid);
+                      }
+                    }}
+                    disabled={deploying}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-500/15 border border-yellow-500/30 px-3 py-2 text-xs text-yellow-400 hover:bg-yellow-500/25 transition-all disabled:opacity-50"
+                  >
+                    <RotateCcw className="size-3.5" /> Instant Rollback
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm(`Promote deployment ini ke production?\n\nCommit: ${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nProduction URL akan update ke versi ini.`)) {
+                        handleDeploy("promote", selectedDep.uid);
+                      }
+                    }}
+                    disabled={deploying}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-green-500/15 border border-green-500/30 px-3 py-2 text-xs text-green-400 hover:bg-green-500/25 transition-all disabled:opacity-50"
+                  >
+                    <CheckCircle2 className="size-3.5" /> Promote to Prod
+                  </button>
+                </div>
+              </div>
               <div className="glass rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
