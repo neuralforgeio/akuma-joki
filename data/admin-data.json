@@ -263,41 +263,102 @@
   },
   "reviews": [],
   "reports": [],
-  "notifications": [],
+  "notifications": [
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKVVC9EU] Raid 1-10 (Blox Fruits) - 10K oleh Test",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrj01p4oe36n",
+      "read": false,
+      "createdAt": 1783933669752
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKQQDP7C] 300 Level (Blox Fruits) - 6K oleh Test",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrj01p4gl2t6",
+      "read": false,
+      "createdAt": 1783933669744
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKF6ABWA] 200 Level (Blox Fruits) - 4K oleh Test",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrj01p468lv1",
+      "read": false,
+      "createdAt": 1783933669734
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKUQZGYT] 100 Level (Blox Fruits) - 2K oleh Test",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrj01p3t8kcr",
+      "read": false,
+      "createdAt": 1783933669721
+    }
+  ],
   "orders": [
     {
+      "orderId": "AKVVC9EU",
       "gameName": "Blox Fruits",
-      "productName": "CDK",
-      "priceLabel": "20K",
-      "username": "test",
-      "password": "test",
-      "id": "mrius8pmmqr3d4",
-      "createdAt": 1783924830490,
-      "status": "new"
-    },
-    {
-      "gameName": "Blox Fruits",
-      "productName": "Raid Full Skill",
+      "productName": "Raid 1-10",
       "priceLabel": "10K",
-      "username": "test",
-      "password": "test",
-      "id": "mrius8pmlvhjgi",
-      "createdAt": 1783924830490,
-      "status": "new"
+      "username": "Test",
+      "password": "Tos",
+      "id": "mrj01p4k99hab7",
+      "createdAt": 1783933669748,
+      "status": "processing"
     },
     {
+      "orderId": "AKQQDP7C",
+      "gameName": "Blox Fruits",
+      "productName": "300 Level",
+      "priceLabel": "6K",
+      "username": "Test",
+      "password": "Tos",
+      "id": "mrj01p4c7qo948",
+      "createdAt": 1783933669740,
+      "status": "processing"
+    },
+    {
+      "orderId": "AKF6ABWA",
       "gameName": "Blox Fruits",
       "productName": "200 Level",
       "priceLabel": "4K",
-      "username": "test",
-      "password": "test",
-      "id": "mrius8plmmi5bb",
-      "createdAt": 1783924830489,
-      "status": "new"
+      "username": "Test",
+      "password": "Tos",
+      "id": "mrj01p41hk2utj",
+      "createdAt": 1783933669729,
+      "status": "processing"
+    },
+    {
+      "orderId": "AKUQZGYT",
+      "gameName": "Blox Fruits",
+      "productName": "100 Level",
+      "priceLabel": "2K",
+      "username": "Test",
+      "password": "Tos",
+      "id": "mrj01p25v7cgwd",
+      "createdAt": 1783933669661,
+      "status": "processing"
     }
   ],
-  "gameViews": [],
+  "gameViews": [
+    {
+      "slug": "blox-fruits",
+      "date": "2026-07-13",
+      "count": 2
+    }
+  ],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-13T08:40:16.530Z"
+  "updatedAt": "2026-07-13T09:07:49.758Z"
 }
