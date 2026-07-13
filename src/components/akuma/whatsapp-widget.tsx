@@ -124,7 +124,7 @@ const SUBSTATUS_OFFLINE = "Online 13.00-21.00 WIB";
 
 /** Pesan auto-reply untuk "Status Pesanan" (tidak ada sistem order tracking backend). */
 const STATUS_REPLY =
-  "📦 Untuk cek status pesanan, mohon beritahu kami Order ID / nomor WhatsApp yang dipakai saat order. Kamu bisa ketik detailnya di bawah ini, lalu akan diteruskan ke admin kami untuk dicek ya!";
+  "📦 Untuk cek status order, ketik Order ID kamu (8 digit, mis. AK3X9F2K).\n\nOrder ID ada di modal setelah checkout & di pesan WhatsApp yang dikirim ke admin. Ketik langsung ID-nya di chat ini untuk cek status otomatis! ⚡";
 
 /** Pesan auto-reply untuk "Chat Admin" — tetap di chat box (instruksi), redirect terpisah. */
 const CHAT_ADMIN_REPLY =
@@ -661,8 +661,10 @@ export function WhatsAppWidget() {
   );
 
   /**
-   * Kirim pesan FREE-TEXT (bukan dari template) → LANGSUNG redirect ke WhatsApp
-   * admin dengan teks yang user ketik. Tidak ada auto-reply.
+   * Kirim pesan FREE-TEXT (bukan dari template).
+   * - Jika text cocok pattern Order ID (AK + 6 chars) → auto-reply dengan status order
+   * - Jika text mengandung keyword "status/lacak/track/order" → tanya Order ID
+   * - Selain itu → redirect ke WhatsApp admin
    */
   const sendMessage = useCallback(
     (text: string) => {
@@ -680,21 +682,70 @@ export function WhatsAppWidget() {
       writeChat(withUser);
       setInput("");
 
-      // buka wa.me via anchor click (hindari proxy corrupt emoji)
-      openWhatsApp(WHATSAPP_NUMBER, t);
+      // === ORDER ID DETECTION ===
+      // Check if text matches order ID pattern (AK + 6 alphanumeric, uppercase)
+      const orderIdMatch = t.toUpperCase().match(/\bAK[A-HJ-NP-Z2-9]{6}\b/);
+      // Check if user asks about order status/progress
+      const isOrderQuery = /\b(status|lacak|track|order|pesanan|progres|update)\b/i.test(t);
 
-      // show clipboard hint (auto-hide setelah 5 detik)
+      if (orderIdMatch) {
+        // User typed an Order ID → lookup & auto-reply with status
+        const orderId = orderIdMatch[0];
+        const orders = useAdminStore.getState().orders;
+        const order = orders.find(o => o.orderId?.toUpperCase() === orderId);
+
+        setTyping(true);
+        window.setTimeout(() => {
+          setTyping(false);
+          let replyText = "";
+          if (order) {
+            const statusLabel = order.status === "processing" ? "🔄 Sedang Diproses" :
+              order.status === "done" ? "✅ Selesai" :
+              order.status === "cancelled" ? "❌ Dibatalkan" : "🆕 Baru";
+            replyText = `📦 *Order ${order.orderId}*\n\nGame: ${order.gameName}\nJoki: ${order.productName}\nHarga: ${order.priceLabel}\nStatus: ${statusLabel}\n\n${order.status === "processing" ? "Joki sedang berjalan! Mohon tunggu ya 🙏" : order.status === "done" ? "Order kamu sudah selesai! Terima kasih sudah percaya AKUMA JOKI 🎉" : "Ada yang bisa kami bantu? Ketik pertanyaan kamu 😊"}`;
+          } else {
+            replyText = `❌ Order ID "${orderId}" tidak ditemukan.\n\nPastikan ID benar (8 digit, huruf besar). Order ID ada di modal setelah checkout & di pesan WhatsApp yang dikirim ke admin.\n\nButuh bantuan? Admin akan membalas via WhatsApp 😊`;
+          }
+          writeChat([
+            ...readChat(),
+            { id: nextId(), role: "cs", text: replyText, ts: Date.now(), badge: "AUTO" },
+          ]);
+          if (!muted) playBlip("recv");
+        }, 1500);
+        return;
+      }
+
+      if (isOrderQuery && !orderIdMatch) {
+        // User asks about order but didn't provide ID → ask for Order ID
+        setTyping(true);
+        window.setTimeout(() => {
+          setTyping(false);
+          writeChat([
+            ...readChat(),
+            {
+              id: nextId(),
+              role: "cs",
+              text: "📦 Untuk cek status order, ketik Order ID kamu (8 digit, mis. AK3X9F2K).\n\nOrder ID ada di modal setelah checkout & di pesan WhatsApp yang dikirim ke admin.",
+              ts: Date.now(),
+              badge: "AUTO",
+            },
+          ]);
+          if (!muted) playBlip("recv");
+        }, 1500);
+        return;
+      }
+
+      // === DEFAULT: redirect to WhatsApp ===
+      openWhatsApp(WHATSAPP_NUMBER, t);
       setShowHint(true);
       window.setTimeout(() => setShowHint(false), 5000);
 
-      // tandai pesan user sebagai "sent" (read receipt) setelah jeda singkat
       window.setTimeout(() => {
         writeChat(
           readChat().map((m) => (m.id === userMsg.id ? { ...m, sent: true } : m))
         );
       }, 500);
 
-      // CS konfirmasi (dengan jeda typing) — badge ADMIN karena terkait redirect
       setTyping(true);
       window.setTimeout(() => {
         setTyping(false);
@@ -1522,6 +1573,38 @@ export function WhatsAppWidget() {
 
 /* ============================ Sub-components ============================ */
 
+/** TypingText — animasi reveal text huruf demi huruf (typing effect) */
+function TypingText({ text, speed = 15 }: { text: string; speed?: number }) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    // Skip animation untuk text yang sangat panjang (> 300 chars) atau yang ada newline
+    if (text.length > 300) {
+      setDisplayed(text);
+      setDone(true);
+      return;
+    }
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setDisplayed(text.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(interval);
+        setDone(true);
+      }
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return (
+    <span className={cn(!done && "after:content-['▋'] after:text-violet-400 after:animate-pulse")}>
+      {displayed}
+    </span>
+  );
+}
+
 function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
   const isUser = msg.role === "user";
   const isRedirect = msg.role === "cs" && msg.text === REDIRECT_MSG;
@@ -1580,9 +1663,11 @@ function Bubble({ msg, isOnline }: { msg: Msg; isOnline: boolean }) {
           {isPriceList ? (
             <PriceListContent games={priceGames} single={!!msg.priceGameSlug} />
           ) : isCaraOrder ? (
-            msg.text
+            <span className="whitespace-pre-line">{msg.text}</span>
+          ) : isUser ? (
+            <span className="whitespace-pre-line">{msg.text}</span>
           ) : (
-            msg.text
+            <span className="whitespace-pre-line"><TypingText text={msg.text} /></span>
           )}
         </div>
         <div
