@@ -189,20 +189,18 @@ ${data.envs.map((e: any) => `  ${e.key} [${e.type}] → ${e.target.join(", ")}`)
     // CACHE
     {
       cmd: "refresh-data",
-      description: "🔄 Trigger refresh data GLOBAL (semua device) — no reload, no cache clear",
+      description: "🔄 Trigger refresh data GLOBAL (semua device) — no GitHub push, no auto-deploy",
       usage: "refresh-data [reason]",
       example: "refresh-data after-update\n        refresh-data",
       category: "cache",
       run: async (args) => {
         const reason = args || "Manual refresh from dev-console";
-        const res = await fetch("/api/vercel/clear-cache", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reason }),
-        });
+        // Fetch latest data & sync immediately (no GitHub push)
+        const res = await fetch("/api/synced-data", { cache: "no-store" });
         const data = await res.json();
         if (!data.ok) return `❌ Error: ${data.error}`;
-        return `✅ Refresh signal pushed!\n  Timestamp: ${data.refreshSignal}\n  Reason: ${data.reason}\n\n  Semua device akan re-fetch data dalam 60 detik.\n  No reload, no cache clear — just state update.`;
+        useAdminStore.getState().syncFromServer(data.data);
+        return `✅ Data refreshed on this device!\n  Updated at: ${data.updatedAt}\n  Reason: ${reason}\n\n  Note: Other devices akan auto-refresh dalam 60s via useAutoSync polling.\n  No GitHub push (prevents Vercel auto-deploy).`;
       },
     },
     {

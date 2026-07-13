@@ -144,7 +144,6 @@ export default function DevVercelPage() {
     setDeploying(true);
     try {
       const body: any = { action };
-      // Jika action redeploy/rollback/promote dan ada ID, kirim sebagai deploymentId
       if ((action === "rollback" || action === "promote" || action === "redeploy") && refOrId) {
         body.deploymentId = refOrId;
       } else if (action === "deploy-git" && refOrId) {
@@ -165,6 +164,28 @@ export default function DevVercelPage() {
       }
     } catch {
       toast({ title: "Deploy request failed", variant: "destructive" });
+    } finally {
+      setDeploying(false);
+    }
+  };
+
+  const handleCancelDeploy = async (deploymentId: string) => {
+    setDeploying(true);
+    try {
+      const res = await fetch("/api/vercel/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deploymentId }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast({ title: `✅ ${data.message}` });
+        setTimeout(() => fetchDeployments(), 2000);
+      } else {
+        toast({ title: data.error || "Cancel failed", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Cancel request failed", variant: "destructive" });
     } finally {
       setDeploying(false);
     }
@@ -492,7 +513,7 @@ export default function DevVercelPage() {
                   )}
                 </div>
 
-                {/* Action buttons: Redeploy, Rollback, Promote */}
+                {/* Action buttons: Redeploy, Rollback, Promote, Cancel */}
                 <div className="mt-4 pt-4 border-t border-white/8 flex flex-wrap gap-2">
                   <button
                     onClick={() => handleDeploy("redeploy", selectedDep.uid)}
@@ -523,6 +544,19 @@ export default function DevVercelPage() {
                   >
                     <CheckCircle2 className="size-3.5" /> Promote to Prod
                   </button>
+                  {(selectedDep.state === "BUILDING" || selectedDep.state === "QUEUED" || selectedDep.state === "INITIALIZING") && (
+                    <button
+                      onClick={() => {
+                        if (confirm(`Cancel deployment ini?\n\n${selectedDep.commit || selectedDep.uid.slice(0, 12)}\n\nBuild akan dihentikan.`)) {
+                          handleCancelDeploy(selectedDep.uid);
+                        }
+                      }}
+                      disabled={deploying}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-red-500/15 border border-red-500/30 px-3 py-2 text-xs text-red-400 hover:bg-red-500/25 transition-all disabled:opacity-50"
+                    >
+                      <XCircle className="size-3.5" /> Cancel Deploy
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="glass rounded-2xl p-4">
