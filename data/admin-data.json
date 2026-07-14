@@ -273,54 +273,48 @@
   "reports": [],
   "notifications": [
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AK7XEQGQ] 100 Level (Blox Fruits) - 2K oleh asa",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AK7XEQGQ (Raid Full Skill) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrkilx9b0dlk",
+      "targetUser": "asa",
+      "link": "/track-order",
+      "id": "mrkimr6sfpcz",
       "read": false,
-      "createdAt": 1784025312671
+      "createdAt": 1784025351460
     },
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AK7XEQGQ] Raid 1-10 (Blox Fruits) - 10K oleh asa",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AK7XEQGQ (300 Level) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrkilx9adbx1",
+      "targetUser": "asa",
+      "link": "/track-order",
+      "id": "mrkimr6s5a8v",
       "read": false,
-      "createdAt": 1784025312670
+      "createdAt": 1784025351460
     },
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AK7XEQGQ] 300 Level (Blox Fruits) - 6K oleh asa",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AK7XEQGQ (Raid 1-10) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrkilx9aag1z",
+      "targetUser": "asa",
+      "link": "/track-order",
+      "id": "mrkimr6rcw26",
       "read": false,
-      "createdAt": 1784025312670
+      "createdAt": 1784025351459
     },
     {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AK7XEQGQ] Raid Full Skill (Blox Fruits) - 10K oleh asa",
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AK7XEQGQ (100 Level) sekarang: DONE",
       "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrkilx98d18d",
+      "targetUser": "asa",
+      "link": "/track-order",
+      "id": "mrkimr6rdefp",
       "read": false,
-      "createdAt": 1784025312668
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AK7XEQGQ] 200 Level (Blox Fruits) - 4K oleh asa",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrkilx97iici",
-      "read": false,
-      "createdAt": 1784025312667
+      "createdAt": 1784025351459
     }
   ],
   "orders": [
@@ -333,7 +327,7 @@
       "password": "sas",
       "id": "mrkilx9briyw0d",
       "createdAt": 1784025312671,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AK7XEQGQ",
@@ -344,7 +338,7 @@
       "password": "sas",
       "id": "mrkilx9am3pqbj",
       "createdAt": 1784025312670,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AK7XEQGQ",
@@ -355,7 +349,7 @@
       "password": "sas",
       "id": "mrkilx98gfjbf3",
       "createdAt": 1784025312668,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AK7XEQGQ",
@@ -366,7 +360,7 @@
       "password": "sas",
       "id": "mrkilx98vx4m3z",
       "createdAt": 1784025312668,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AK7XEQGQ",
@@ -377,7 +371,7 @@
       "password": "sas",
       "id": "mrkilx9708rfj4",
       "createdAt": 1784025312667,
-      "status": "processing"
+      "status": "done"
     },
     {
       "gameName": "Blox Fruits",
@@ -490,5 +484,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-14T10:35:12.671Z"
+  "updatedAt": "2026-07-14T10:35:51.461Z"
 }
