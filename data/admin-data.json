@@ -275,75 +275,110 @@
     {
       "type": "order_new",
       "title": "Order Baru Masuk!",
-      "message": "[AKA796M3] SG (Blox Fruits) - 10K oleh tester",
+      "message": "[AK7XEQGQ] 100 Level (Blox Fruits) - 2K oleh asa",
       "targetRole": "all",
       "link": "/admin/pesanan",
-      "id": "mrkijz5ywk6e",
+      "id": "mrkilx9b0dlk",
       "read": false,
-      "createdAt": 1784025221830
+      "createdAt": 1784025312671
     },
     {
       "type": "order_new",
       "title": "Order Baru Masuk!",
-      "message": "[AKRHUEUE] CDK (Blox Fruits) - 20K oleh tester",
+      "message": "[AK7XEQGQ] Raid 1-10 (Blox Fruits) - 10K oleh asa",
       "targetRole": "all",
       "link": "/admin/pesanan",
-      "id": "mrkijz5xhw66",
+      "id": "mrkilx9adbx1",
       "read": false,
-      "createdAt": 1784025221829
+      "createdAt": 1784025312670
     },
     {
       "type": "order_new",
       "title": "Order Baru Masuk!",
-      "message": "[AKQJSZQZ] Raid Full Skill (Blox Fruits) - 10K oleh tester",
+      "message": "[AK7XEQGQ] 300 Level (Blox Fruits) - 6K oleh asa",
       "targetRole": "all",
       "link": "/admin/pesanan",
-      "id": "mrkijz5wf6gj",
+      "id": "mrkilx9aag1z",
       "read": false,
-      "createdAt": 1784025221828
+      "createdAt": 1784025312670
     },
     {
       "type": "order_new",
       "title": "Order Baru Masuk!",
-      "message": "[AKQ2TQ82] Raid 1-10 (Blox Fruits) - 10K oleh tester",
+      "message": "[AK7XEQGQ] Raid Full Skill (Blox Fruits) - 10K oleh asa",
       "targetRole": "all",
       "link": "/admin/pesanan",
-      "id": "mrkijz5vg7e5",
+      "id": "mrkilx98d18d",
       "read": false,
-      "createdAt": 1784025221828
+      "createdAt": 1784025312668
     },
     {
       "type": "order_new",
       "title": "Order Baru Masuk!",
-      "message": "[AKEQJ5V6] 100 Level (Blox Fruits) - 2K oleh tester",
+      "message": "[AK7XEQGQ] 200 Level (Blox Fruits) - 4K oleh asa",
       "targetRole": "all",
       "link": "/admin/pesanan",
-      "id": "mrkijz5vn4pk",
+      "id": "mrkilx97iici",
       "read": false,
-      "createdAt": 1784025221827
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKR67YVT] 300 Level (Blox Fruits) - 6K oleh tester",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrkijz5tfxup",
-      "read": false,
-      "createdAt": 1784025221825
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKZJ658T] 200 Level (Blox Fruits) - 4K oleh tester",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrkijz5s7961",
-      "read": false,
-      "createdAt": 1784025221824
+      "createdAt": 1784025312667
     }
   ],
   "orders": [
+    {
+      "orderId": "AK7XEQGQ",
+      "gameName": "Blox Fruits",
+      "productName": "100 Level",
+      "priceLabel": "2K",
+      "username": "asa",
+      "password": "sas",
+      "id": "mrkilx9briyw0d",
+      "createdAt": 1784025312671,
+      "status": "processing"
+    },
+    {
+      "orderId": "AK7XEQGQ",
+      "gameName": "Blox Fruits",
+      "productName": "Raid 1-10",
+      "priceLabel": "10K",
+      "username": "asa",
+      "password": "sas",
+      "id": "mrkilx9am3pqbj",
+      "createdAt": 1784025312670,
+      "status": "processing"
+    },
+    {
+      "orderId": "AK7XEQGQ",
+      "gameName": "Blox Fruits",
+      "productName": "300 Level",
+      "priceLabel": "6K",
+      "username": "asa",
+      "password": "sas",
+      "id": "mrkilx98gfjbf3",
+      "createdAt": 1784025312668,
+      "status": "processing"
+    },
+    {
+      "orderId": "AK7XEQGQ",
+      "gameName": "Blox Fruits",
+      "productName": "Raid Full Skill",
+      "priceLabel": "10K",
+      "username": "asa",
+      "password": "sas",
+      "id": "mrkilx98vx4m3z",
+      "createdAt": 1784025312668,
+      "status": "processing"
+    },
+    {
+      "orderId": "AK7XEQGQ",
+      "gameName": "Blox Fruits",
+      "productName": "200 Level",
+      "priceLabel": "4K",
+      "username": "asa",
+      "password": "sas",
+      "id": "mrkilx9708rfj4",
+      "createdAt": 1784025312667,
+      "status": "processing"
+    },
     {
       "gameName": "Blox Fruits",
       "productName": "SG",
@@ -455,5 +490,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-14T10:33:41.830Z"
+  "updatedAt": "2026-07-14T10:35:12.671Z"
 }
