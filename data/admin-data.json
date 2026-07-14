@@ -271,8 +271,156 @@
   },
   "reviews": [],
   "reports": [],
-  "notifications": [],
+  "notifications": [
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKA796M3] SG (Blox Fruits) - 10K oleh tester",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrkijz5ywk6e",
+      "read": false,
+      "createdAt": 1784025221830
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKRHUEUE] CDK (Blox Fruits) - 20K oleh tester",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrkijz5xhw66",
+      "read": false,
+      "createdAt": 1784025221829
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKQJSZQZ] Raid Full Skill (Blox Fruits) - 10K oleh tester",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrkijz5wf6gj",
+      "read": false,
+      "createdAt": 1784025221828
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKQ2TQ82] Raid 1-10 (Blox Fruits) - 10K oleh tester",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrkijz5vg7e5",
+      "read": false,
+      "createdAt": 1784025221828
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKEQJ5V6] 100 Level (Blox Fruits) - 2K oleh tester",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrkijz5vn4pk",
+      "read": false,
+      "createdAt": 1784025221827
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKR67YVT] 300 Level (Blox Fruits) - 6K oleh tester",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrkijz5tfxup",
+      "read": false,
+      "createdAt": 1784025221825
+    },
+    {
+      "type": "order_new",
+      "title": "Order Baru Masuk!",
+      "message": "[AKZJ658T] 200 Level (Blox Fruits) - 4K oleh tester",
+      "targetRole": "all",
+      "link": "/admin/pesanan",
+      "id": "mrkijz5s7961",
+      "read": false,
+      "createdAt": 1784025221824
+    }
+  ],
   "orders": [
+    {
+      "gameName": "Blox Fruits",
+      "productName": "SG",
+      "priceLabel": "10K",
+      "username": "tester",
+      "password": "tester",
+      "id": "mrkijz5yxog638",
+      "orderId": "AKA796M3",
+      "createdAt": 1784025221830,
+      "status": "processing"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "CDK",
+      "priceLabel": "20K",
+      "username": "tester",
+      "password": "tester",
+      "id": "mrkijz5xjuyier",
+      "orderId": "AKRHUEUE",
+      "createdAt": 1784025221829,
+      "status": "processing"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "Raid Full Skill",
+      "priceLabel": "10K",
+      "username": "tester",
+      "password": "tester",
+      "id": "mrkijz5wc8xa9u",
+      "orderId": "AKQJSZQZ",
+      "createdAt": 1784025221828,
+      "status": "processing"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "Raid 1-10",
+      "priceLabel": "10K",
+      "username": "tester",
+      "password": "tester",
+      "id": "mrkijz5vpp4l9o",
+      "orderId": "AKQ2TQ82",
+      "createdAt": 1784025221827,
+      "status": "processing"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "100 Level",
+      "priceLabel": "2K",
+      "username": "tester",
+      "password": "tester",
+      "id": "mrkijz5ukr4d7u",
+      "orderId": "AKEQJ5V6",
+      "createdAt": 1784025221826,
+      "status": "processing"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "300 Level",
+      "priceLabel": "6K",
+      "username": "tester",
+      "password": "tester",
+      "id": "mrkijz5tgfwa16",
+      "orderId": "AKR67YVT",
+      "createdAt": 1784025221825,
+      "status": "processing"
+    },
+    {
+      "gameName": "Blox Fruits",
+      "productName": "200 Level",
+      "priceLabel": "4K",
+      "username": "tester",
+      "password": "tester",
+      "id": "mrkijz5sbg98u3",
+      "orderId": "AKZJ658T",
+      "createdAt": 1784025221824,
+      "status": "processing"
+    },
     {
       "gameName": "Blox Fruits",
       "productName": "CDK",
@@ -307,5 +455,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-14T05:10:25.524Z"
+  "updatedAt": "2026-07-14T10:33:41.830Z"
 }
