@@ -294,58 +294,7 @@
   },
   "reviews": [],
   "reports": [],
-  "notifications": [
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKFBN9Y5] V3 Race (Blox Fruits) - 5K oleh TempekGorengLezat",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrno7jzq3uz9",
-      "read": false,
-      "createdAt": 1784216118518
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKFBN9Y5] Soul Guitar(SG) (Blox Fruits) - 10K oleh TempekGorengLezat",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrno7jznic97",
-      "read": false,
-      "createdAt": 1784216118515
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKFBN9Y5] GodHuman (Blox Fruits) - 10K oleh TempekGorengLezat",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrno7jzmfcnm",
-      "read": false,
-      "createdAt": 1784216118514
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKFBN9Y5] Cursed Dual Katana(CDK) (Blox Fruits) - 15K oleh TempekGorengLezat",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrno7jzlmcpa",
-      "read": false,
-      "createdAt": 1784216118513
-    },
-    {
-      "type": "order_new",
-      "title": "Order Baru Masuk!",
-      "message": "[AKFBN9Y5] Muncak 1-25 (Expedition Antarctica) - 30K oleh TempekGorengLezat",
-      "targetRole": "all",
-      "link": "/admin/pesanan",
-      "id": "mrno7jzkaepn",
-      "read": false,
-      "createdAt": 1784216118513
-    }
-  ],
+  "notifications": [],
   "orders": [
     {
       "orderId": "AKFBN9Y5",
@@ -378,7 +327,7 @@
       "password": "dearlyfebriano08",
       "id": "mrno7jzmmkj0pq",
       "createdAt": 1784216118514,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKFBN9Y5",
@@ -505,5 +454,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T15:35:18.518Z"
+  "updatedAt": "2026-07-16T15:40:15.742Z"
 }
