@@ -48,7 +48,16 @@
           "id": "raid",
           "name": "RAID",
           "icon": "🌀",
-          "items": []
+          "items": [
+            {
+              "id": "raid-1-10",
+              "name": "Raid 1-10",
+              "price": 5000,
+              "priceLabel": "5K",
+              "description": "Menambahkan fragment dan menaikan skill-skill buah",
+              "requirement": "Membutuhkan LEVEL 700 - MAX"
+            }
+          ]
         },
         {
           "id": "senjata",
@@ -360,5 +369,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T11:33:31.825Z"
+  "updatedAt": "2026-07-16T11:35:47.101Z"
 }
