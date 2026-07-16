@@ -74,15 +74,6 @@
           "icon": "🗡️",
           "items": [
             {
-              "id": "cursed-dual-katana-cdk-",
-              "name": "Cursed Dual Katana(CDK)",
-              "price": 15000,
-              "priceLabel": "15K",
-              "tag": "Mythical",
-              "description": "Pedang Mythical yang susah di dapatkan dan bagus untuk di gunakan pvp",
-              "requirement": "Membutuhkan pedang Yama&Thusita(Mastery 350) dan membutuhkan Level 2300 - Max"
-            },
-            {
               "id": "yama",
               "name": "Yama",
               "price": 2000,
@@ -90,6 +81,15 @@
               "tag": "Legendary",
               "description": "Bagus untuk pvp dan untuk membuka pedang selanjutnya",
               "requirement": "Membutuhkan level 1500 - Max"
+            },
+            {
+              "id": "tushita",
+              "name": "Tushita",
+              "price": 5000,
+              "priceLabel": "5K",
+              "tag": "Legendary",
+              "description": "Untuk menaikkan tingkat pedang selanjutnya",
+              "requirement": "Membutuhan Level 2200 - max"
             }
           ]
         },
@@ -365,5 +365,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T11:49:27.867Z"
+  "updatedAt": "2026-07-16T11:52:03.484Z"
 }
