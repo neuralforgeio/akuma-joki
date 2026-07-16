@@ -56,6 +56,15 @@
               "priceLabel": "2K",
               "description": "Menambahkan fragment dan menaikan skill-skill buahmu",
               "requirement": "Membutuhkan LEVEL 700 -  MAX"
+            },
+            {
+              "id": "raid-sampai-v2-semua-skill-buahmu",
+              "name": "Raid sampai V2 semua skill buahmu",
+              "price": 5000,
+              "priceLabel": "5K",
+              "tag": "MAX",
+              "description": "Membuka skill baru dan pengalaman baru",
+              "requirement": "Membutuhkan Level 700 - Max"
             }
           ]
         },
@@ -369,5 +378,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T11:38:27.305Z"
+  "updatedAt": "2026-07-16T11:40:26.889Z"
 }
