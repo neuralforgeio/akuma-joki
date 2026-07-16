@@ -90,6 +90,15 @@
               "tag": "Legendary",
               "description": "Untuk menaikkan tingkat pedang selanjutnya",
               "requirement": "Membutuhan Level 2200 - max"
+            },
+            {
+              "id": "cursed-dual-katana-cdk-",
+              "name": "Cursed Dual Katana(CDK)",
+              "price": 15000,
+              "priceLabel": "15K",
+              "tag": "Mythical",
+              "description": "Pedang Mythical yang sangat bagus untuk pvp",
+              "requirement": "Membutuhkan pedang Yama&Tushita(Mastery 350) dan membutuhkan Level 2200 - Max"
             }
           ]
         },
@@ -365,5 +374,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T11:52:03.484Z"
+  "updatedAt": "2026-07-16T11:57:33.492Z"
 }
