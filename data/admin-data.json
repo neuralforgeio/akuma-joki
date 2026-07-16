@@ -72,39 +72,7 @@
           "id": "senjata",
           "name": "SENJATA",
           "icon": "🗡️",
-          "items": [
-            {
-              "id": "wpn-cdk",
-              "name": "CDK",
-              "price": 20,
-              "priceLabel": "20K",
-              "tag": "Legendary",
-              "description": "Cursed Dual Katana — pedang legendaris pada umumnya, serangan melee tajam khas swordsman.",
-              "requirement": "Level 2300 - MAX"
-            },
-            {
-              "id": "wpn-sg",
-              "name": "SG",
-              "price": 10,
-              "priceLabel": "10K",
-              "description": "Soul Guitar — pistol berbentuk gitar dengan serangan area (AoE) yang mematikan.",
-              "requirement": "Level 2300 - MAX"
-            },
-            {
-              "id": "wpn-sh",
-              "name": "SH",
-              "price": 10,
-              "priceLabel": "10K",
-              "description": "Senjata langka khusus endgame."
-            },
-            {
-              "id": "wpn-gh",
-              "name": "GH",
-              "price": 15,
-              "priceLabel": "15K",
-              "description": "Senjata tier tinggi untuk PvP & grind."
-            }
-          ]
+          "items": []
         },
         {
           "id": "race",
@@ -378,5 +346,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T11:40:26.889Z"
+  "updatedAt": "2026-07-16T11:41:00.493Z"
 }
