@@ -99,6 +99,15 @@
               "tag": "Mythical",
               "description": "Pedang Mythical yang sangat bagus untuk pvp",
               "requirement": "Membutuhkan pedang Yama&Tushita(Mastery 350) dan membutuhkan Level 2200 - Max"
+            },
+            {
+              "id": "soul-guitar-sg-",
+              "name": "Soul Guitar(SG)",
+              "price": 10000,
+              "priceLabel": "10K",
+              "tag": "Mythical",
+              "description": "Senjata jarak jauh yang memiliki area damage dan cocok buat pvp",
+              "requirement": "Membutuhkan level 2300 - Max"
             }
           ]
         },
@@ -374,5 +383,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T11:57:33.492Z"
+  "updatedAt": "2026-07-16T11:59:40.316Z"
 }
