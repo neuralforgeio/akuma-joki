@@ -81,6 +81,15 @@
               "tag": "Mythical",
               "description": "Pedang Mythical yang susah di dapatkan dan bagus untuk di gunakan pvp",
               "requirement": "Membutuhkan pedang Yama&Thusita(Mastery 350) dan membutuhkan Level 2300 - Max"
+            },
+            {
+              "id": "yama",
+              "name": "Yama",
+              "price": 2000,
+              "priceLabel": "2K",
+              "tag": "Legendary",
+              "description": "Bagus untuk pvp dan untuk membuka pedang selanjutnya",
+              "requirement": "Membutuhkan level 1500 - Max"
             }
           ]
         },
@@ -356,5 +365,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T11:46:53.559Z"
+  "updatedAt": "2026-07-16T11:49:27.867Z"
 }
