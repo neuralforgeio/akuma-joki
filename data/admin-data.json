@@ -294,7 +294,52 @@
   },
   "reviews": [],
   "reports": [],
-  "notifications": [],
+  "notifications": [
+    {
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKFBN9Y5 (Cursed Dual Katana(CDK)) sekarang: DONE",
+      "targetRole": "all",
+      "targetUser": "TempekGorengLezat",
+      "link": "/track-order",
+      "id": "mrnoeuounm19",
+      "read": false,
+      "createdAt": 1784216458974
+    },
+    {
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKFBN9Y5 (V3 Race) sekarang: DONE",
+      "targetRole": "all",
+      "targetUser": "TempekGorengLezat",
+      "link": "/track-order",
+      "id": "mrnoethagmwz",
+      "read": false,
+      "createdAt": 1784216457406
+    },
+    {
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKFBN9Y5 (Soul Guitar(SG)) sekarang: DONE",
+      "targetRole": "all",
+      "targetUser": "TempekGorengLezat",
+      "link": "/track-order",
+      "id": "mrnoesvqaknv",
+      "read": false,
+      "createdAt": 1784216456630
+    },
+    {
+      "type": "order_status",
+      "title": "Status Order Diperbarui",
+      "message": "Order AKFBN9Y5 (GodHuman) sekarang: DONE",
+      "targetRole": "all",
+      "targetUser": "TempekGorengLezat",
+      "link": "/track-order",
+      "id": "mrnodxby2vy4",
+      "read": false,
+      "createdAt": 1784216415742
+    }
+  ],
   "orders": [
     {
       "orderId": "AKFBN9Y5",
@@ -305,7 +350,7 @@
       "password": "dearlyfebriano08",
       "id": "mrno7jzpwn8luv",
       "createdAt": 1784216118517,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKFBN9Y5",
@@ -316,7 +361,7 @@
       "password": "dearlyfebriano08",
       "id": "mrno7jzmbsiirx",
       "createdAt": 1784216118514,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKFBN9Y5",
@@ -338,7 +383,7 @@
       "password": "dearlyfebriano08",
       "id": "mrno7jzlktjai1",
       "createdAt": 1784216118513,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKFBN9Y5",
@@ -349,7 +394,7 @@
       "password": "dearlyfebriano08",
       "id": "mrno7jzkmoymm0",
       "createdAt": 1784216118512,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -454,5 +499,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T15:40:15.742Z"
+  "updatedAt": "2026-07-16T15:41:00.871Z"
 }
