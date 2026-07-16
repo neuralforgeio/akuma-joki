@@ -116,6 +116,14 @@
               "priceLabel": "5K",
               "description": "Fighting style yang cocok buat kamu untuk pvp di level 1000 - Max",
               "requirement": "Membutuhkan level 700 - Max dan 3.000.000 beli"
+            },
+            {
+              "id": "godhuman",
+              "name": "GodHuman",
+              "price": 10000,
+              "priceLabel": "10K",
+              "description": "Fighting style yang op untuk pvp di level 2450 - MAX",
+              "requirement": "Membutuhkan level 2450 - max dan membutuhkan 5.000.000 beli dan 5.000 fragment"
             }
           ]
         },
@@ -391,5 +399,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-16T12:14:27.375Z"
+  "updatedAt": "2026-07-16T12:16:21.880Z"
 }
