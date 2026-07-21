@@ -108,6 +108,15 @@
               "tag": "Legendary",
               "description": "Mendapatkan pedang overopwer dari sang raja lautan",
               "requirement": "membutuhkan level 2000 - max"
+            },
+            {
+              "id": "soul-guitar-sg-",
+              "name": "Soul Guitar(SG)",
+              "price": 10000,
+              "priceLabel": "10K",
+              "tag": "Mythical",
+              "description": "Senjata jarak jauh yang memiliki area damage dan cocok buat pvp",
+              "requirement": "Membutuhkan level 2300 - Max"
             }
           ]
         },
@@ -383,5 +392,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:33:07.011Z"
+  "updatedAt": "2026-07-21T06:34:48.514Z"
 }
