@@ -131,8 +131,7 @@
               "name": "GodHuman(GH)",
               "price": 10000,
               "priceLabel": "10K",
-              "description": "Fighting style yang overpower untuk pvp di level keatas",
-              "requirement": "Membutuhkan level 2500 - max dan membutuhkan 5.000.000 beli dan membutuhlan 5.000 fragment"
+              "description": "Fighting style overpower untuk pvp di level keatas"
             }
           ]
         },
@@ -408,5 +407,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:38:35.098Z"
+  "updatedAt": "2026-07-21T06:39:49.991Z"
 }
