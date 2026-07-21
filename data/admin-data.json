@@ -237,7 +237,7 @@
   ],
   "announcement": null,
   "takedown": false,
-  "takedownReason": "Website sedang dalam perbaikan sistem (Maintenance). Kami akan kembali secepatnya! - AKUMA JOKI",
+  "takedownReason": "🚧 Website di banned dikarenakan melakukan pelanggaran SARA, Pengadaan Adu Domba, hingga Pengfitnahan",
   "settings": {
     "whatsappNumber": "6282131561301",
     "csName": "Akuma Joki",
@@ -313,7 +313,7 @@
       "password": "test",
       "id": "mrj2ev032pyo9z",
       "createdAt": 1783937643123,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -324,7 +324,7 @@
       "password": "test",
       "id": "mrj2euzx6jnp7r",
       "createdAt": 1783937643117,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -335,7 +335,7 @@
       "password": "test",
       "id": "mrj2euzqlersch",
       "createdAt": 1783937643110,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -346,7 +346,7 @@
       "password": "test",
       "id": "mrj2euzb5mh3tp",
       "createdAt": 1783937643095,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKXYHBUH",
@@ -357,7 +357,7 @@
       "password": "test",
       "id": "mrj2euxtth7063",
       "createdAt": 1783937643041,
-      "status": "processing"
+      "status": "done"
     },
     {
       "orderId": "AKVVC9EU",
@@ -407,5 +407,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:39:49.991Z"
+  "updatedAt": "2026-07-21T10:09:42.811Z"
 }
