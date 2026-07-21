@@ -117,6 +117,14 @@
               "tag": "Mythical",
               "description": "Senjata jarak jauh yang memiliki area damage dan cocok buat pvp",
               "requirement": "Membutuhkan level 2300 - Max"
+            },
+            {
+              "id": "superhuman-sh-",
+              "name": "SuperHuman(SH)",
+              "price": 5000,
+              "priceLabel": "5K",
+              "description": "Fighting style yang bagus buat pvp di level memengah keatas",
+              "requirement": "Membutuhkan level 700 - max dan 3.000.000 beli"
             }
           ]
         },
@@ -392,5 +400,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:34:48.514Z"
+  "updatedAt": "2026-07-21T06:37:02.678Z"
 }
