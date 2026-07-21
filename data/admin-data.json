@@ -131,24 +131,7 @@
           "id": "race",
           "name": "RACE",
           "icon": "🔥",
-          "items": [
-            {
-              "id": "v2-race",
-              "name": "V2 Race",
-              "price": 2000,
-              "priceLabel": "2k",
-              "description": "Menjadi lebih kuat dari sebelumnya",
-              "requirement": "Membutuhkan Level 850 - MAX"
-            },
-            {
-              "id": "v3-race",
-              "name": "V3 Race",
-              "price": 5000,
-              "priceLabel": "5K",
-              "description": "Menjadi lebih kuat dari sebelumnya",
-              "requirement": "Membutuhkan level 1000 - MAX"
-            }
-          ]
+          "items": []
         }
       ]
     },
@@ -399,5 +382,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:23:50.963Z"
+  "updatedAt": "2026-07-21T06:24:37.240Z"
 }
