@@ -48,7 +48,16 @@
           "id": "raid",
           "name": "RAID",
           "icon": "🌀",
-          "items": []
+          "items": [
+            {
+              "id": "raid-flame-only-1-10",
+              "name": "Raid(flame only) 1-10",
+              "price": 2000,
+              "priceLabel": "2K",
+              "description": "Menambahkan fragment untuk kepentingan selanjutnya",
+              "requirement": "Membutuhkan level 700 - Max"
+            }
+          ]
         },
         {
           "id": "senjata",
@@ -381,5 +390,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:20:13.965Z"
+  "updatedAt": "2026-07-21T06:22:51.806Z"
 }
