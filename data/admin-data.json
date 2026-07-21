@@ -99,6 +99,15 @@
               "tag": "Mythical",
               "description": "Pedang Mythical yang sangat bagus untuk pvp",
               "requirement": "Membutuhkan pedang Yama&Tushita(Mastery 350) dan membutuhkan Level 2200 - Max"
+            },
+            {
+              "id": "shark-anchor",
+              "name": "Shark Anchor",
+              "price": 10000,
+              "priceLabel": "10K",
+              "tag": "Legendary",
+              "description": "Mendapatkan pedang overopwer dari sang raja lautan",
+              "requirement": "membutuhkan level 2000 - max"
             }
           ]
         },
@@ -374,5 +383,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:29:14.730Z"
+  "updatedAt": "2026-07-21T06:33:07.011Z"
 }
