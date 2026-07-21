@@ -139,6 +139,14 @@
               "priceLabel": "2K",
               "description": "Menjadi lebih kuat dari sebelumnya",
               "requirement": "Membutuhkan level 850 - MAX dan 500.000 beli"
+            },
+            {
+              "id": "v3-race",
+              "name": "V3 Race",
+              "price": 5000,
+              "priceLabel": "5K",
+              "description": "Menjadi lebih kuat dari sebelumnya",
+              "requirement": "membutuhkan level 1000 - max dan 2.000.000 beli"
             }
           ]
         }
@@ -391,5 +399,5 @@
   "gameViews": [],
   "chatMessages": [],
   "version": 1,
-  "updatedAt": "2026-07-21T06:26:10.072Z"
+  "updatedAt": "2026-07-21T06:28:38.678Z"
 }
