@@ -16,7 +16,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_API_URL = "https://api.github.com/repos/luminarydearx/akuma-joki/contents/data/admin-data.json";
+const GITHUB_API_URL = "https://api.github.com/repos/neuralforgeio/akuma-joki/contents/data/admin-data.json";
 
 export const dynamic = "force-dynamic";
 

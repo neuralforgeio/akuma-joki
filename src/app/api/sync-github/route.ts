@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_OWNER = process.env.GITHUB_OWNER || "luminarydearx";
+const GITHUB_OWNER = process.env.GITHUB_OWNER || "neuralforgeio";
 const GITHUB_REPO = process.env.GITHUB_REPO || "akuma-joki";
 const FILE_PATH = "data/admin-data.json";
 

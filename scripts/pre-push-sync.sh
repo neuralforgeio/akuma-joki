@@ -10,7 +10,7 @@
 
 set -e
 
-REPO="luminarydearx/akuma-joki"
+REPO="neuralforgeio/akuma-joki"
 BRANCH="main"
 FILE_PATH="data/admin-data.json"
 LOCAL_FILE="data/admin-data.json"

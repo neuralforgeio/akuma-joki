@@ -794,7 +794,7 @@ export default function DevVercelPage() {
             <InfoCard label="Production URL" value={PROJECT_URL} link />
             <InfoCard label="Project Name" value="akuma-joki" />
             <InfoCard label="Framework" value="Next.js" />
-            <InfoCard label="Repository" value="luminarydearx/akuma-joki" link="https://github.com/luminarydearx/akuma-joki" />
+            <InfoCard label="Repository" value="neuralforgeio/akuma-joki" link="https://github.com/neuralforgeio/akuma-joki" />
             <InfoCard label="Branch" value="main" />
             <InfoCard label="Token Env" value="akuma_joki_token" mono />
           </div>
@@ -804,7 +804,7 @@ export default function DevVercelPage() {
               <a href={PROJECT_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-green-500/10 border border-green-500/30 px-3 py-1.5 text-xs text-green-400 hover:bg-green-500/20 transition-all">
                 <ExternalLink className="size-3" /> Live Site
               </a>
-              <a href="https://github.com/luminarydearx/akuma-joki" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 transition-all">
+              <a href="https://github.com/neuralforgeio/akuma-joki" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 transition-all">
                 <GitBranch className="size-3" /> GitHub
               </a>
               <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/10 transition-all">
