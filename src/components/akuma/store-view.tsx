@@ -585,17 +585,24 @@ function ProductCard({
       : game.accent
     : game.accent;
 
-  // Difficulty meter: based on price
-  // <5K = Easy (green), <15K = Medium (yellow), <30K = Hard (orange), >30K = Expert (red)
+  // Difficulty meter: admin can set an explicit difficulty on the item.
+  // If not set, auto-detect from price:
+  //   <5K = Easy (green), <15K = Medium (yellow), <30K = Hard (orange), >=30K = Expert (red)
   const priceNum = item.price ?? (parseInt(item.priceLabel.replace(/\D/g, ""), 10) || 0);
-  const difficulty =
-    priceNum < 5
-      ? { level: "easy", color: "#6ee7b7", bars: 1 }
-      : priceNum < 15
-      ? { level: "medium", color: "#ffd166", bars: 2 }
-      : priceNum < 30
-      ? { level: "hard", color: "#fb923c", bars: 3 }
-      : { level: "expert", color: "#ff3b6b", bars: 4 };
+  const DIFFICULTY_PRESET: Record<"easy" | "medium" | "hard" | "expert", { color: string; bars: number }> = {
+    easy: { color: "#6ee7b7", bars: 1 },
+    medium: { color: "#ffd166", bars: 2 },
+    hard: { color: "#fb923c", bars: 3 },
+    expert: { color: "#ff3b6b", bars: 4 },
+  };
+  const autoLevel: "easy" | "medium" | "hard" | "expert" =
+    priceNum < 5 ? "easy" : priceNum < 15 ? "medium" : priceNum < 30 ? "hard" : "expert";
+  const effectiveLevel = item.difficulty ?? autoLevel;
+  const difficulty = {
+    level: effectiveLevel,
+    color: DIFFICULTY_PRESET[effectiveLevel].color,
+    bars: DIFFICULTY_PRESET[effectiveLevel].bars,
+  };
 
   return (
     <div

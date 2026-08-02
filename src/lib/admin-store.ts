@@ -171,8 +171,8 @@ type AdminState = {
   deleteGame: (slug: string) => void;
   addCategory: (slug: string, cat: { id: string; name: string; icon: string }) => void;
   deleteCategory: (slug: string, catId: string) => void;
-  addItem: (slug: string, catId: string, item: { id: string; name: string; price: number; priceLabel: string; tag?: string; description?: string; requirement?: string }) => void;
-  updateItem: (slug: string, catId: string, itemId: string, item: Partial<{ id: string; name: string; price: number; priceLabel: string; tag?: string; description?: string; requirement?: string }>) => void;
+  addItem: (slug: string, catId: string, item: { id: string; name: string; price: number; priceLabel: string; tag?: string; difficulty?: "easy" | "medium" | "hard" | "expert"; description?: string; requirement?: string }) => void;
+  updateItem: (slug: string, catId: string, itemId: string, item: Partial<{ id: string; name: string; price: number; priceLabel: string; tag?: string; difficulty?: "easy" | "medium" | "hard" | "expert"; description?: string; requirement?: string }>) => void;
   deleteItem: (slug: string, catId: string, itemId: string) => void;
 
   /* announcement */

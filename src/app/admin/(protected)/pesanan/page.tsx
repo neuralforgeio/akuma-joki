@@ -85,14 +85,21 @@ export default function PesananPage() {
   };
 
   const handleWA = (group: OrderGroup) => {
+    // Send to CUSTOMER's WhatsApp (if provided), not admin
+    const customerWA = group.items[0]?.customerWA;
+    if (!customerWA) {
+      toast({ title: "Customer tidak punya nomor WA", description: "Minta customer untuk isi nomor WA saat checkout.", variant: "destructive" });
+      return;
+    }
     const msg = `Halo! Update order ${group.orderId}\n\nTotal Item: ${group.items.length}\n${group.items.map((i, idx) => `${idx + 1}. ${i.productName} (${i.gameName}) - ${i.status}`).join("\n")}`;
     const a = document.createElement("a");
-    a.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    a.href = `https://wa.me/${customerWA}?text=${encodeURIComponent(msg)}`;
     a.target = "_blank";
     a.rel = "noopener noreferrer";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    toast({ title: "Membuka WhatsApp customer...", description: `Ke: ${customerWA}` });
   };
 
   const copyOrderId = (id: string) => {
@@ -212,6 +219,9 @@ export default function PesananPage() {
                     {/* User info */}
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
                       <span>👤 <span className="text-zinc-300">{group.username}</span></span>
+                      {group.items[0]?.customerWA && (
+                        <span>📞 <span className="text-green-400">{group.items[0].customerWA}</span></span>
+                      )}
                     </div>
 
                     {/* Quick action buttons */}

@@ -34,7 +34,7 @@ export function PWAInstaller() {
       return;
     }
 
-    // Check dismissed (cookie, bukan localStorage — persist selamanya)
+    // Check dismissed (cookie, 7 days expiry — muncul max 1x per minggu)
     const dismissedCookie = document.cookie.match(new RegExp(`(?:^|; )${DISMISSED_KEY}=([^;]*)`));
     if (dismissedCookie) return;
 
@@ -58,9 +58,9 @@ export function PWAInstaller() {
 
   const handleDismiss = () => {
     setShowBanner(false);
-    // Pakai cookie (bukan localStorage) supaya tidak ke-reset saat clear cache
+    // Cookie 7 hari — muncul max 1x per minggu
     try {
-      const expires = new Date(Date.now() + 365 * 864e5).toUTCString();
+      const expires = new Date(Date.now() + 7 * 864e5).toUTCString();
       document.cookie = `${DISMISSED_KEY}=1; expires=${expires}; path=/; SameSite=Lax`;
     } catch { /* ignore */ }
     setDeferredPrompt(null);
@@ -74,7 +74,7 @@ export function PWAInstaller() {
       setInstalled(true);
     }
     setShowBanner(false);
-    // Juga set cookie supaya tidak muncul lagi setelah install
+    // Cookie 365 hari setelah install — tidak muncul lagi
     try {
       const expires = new Date(Date.now() + 365 * 864e5).toUTCString();
       document.cookie = `${DISMISSED_KEY}=1; expires=${expires}; path=/; SameSite=Lax`;

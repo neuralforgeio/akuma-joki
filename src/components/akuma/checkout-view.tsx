@@ -31,6 +31,7 @@ export function CheckoutView() {
   const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [customerWA, setCustomerWA] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [successModal, setSuccessModal] = useState<{ orderIds: string[] } | null>(null);
@@ -130,11 +131,11 @@ export function CheckoutView() {
     try {
       if (hasCart) {
         cartItems.forEach((item) => {
-          useAdminStore.getState().addOrder({ orderId, gameName: item.gameName, productName: item.productName, priceLabel: item.priceLabel, username: username.trim(), password: password.trim() });
+          useAdminStore.getState().addOrder({ orderId, gameName: item.gameName, productName: item.productName, priceLabel: item.priceLabel, username: username.trim(), password: password.trim(), customerWA: customerWA.trim() || undefined });
         });
         cartClear();
       } else if (order) {
-        useAdminStore.getState().addOrder({ orderId, gameName: order.gameName, productName: order.productName, priceLabel: order.priceLabel, username: username.trim(), password: password.trim() });
+        useAdminStore.getState().addOrder({ orderId, gameName: order.gameName, productName: order.productName, priceLabel: order.priceLabel, username: username.trim(), password: password.trim(), customerWA: customerWA.trim() || undefined });
       }
       clearOrder();
     } catch { /* ignore */ }
@@ -278,6 +279,26 @@ export function CheckoutView() {
                       onToggle: () => setShowPassword((v) => !v),
                     }}
                   />
+
+                  {/* Customer WA — for admin to send progress updates */}
+                  <div className="space-y-1.5">
+                    <label className="font-pixel text-[8px] uppercase tracking-wide text-[#9a93a8]">
+                      No. WhatsApp Kamu (untuk update progres)
+                    </label>
+                    <div className="relative">
+                      <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#9a93a8]" />
+                      <input
+                        type="tel"
+                        value={customerWA}
+                        onChange={(e) => setCustomerWA(e.target.value)}
+                        placeholder="628xxx (opsional, untuk update progres joki)"
+                        className="w-full bg-[#0a0a0a] border-2 border-[#2a2436] focus:border-[#a020f0] text-[#e5e5e5] pl-10 pr-3 py-2.5 text-sm pixel-corner outline-none"
+                      />
+                    </div>
+                    <p className="font-pixel text-[6px] uppercase text-[#5a5266]">
+                      Admin akan kirim update progres ke nomor ini via WhatsApp
+                    </p>
+                  </div>
 
                   {/* agreement */}
                   <label className="flex items-start gap-3 cursor-pointer group">
@@ -671,7 +692,10 @@ function EmptyOrder({ orderHistory, removeHistoryItem, copyOrderIdWithToast, onR
           </div>
           <p className="text-[11px] text-zinc-500 mb-3">{t("checkout.historyDesc")}</p>
           <div className="space-y-2 max-h-48 overflow-y-auto akuma-scroll">
-            {orderHistory.map((h) => (
+            {orderHistory.map((h) => {
+              const allOrders = useAdminStore.getState().orders.filter(o => o.orderId === h.orderId);
+              const allDone = allOrders.length > 0 && allOrders.every(o => o.status === "done");
+              return (
               <div key={h.orderId} className="glass rounded-xl p-2.5 flex items-center gap-3">
                 <button
                   onClick={() => copyOrderIdWithToast(h.orderId)}
@@ -679,6 +703,11 @@ function EmptyOrder({ orderHistory, removeHistoryItem, copyOrderIdWithToast, onR
                 >
                   <span className="font-mono text-sm font-bold text-violet-400 tracking-wider group-hover:underline">{h.orderId}</span>
                   <span className="text-[10px] text-zinc-600">· {h.items} {t("common.item")} · {new Date(h.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}</span>
+                  {allDone && (
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-green-500/15 border border-green-500/30 px-1.5 py-0.5 text-[8px] font-bold text-green-400 uppercase tracking-wider">
+                      ✓ Success
+                    </span>
+                  )}
                 </button>
                 {/* Quick Reorder (Feature 3) */}
                 {h.snapshot && h.snapshot.length > 0 && (
@@ -704,7 +733,8 @@ function EmptyOrder({ orderHistory, removeHistoryItem, copyOrderIdWithToast, onR
                   <Trash2 className="size-3.5" />
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

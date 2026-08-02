@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ShieldCheck, Zap, Wallet, ChevronDown, Flame, Gamepad2, Trophy, Star, ArrowRight, Headphones, Clock } from "lucide-react";
-import { GAMES as DEFAULT_GAMES } from "@/lib/games-data";
+import { GAMES as DEFAULT_GAMES, DEFAULT_ABOUT } from "@/lib/games-data";
 import type { Game } from "@/lib/games-data";
 import { useAdminStore } from "@/lib/admin-store";
 import { useReviews } from "@/lib/reviews";
@@ -56,8 +56,11 @@ const TESTIMONIALS = [
 export function HomeView() {
   const gamesRef = useRef<HTMLDivElement>(null);
   const adminGames = useAdminStore((s) => s.games);
+  const about = useAdminStore((s) => s.about);
   const hydrated = useAdminStore((s) => s._hasHydrated);
   const games: Game[] = hydrated && adminGames.length > 0 ? adminGames : DEFAULT_GAMES;
+  // Use about stats (single source of truth — editable from dashboard)
+  const homeStats = hydrated && about ? about.stats : DEFAULT_ABOUT.stats;
   const t = useI18n((s) => s.t);
   // Subscribe to lang so this component re-renders when language changes
   // (the t function reference is stable and won't trigger re-render by itself)
@@ -98,14 +101,10 @@ export function HomeView() {
               </PixelButton>
             </div>
 
-            {/* Stats */}
+            {/* Stats — from About page (single source of truth) */}
             <div className="mt-10 flex flex-wrap gap-6 sm:gap-10">
-              {[
-                { value: "1.2K+", label: t("home.statsOrders") },
-                { value: "24/7", label: t("home.statsSupport") },
-                { value: "100%", label: t("home.statsSafe") },
-              ].map((s) => (
-                <div key={s.label}>
+              {homeStats.map((s) => (
+                <div key={s.id}>
                   <p className="text-2xl sm:text-3xl font-bold text-gradient">{s.value}</p>
                   <p className="text-xs text-zinc-500 mt-0.5">{s.label}</p>
                 </div>

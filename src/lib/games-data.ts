@@ -11,6 +11,7 @@ export type ProductItem = {
   price: number; // in thousands (K) of in-game currency — displayed as "{price}K"
   priceLabel: string;
   tag?: string;
+  difficulty?: "easy" | "medium" | "hard" | "expert";
   /** Short flavor / explanation of what this joki item is. */
   description?: string;
   /** Requirement that must be met before this joki can be done (e.g. "Level 2300 - MAX"). */
