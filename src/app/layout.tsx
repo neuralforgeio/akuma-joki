@@ -7,7 +7,6 @@ import { VisitorTracker } from "@/components/admin/visitor-tracker";
 import { NetworkStatus } from "@/components/akuma/network-status";
 import { ClientFloatingComponents } from "@/components/akuma/client-floating";
 import { ConfirmModal } from "@/components/akuma/confirm-modal";
-import { LanguageHydrationGate } from "@/components/akuma/language-hydration-gate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,7 +69,6 @@ export default function RootLayout({
         <NetworkStatus />
         <AnnouncementBanner />
         <VisitorTracker />
-        <LanguageHydrationGate />
         {children}
         {/* Non-critical floating components: deferred load (3s atau user interact) */}
         <ClientFloatingComponents />

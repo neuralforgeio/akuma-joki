@@ -564,9 +564,6 @@ export const useI18n = create<I18nState>()(
     }),
     {
       name: "akuma-lang",
-      // Skip automatic hydration so the first client render matches SSR (lang="id").
-      // Hydration is triggered manually in <LanguageHydrationGate /> after mount.
-      skipHydration: true,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
