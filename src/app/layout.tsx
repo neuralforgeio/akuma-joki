@@ -21,33 +21,7 @@ const pixelFont = Press_Start_2P({
 
 export const metadata: Metadata = {
   title: "AKUMA JOKI — Joki & Store Roblox Terpercaya",
-  description:
-    "AKUMA JOKI: Joki & Store Roblox untuk Blox Fruits, Expedition Antarctica, dan Retail Tycoon 2. Aman, cepat, harga bersahabat.",
-  keywords: [
-    "AKUMA JOKI",
-    "Joki Roblox",
-    "Blox Fruits Joki",
-    "Expedition Antarctica",
-    "Retail Tycoon 2",
-    "Joki Murah",
-  ],
-  authors: [{ name: "AKUMA JOKI" }],
-  icons: {
-    icon: "/akuma-logo.png",
-    apple: "/akuma-logo.png",
-  },
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "AKUMA JOKI",
-  },
-  openGraph: {
-    title: "AKUMA JOKI — Joki & Store Roblox",
-    description: "Joki Roblox aman, cepat, harga bersahabat.",
-    siteName: "AKUMA JOKI",
-    type: "website",
-  },
+  description: "AKUMA JOKI: Joki & Store Roblox untuk Blox Fruits, Expedition Antarctica, dan Retail Tycoon 2.",
 };
 
 export const viewport = {
@@ -56,21 +30,14 @@ export const viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="id" suppressHydrationWarning className="dark">
-      <body
-        className={`${geistSans.variable} ${pixelFont.variable} font-sans antialiased bg-background text-foreground`}
-      >
+      <body className={`${geistSans.variable} ${pixelFont.variable} font-sans antialiased bg-background text-foreground`}>
         <NetworkStatus />
         <AnnouncementBanner />
         <VisitorTracker />
         {children}
-        {/* Non-critical floating components: deferred load (3s atau user interact) */}
         <ClientFloatingComponents />
         <ConfirmModal />
         <Toaster />
