@@ -1,43 +1,27 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "@/components/akuma/navbar";
 import { Footer } from "@/components/akuma/footer";
-import { DeferredLoader } from "@/components/akuma/deferred-loader";
-import { useAutoSync } from "@/lib/use-auto-sync";
+import { AutoSyncClient } from "@/components/akuma/auto-sync-client";
+import { FloatingComponents } from "@/components/akuma/floating-components";
 
-const BackToTop = dynamic(() => import("@/components/akuma/back-to-top").then(m => ({ default: m.BackToTop })), { ssr: false, loading: () => null });
-const KeyboardShortcutsHint = dynamic(() => import("@/components/akuma/keyboard-shortcuts").then(m => ({ default: m.KeyboardShortcutsHint })), { ssr: false, loading: () => null });
-const PushNotificationOptIn = dynamic(() => import("@/components/akuma/push-notif-opt-in").then(m => ({ default: m.PushNotificationOptIn })), { ssr: false, loading: () => null });
-const PWAInstaller = dynamic(() => import("@/components/akuma/pwa-installer").then(m => ({ default: m.PWAInstaller })), { ssr: false, loading: () => null });
-const AchievementToast = dynamic(() => import("@/components/akuma/achievement-toast").then(m => ({ default: m.AchievementToast })), { ssr: false, loading: () => null });
-const PriceCalculator = dynamic(() => import("@/components/akuma/price-calculator").then(m => ({ default: m.PriceCalculator })), { ssr: false, loading: () => null });
-
-export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  useAutoSync();
-
+/**
+ * MainLayout — Server Component (no "use client")
+ * Wraps all normal routes with Navbar + Footer.
+ * Client logic (useAutoSync, AnimatePresence) moved to separate client components.
+ */
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="relative flex min-h-screen flex-col bg-[#0a0a0a]">
       <Navbar />
+      <AutoSyncClient />
       <main className="relative flex-1">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22, ease: "easeOut" }}>
-            {children}
-          </motion.div>
-        </AnimatePresence>
+        {children}
       </main>
       <Footer />
-      <DeferredLoader delay={2000}>
-        <BackToTop />
-        <KeyboardShortcutsHint />
-        <PushNotificationOptIn />
-        <PWAInstaller />
-        <AchievementToast />
-        <PriceCalculator />
-      </DeferredLoader>
+      <FloatingComponents />
     </div>
   );
 }

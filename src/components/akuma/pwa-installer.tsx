@@ -4,44 +4,55 @@ import { useState, useEffect } from "react";
 import { Download, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-/**
- * PWAInstaller — register service worker + tampilkan install prompt.
- *
- * - Register /sw.js saat mount
- * - Listen beforeinstallprompt event
- * - Tampilkan install banner setelah 5s jika eligible
- * - Simpan dismissed flag ke localStorage
- */
 const DISMISSED_KEY = "akuma-pwa-install-dismissed";
 
+/**
+ * PWAInstaller — unregister old service workers + show install prompt.
+ *
+ * IMPORTANT: We removed the service worker (sw.js) because it was caching
+ * broken pages. This component now UNREGISTERS any existing service workers
+ * to self-heal devices that have the old sw.js cached.
+ */
 export function PWAInstaller() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
-    // Register service worker
+    // === SELF-HEALING: Unregister ALL existing service workers ===
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {
-        // Silent fail — SW registration optional
-      });
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+          registration.unregister();
+          console.log("[PWA] Unregistered old service worker:", registration.scope);
+        });
+      }).catch(() => {});
+
+      // Also clear all caches
+      if ("caches" in window) {
+        caches.keys().then((cacheNames) => {
+          cacheNames.forEach((cacheName) => {
+            caches.delete(cacheName);
+            console.log("[PWA] Deleted cache:", cacheName);
+          });
+        }).catch(() => {});
+      }
     }
 
-    // Check if already installed (standalone mode)
+    // Check if already installed
     if (window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setInstalled(true);
       return;
     }
 
-    // Check dismissed (cookie, 7 days expiry — muncul max 1x per minggu)
+    // Check dismissed (cookie, 7 days)
     const dismissedCookie = document.cookie.match(new RegExp(`(?:^|; )${DISMISSED_KEY}=([^;]*)`));
     if (dismissedCookie) return;
 
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // Show banner after 5s
       setTimeout(() => setShowBanner(true), 5000);
     };
 
@@ -58,7 +69,6 @@ export function PWAInstaller() {
 
   const handleDismiss = () => {
     setShowBanner(false);
-    // Cookie 7 hari — muncul max 1x per minggu
     try {
       const expires = new Date(Date.now() + 7 * 864e5).toUTCString();
       document.cookie = `${DISMISSED_KEY}=1; expires=${expires}; path=/; SameSite=Lax`;
@@ -74,7 +84,6 @@ export function PWAInstaller() {
       setInstalled(true);
     }
     setShowBanner(false);
-    // Cookie 365 hari setelah install — tidak muncul lagi
     try {
       const expires = new Date(Date.now() + 365 * 864e5).toUTCString();
       document.cookie = `${DISMISSED_KEY}=1; expires=${expires}; path=/; SameSite=Lax`;
